@@ -72,6 +72,8 @@ class GRPOScriptArguments(ScriptArguments):
 
 #     return rewards
 
+def accuracy_reward(completions, solution, **kwargs):
+    return [0.0 for _ in completions]
 
 def format_reward(completions, **kwargs):
     """Reward function that checks if the completion has a specific format."""
@@ -82,7 +84,7 @@ def format_reward(completions, **kwargs):
 
 
 reward_funcs_registry = {
-    "accuracy": lambda x: 0.,
+    "accuracy": accuracy_reward,
     "format": format_reward,
 }
 
@@ -99,14 +101,13 @@ def main(script_args, training_args, model_args):
     reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
 
     # Load the dataset
-    # dataset = ChemDataset()
     dataset = CustomDatasetLoader(
         root_dir="data/USPTO",
         src_train_file="src-train.txt",
         tgt_train_file="tgt-train.txt",
         src_test_file="src-test.txt",
         tgt_test_file="tgt-test.txt",
-    )
+    ).load()
 
     # Format into conversation
     def make_conversation(example):
