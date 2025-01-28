@@ -15,10 +15,7 @@
 import re
 from dataclasses import dataclass, field
 
-from datasets import load_dataset
-
-from latex2sympy2_extended import NormalizationConfig
-from math_verify import LatexExtractionConfig, parse, verify
+from dataset import CustomDatasetLoader
 from trl import GRPOConfig, GRPOTrainer, ModelConfig, ScriptArguments, TrlParser, get_peft_config
 
 
@@ -38,42 +35,42 @@ class GRPOScriptArguments(ScriptArguments):
     )
 
 
-def accuracy_reward(completions, solution, **kwargs):
-    """Reward function that checks if the completion is the same as the ground truth."""
-    contents = [completion[0]["content"] for completion in completions]
-    rewards = []
-    for content, sol in zip(contents, solution):
-        gold_parsed = parse(sol, extraction_mode="first_match", extraction_config=[LatexExtractionConfig()])
-        if len(gold_parsed) != 0:
-            # We require the answer to be provided in correct latex (no malformed operators)
-            answer_parsed = parse(
-                content,
-                extraction_config=[
-                    LatexExtractionConfig(
-                        normalization_config=NormalizationConfig(
-                            nits=False,
-                            malformed_operators=False,
-                            basic_latex=True,
-                            equations=True,
-                            boxed=True,
-                            units=True,
-                        ),
-                        # Ensures that boxed is tried first
-                        boxed_match_priority=0,
-                        try_extract_without_anchor=False,
-                    )
-                ],
-                extraction_mode="first_match",
-            )
-            # Reward 1 if the content is the same as the ground truth, 0 otherwise
-            reward = float(verify(answer_parsed, gold_parsed))
-        else:
-            # If the gold solution is not parseable, we reward 1 to skip this example
-            reward = 1.0
-            print("Failed to parse gold solution: ", sol)
-        rewards.append(reward)
+# def accuracy_reward(completions, solution, **kwargs):
+#     """Reward function that checks if the completion is the same as the ground truth."""
+#     contents = [completion[0]["content"] for completion in completions]
+#     rewards = []
+#     for content, sol in zip(contents, solution):
+#         gold_parsed = parse(sol, extraction_mode="first_match", extraction_config=[LatexExtractionConfig()])
+#         if len(gold_parsed) != 0:
+#             # We require the answer to be provided in correct latex (no malformed operators)
+#             answer_parsed = parse(
+#                 content,
+#                 extraction_config=[
+#                     LatexExtractionConfig(
+#                         normalization_config=NormalizationConfig(
+#                             nits=False,
+#                             malformed_operators=False,
+#                             basic_latex=True,
+#                             equations=True,
+#                             boxed=True,
+#                             units=True,
+#                         ),
+#                         # Ensures that boxed is tried first
+#                         boxed_match_priority=0,
+#                         try_extract_without_anchor=False,
+#                     )
+#                 ],
+#                 extraction_mode="first_match",
+#             )
+#             # Reward 1 if the content is the same as the ground truth, 0 otherwise
+#             reward = float(verify(answer_parsed, gold_parsed))
+#         else:
+#             # If the gold solution is not parseable, we reward 1 to skip this example
+#             reward = 1.0
+#             print("Failed to parse gold solution: ", sol)
+#         rewards.append(reward)
 
-    return rewards
+#     return rewards
 
 
 def format_reward(completions, **kwargs):
@@ -85,7 +82,7 @@ def format_reward(completions, **kwargs):
 
 
 reward_funcs_registry = {
-    "accuracy": accuracy_reward,
+    "accuracy": lambda x: 0.,
     "format": format_reward,
 }
 
@@ -102,7 +99,14 @@ def main(script_args, training_args, model_args):
     reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
 
     # Load the dataset
-    dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    # dataset = ChemDataset()
+    dataset = CustomDatasetLoader(
+        root_dir="data/USPTO",
+        src_train_file="src-train.txt",
+        tgt_train_file="tgt-train.txt",
+        src_test_file="src-test.txt",
+        tgt_test_file="tgt-test.txt",
+    )
 
     # Format into conversation
     def make_conversation(example):

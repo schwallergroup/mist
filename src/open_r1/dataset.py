@@ -3,63 +3,104 @@ import os
 from datasets import Dataset
 from typing import Dict
 
-class ChemDataset(Dataset):
-    def __init__(self, root: str, src_file: str, tgt_file: str):
-        """
-        Initialize the dataset with source and target file paths
-        
-        Args:
-            src_file (str): Path to source text file
-            tgt_file (str): Path to target text file
-        """
-        src_file = os.path.join(root, src_file)
-        tgt_file = os.path.join(root, tgt_file)
 
-        # Read the files
+from datasets import Dataset, DatasetDict
+from typing import Dict, Optional, List
+import json
+import random
+
+class CustomDatasetLoader:
+    def __init__(
+        self,
+        root_dir: str,
+        src_train_file: str,
+        tgt_train_file: str,
+        src_test_file: Optional[str] = None,
+        tgt_test_file: Optional[str] = None,
+        cache_dir: Optional[str] = None
+    ):
+        self.root_dir = root_dir
+
+        self.src_train_file = os.path.join(root_dir, src_train_file)
+        self.tgt_train_file = os.path.join(root_dir, tgt_train_file)
+        self.src_test_file = os.path.join(root_dir, src_test_file) if src_test_file else None
+        self.tgt_test_file = os.path.join(root_dir, tgt_test_file) if tgt_test_file else None
+        self.cache_dir = cache_dir
+        
+    def read_files(self, src_file: str, tgt_file: str) -> Dict:
+        """Read source and target files and create dataset dictionary."""
         with open(src_file, 'r', encoding='utf-8') as f:
-            src_texts = [line.strip() for line in f.readlines()]
+            problems = [line.strip() for line in f.readlines()]
             
         with open(tgt_file, 'r', encoding='utf-8') as f:
-            tgt_texts = [line.strip() for line in f.readlines()]
+            solutions = [line.strip() for line in f.readlines()]
             
-        # Create dictionary of features
-        self.examples = {
-            'source': src_texts,
-            'target': tgt_texts
-        }
+        # Create empty messages list for each example
+        messages = [[] for _ in range(len(problems))]
         
-        # Convert to HuggingFace Dataset
-        self.dataset = Dataset.from_dict(self.examples)
+        return {
+            'problem': problems,
+            'solution': solutions,
+            'messages': messages
+        }
     
-    def __len__(self) -> int:
-        return len(self.dataset)
+    def add_messages(self, dataset: Dataset, messages: List[List[str]]) -> Dataset:
+        """Add messages to the dataset."""
+        assert len(messages) == len(dataset), "Messages length must match dataset length"
+        dataset = dataset.add_column('messages', messages)
+        return dataset
     
-    def __getitem__(self, idx) -> Dict[str, str]:
-        return self.dataset[idx]
+    def load(self) -> DatasetDict:
+        """Load and return the complete dataset."""
+        # Load training data
+        train_dict = self.read_files(self.src_train_file, self.tgt_train_file)
+        train_dataset = Dataset.from_dict(train_dict)
+        
+        # Load or create test data
+        if self.src_test_file and self.tgt_test_file:
+            test_dict = self.read_files(self.src_test_file, self.tgt_test_file)
+            test_dataset = Dataset.from_dict(test_dict)
+        else:
+            # Create test split from training data
+            train_test_split = train_dataset.train_test_split(test_size=0.001)
+            train_dataset = train_test_split['train']
+            test_dataset = train_test_split['test']
+        
+        # Combine into DatasetDict
+        dataset_dict = DatasetDict({
+            'train': train_dataset,
+            'test': test_dataset
+        })
+        
+        return dataset_dict
+    
+    def save_to_disk(self, dataset: DatasetDict, output_dir: str):
+        """Save dataset to disk."""
+        dataset.save_to_disk(output_dir)
+    
+    @staticmethod
+    def load_from_disk(input_dir: str) -> DatasetDict:
+        """Load dataset from disk."""
+        return DatasetDict.load_from_disk(input_dir)
 
 # Usage example:
 if __name__ == "__main__":
-    # Create dataset
-    fpath = "data/USPTO"
-    dataset = ChemDataset(
-        root=fpath,
-        src_file='src-train.txt',
-        tgt_file='tgt-train.txt'
+    # Initialize loader
+    loader = CustomDatasetLoader(
+        src_train_file='src-train.txt',
+        tgt_train_file='tgt-train.txt',
+        src_test_file='src-test.txt',
+        tgt_test_file='tgt-test.txt'
     )
     
-    from torch.utils.data import DataLoader
-    from accelerate import Accelerator
+    # Load dataset
+    dataset = loader.load()
     
-    dataloader = DataLoader(
-        dataset,
-        batch_size=16,
-        shuffle=True
-    )
+    # Print structure
+    print(dataset)
     
-    accelerator = Accelerator()
-    dataloader = accelerator.prepare(dataloader)
-
-    for batch in dataloader:
-        print(batch)
-        break
+    # Save to disk
+    loader.save_to_disk(dataset, 'path/to/save')
     
+    # Load from disk
+    loaded_dataset = CustomDatasetLoader.load_from_disk('path/to/save')
