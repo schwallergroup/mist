@@ -21,7 +21,7 @@ class ForwardReactionDataset(CustomDatasetLoader):
             problems = [self.question_template.format(self.process_line(line)) for line in f.readlines()]
             
         with open(tgt_file, 'r', encoding='utf-8') as f:
-            solutions = [self.process_line(line) for line in f.readlines()]
+            solutions = ["[BEGIN_SMILES] "+self.process_line(line)+" [END_SMILES]" for line in f.readlines()]
             
         # Create empty messages list for each example
         messages = [[] for _ in range(len(problems))]
