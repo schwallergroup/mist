@@ -14,8 +14,9 @@
 
 import re
 from dataclasses import dataclass, field
+from rdkit import Chem
 
-from dataset import CustomDatasetLoader
+from dataset import ForwardReactionDataset
 from trl import GRPOConfig, GRPOTrainer, ModelConfig, ScriptArguments, TrlParser, get_peft_config
 
 
@@ -72,8 +73,40 @@ class GRPOScriptArguments(ScriptArguments):
 
 #     return rewards
 
+def preprocess_response(response):
+    """Preprocess the response before checking for accuracy."""
+    pattern = r"<answer>.*?</answer>"
+    if re.match(pattern, response):
+        smi = response.split("<answer>")[1].split("</answer>")[0]
+        return smi
+    else:
+        return ""
+
 def accuracy_reward(completions, solution, **kwargs):
-    return [0.0 for _ in completions]
+    """Reward function - chack that completion is same as ground truth."""
+
+    contents = [completion[0]["content"] for completion in completions]
+    answers = [preprocess_response(c) for c in contents]
+
+    rewards = []
+    for content, sol in zip(answers, solution):
+        try:
+            gold_mol = Chem.MolToSmiles(Chem.MolFromSmiles(sol))
+        except:
+            # invalid smiles
+            rewards.append(0)
+            continue
+        try:
+            completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
+        except:
+            # invalid smiles
+            rewards.append(-1) # penalize if invalid smiles
+            continue
+        if gold_mol == completion_mol:
+            rewards.append(1)  # reward if correct
+        else:
+            rewards.append(0) # no reward if incorrect
+    return rewards
 
 def format_reward(completions, **kwargs):
     """Reward function that checks if the completion has a specific format."""
@@ -101,7 +134,7 @@ def main(script_args, training_args, model_args):
     reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
 
     # Load the dataset
-    dataset = CustomDatasetLoader(
+    dataset = ForwardReactionDataset(
         root_dir="data/USPTO",
         src_train_file="src-train.txt",
         tgt_train_file="tgt-train.txt",
