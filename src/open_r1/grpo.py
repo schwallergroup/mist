@@ -68,7 +68,7 @@ def accuracy_reward(completions, solution, **kwargs):
         if gold_mol == completion_mol:
             rewards.append(1)  # reward if correct
         else:
-            rewards.append(0) # no reward if incorrect
+            rewards.append(-0.5) # no reward if incorrect
     return rewards
 
 def format_reward(completions, **kwargs):
