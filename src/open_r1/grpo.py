@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import re
+import wandb
 from dataclasses import dataclass, field
 from rdkit import Chem
 
@@ -92,6 +93,16 @@ SYSTEM_PROMPT = (
 
 
 def main(script_args, training_args, model_args):
+
+    wandb.init(
+        project="GRPO",
+        name=training_args.run_name,  # If you defined run_name in config
+        config={
+            **script_args.__dict__,
+            **model_args.__dict__,
+        }
+    )
+
     # Get reward functions
     reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
 
@@ -133,6 +144,8 @@ def main(script_args, training_args, model_args):
     trainer.save_model(training_args.output_dir)
     if training_args.push_to_hub:
         trainer.push_to_hub(dataset_name=script_args.dataset_name)
+
+    wandb.finish()
 
 
 if __name__ == "__main__":
