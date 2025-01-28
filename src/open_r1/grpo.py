@@ -57,7 +57,7 @@ def accuracy_reward(completions, solution, **kwargs):
             gold_mol = Chem.MolToSmiles(Chem.MolFromSmiles(sol))
         except:
             # invalid smiles
-            rewards.append(0)
+            rewards.append(-1)
             continue
         try:
             completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
