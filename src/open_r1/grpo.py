@@ -41,6 +41,12 @@ def preprocess_response(response):
     pattern = r"<answer>.*?</answer>"
     if re.match(pattern, response):
         smi = response.split("<answer>")[1].split("</answer>")[0]
+
+        # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
+        if "[BEGIN_SMILES]" in smi:
+            smi = smi.replace("[BEGIN_SMILES]", "")
+        if "[END_SMILES]" in smi:
+            smi = smi.replace("[END_SMILES]", "")
         return smi
     else:
         return ""
