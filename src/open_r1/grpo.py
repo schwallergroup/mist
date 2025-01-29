@@ -109,14 +109,21 @@ SYSTEM_PROMPT = (
 
 def main(script_args, training_args, model_args):
 
-    wandb.init(
-        project="GRPO",
-        name=training_args.run_name,  # If you defined run_name in config
-        config={
-            **script_args.__dict__,
-            **model_args.__dict__,
-        }
-    )
+    # Initialize accelerator
+    from accelerate import Accelerator
+    accelerator = Accelerator()
+
+    # Only initialize wandb on the main process
+    if accelerator.is_main_process:
+        wandb.init(
+            project="GRPO",
+            name=training_args.run_name,  # If you defined run_name in config
+            config={
+                **script_args.__dict__,
+                **model_args.__dict__,
+            }
+        )
+    accelerator.wait_for_everyone()
 
     # Get reward functions
     reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
@@ -142,6 +149,7 @@ def main(script_args, training_args, model_args):
     dataset = dataset.map(make_conversation)
     dataset = dataset.remove_columns("messages")
 
+
     # Initialize the GRPO trainer
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
@@ -160,7 +168,12 @@ def main(script_args, training_args, model_args):
     if training_args.push_to_hub:
         trainer.push_to_hub(dataset_name=script_args.dataset_name)
 
-    wandb.finish()
+    # Only finish wandb on the main process
+    if accelerator.is_main_process:
+        wandb.finish()
+
+    # Wait for all processes to finish
+    accelerator.wait_for_everyone()
 
 
 if __name__ == "__main__":
