@@ -17,6 +17,15 @@ import wandb
 from dataclasses import dataclass, field
 from rdkit import Chem
 
+# Method 1: Using warnings module
+import warnings
+warnings.filterwarnings('ignore')
+
+# Method 2: Specifically for RDKit warnings
+from rdkit import RDLogger
+RDLogger.DisableLog('rdApp.*')
+
+
 from dataset import ForwardReactionDataset
 from trl import GRPOConfig, GRPOTrainer, ModelConfig, ScriptArguments, TrlParser, get_peft_config
 
