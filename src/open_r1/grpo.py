@@ -49,6 +49,7 @@ def preprocess_response(response):
     """Preprocess the response before checking for accuracy."""
     pattern = r"<answer>.*?</answer>"
     if re.match(pattern, response):
+        print(response)
         smi = response.split("<answer>")[1].split("</answer>")[0]
 
         # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
@@ -56,9 +57,9 @@ def preprocess_response(response):
             smi = smi.replace("[BEGIN_SMILES]", "")
         if "[END_SMILES]" in smi:
             smi = smi.replace("[END_SMILES]", "")
-        return smi
+        return smi.strip()
     else:
-        return ""
+        return "No answer"
 
 def accuracy_reward(completions, solution, **kwargs):
     """Reward function - chack that completion is same as ground truth."""
@@ -68,22 +69,26 @@ def accuracy_reward(completions, solution, **kwargs):
 
     rewards = []
     for content, sol in zip(answers, solution):
+        if content == "No answer":
+            rewards.append(-1)
+            continue
         try:
             gold_mol = Chem.MolToSmiles(Chem.MolFromSmiles(sol))
         except:
             # invalid smiles
+            print(f"GT SMILES WRONG: {sol}")
             rewards.append(-1)
             continue
         try:
             completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
         except:
-            # invalid smiles
-            rewards.append(-1) # penalize if invalid smiles
+            print(f"INVALID GEN SMILES: {content}")
+            rewards.append(-0.7) # penalize if invalid smiles
             continue
         if gold_mol == completion_mol:
             rewards.append(1)  # reward if correct
         else:
-            rewards.append(-0.5) # no reward if incorrect
+            rewards.append(-0.5) # no reward if incorrect (but at least valid smiles)
     return rewards
 
 def format_reward(completions, **kwargs):
@@ -103,12 +108,14 @@ SYSTEM_PROMPT = (
     "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
     "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
     "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
-    "<think> reasoning process here </think><answer> answer here </answer>"
+    "<think> reasoning process here </think><answer> answer here </answer>."
 )
 
 
 def main(script_args, training_args, model_args):
-    training_args.use_vllm = True
+    #training_args.use_vllm = True
+    #training_args.vllm_device="cuda:3"
+    #training_args.vllm_gpu_memory_utilization=0.7
 
     # Only initialize wandb on the main process
 
@@ -150,11 +157,12 @@ def main(script_args, training_args, model_args):
 
     if accelerator.is_main_process:
         wandb.init(
-            project="GRPO",
+            project="GRPO-rxnpred",
             name=training_args.run_name,  # If you defined run_name in config
             config={
                 **script_args.__dict__,
                 **model_args.__dict__,
+                "system_prompt":SYSTEM_PROMPT,
             }
         )
     accelerator.wait_for_everyone()
