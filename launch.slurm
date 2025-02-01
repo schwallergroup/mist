@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=chem-grpo
-#SBATCH --time=21:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1
 #SBATCH --exclusive
@@ -15,8 +15,8 @@ echo "START TIME: $(date)"
 echo "PYTHON ENV: $(which python)"
 
 # Training setup
-NUM_NODES=$SLURM_NNODES
 GPUS_PER_NODE=4
+NUM_NODES=$SLURM_NNODES
 WORLD_SIZE=$(($NUM_NODES*$GPUS_PER_NODE))
 
 # so processes know who to talk to

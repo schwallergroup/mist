@@ -8,7 +8,7 @@ class ForwardReactionDataset(CustomDatasetLoader):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = "What is the product of the following reaction? {}"
+        self.question_template = "What is the product of the following reaction? {} Answer with a molecule in SMILES format."
 
     def process_line(self, line: str) -> str:
         """Process a line from the source file."""

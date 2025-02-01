@@ -66,6 +66,8 @@ def main(script_args, training_args, model_args):
                 **script_args.__dict__,
                 **model_args.__dict__,
                 "system_prompt": system_prompt,
+                "question_template": task.question_template,
+
             }
         )
     accelerator.wait_for_everyone()
