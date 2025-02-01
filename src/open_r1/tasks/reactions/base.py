@@ -1,13 +1,15 @@
 
 import os
 from typing import Dict
+import re
 
 from datasets import Dataset, DatasetDict
 from typing import Dict, Optional, List
 import json
 import random
 
-class CustomDatasetLoader:
+class CustomTask:
+    """Base class for custom tasks."""
     def __init__(
         self,
         root_dir: str,
@@ -25,6 +27,17 @@ class CustomDatasetLoader:
         self.tgt_test_file = os.path.join(root_dir, tgt_test_file) if tgt_test_file else None
         self.cache_dir = cache_dir
         
+    def accuracy_reward(self, completions, solution, **kwargs):
+        """Define accuracy reward function for the specific dataset."""
+        pass
+
+    def format_reward(self, completions, **kwargs):
+        """Reward function that checks if the completion has a specific format."""
+        pattern = r"^<think>.*?</think><answer>.*?</answer>$"
+        completion_contents = [completion[0]["content"] for completion in completions]
+        matches = [re.match(pattern, content) for content in completion_contents]
+        return [1.0 if match else 0.0 for match in matches]
+
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
         with open(src_file, 'r', encoding='utf-8') as f:
@@ -84,7 +97,7 @@ class CustomDatasetLoader:
 # Usage example:
 if __name__ == "__main__":
     # Initialize loader
-    loader = CustomDatasetLoader(
+    loader = CustomTask(
         src_train_file='src-train.txt',
         tgt_train_file='tgt-train.txt',
         src_test_file='src-test.txt',
