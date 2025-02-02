@@ -4,7 +4,7 @@ torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 bf16: true
 tf32: true
-output_dir: runs/qwen-2.5-1.5b-r1-countdown
+output_dir: /cache/runs/qwen-2.5-1.5b-r1-countdown
 
 # Dataset arguments
 dataset_id_or_path: Jiayi-Pan/Countdown-Tasks-3to4
@@ -36,6 +36,7 @@ logging_strategy: steps
 logging_steps: 2
 report_to:
 - wandb
+
 save_strategy: "steps"
 save_steps: 25
 seed: 42

@@ -1,10 +1,16 @@
 #!/bin/bash
+#SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
+#SBATCH --time=24:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out # Adjust this for your cluster
 #SBATCH --err=./logs/%x-%j.err    # Adjust this for your cluster
 #SBATCH --environment=vllm071
+
+
+# Run like:
+# sbatch launch.slurm recipes/grpo.yaml
 
 set -x -e
 
@@ -24,8 +30,9 @@ MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
 MODEL=/cache/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796
-MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323/
-MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
+MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323
+MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
+#MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 
 export HF_HOME=/cache/huggingface
 
@@ -43,12 +50,13 @@ export CUDA_LAUNCH_BLOCKING=1
 
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
-    --model_name_or_path=$MODEL
+    --model_name_or_path=$MODEL \
+    --run_name grpo-${SLURM_JOB_ID} \
     "
 
 export LAUNCHER="conda deactivate;
 pip install hf_transfer;
-cd /users/amarulan/Documents/deep-learning-pytorch-huggingface/sink/;
+cd /Documents/sink/;
 WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c \
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
