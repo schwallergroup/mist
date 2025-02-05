@@ -54,7 +54,7 @@ def format_reward_func(completions, target, **kwargs):
     rewards = []
 
     for completion, gt in zip(completions, target):
-
+        completion = "<think>" + completion
         try:
             if random.random() < 0.1:  # 1% chance to write samples into a file
                 os.makedirs("completion_samples", exist_ok=True)
@@ -65,12 +65,11 @@ def format_reward_func(completions, target, **kwargs):
         
             # Check if the format is correct
             # regex = r"^<think>([^<]*(?:<(?!/?think>)[^<]*)*)<\/think>\n<answer>([\s\S]*?)<\/answer>$"
-            regex = r"<think>.*<\/think>.*<answer>.*<\/answer>"
-            regex = r"<think>(.*)<\/think><answer>(.*)<\/answer>"
+            regex = r"<think>(.*)<\/think>\n?<answer>(.*)<\/answer>"
 
             match = re.search(regex, completion, re.DOTALL) 
             # if the format is not correct, reward is 0
-            if match is None or len(match.groups()) != 2:  # this aint matching! TODO
+            if match is None or len(match.groups()) != 2:
                 rewards.append(0.0)
             else:
                 rewards.append(1.0)
