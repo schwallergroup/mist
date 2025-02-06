@@ -88,18 +88,15 @@ def grpo_function(
     #####################
 
     # This works for instruct models. Change for Base TODO
+
+    system_prompt = (
+        "You are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer."
+    )
     def generate_r1_prompt(numbers, target):
-        r1_prefix = [{
-            "role": "system",
-            "content": "You are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer."
-          },
+        r1_prefix = [{"role": "system", "content": system_prompt},
           { 
             "role": "user",
             "content": f"Using the numbers {numbers}, create an equation that equals {target}. You can use basic arithmetic operations (+, -, *, /) one or multiple times but each number can only be used once. Show your work in <think> </think> tags. And return the final equation in <answer> </answer> tags, for example <answer> (1 + 2) / 3 </answer>. Think step by step inside <think> tags."
-          },
-          {
-            "role": "assistant",
-            "content": "Let me solve this step by step.\n<think>"
           }]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "target": target, "nums": numbers}
 
@@ -117,12 +114,12 @@ def grpo_function(
     #########################
 
     trainer = GRPOTrainer(
-      model=model_args.model_name_or_path,
-      reward_funcs=[task.format_reward, task.accuracy_reward],
-      args=training_args,
-      train_dataset=train_dataset,
-      eval_dataset=test_dataset,
-      peft_config=get_peft_config(model_args),
+        model=model_args.model_name_or_path,
+        reward_funcs=[task.format_reward, task.accuracy_reward],
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=test_dataset,
+        peft_config=get_peft_config(model_args),
     )
 
 
