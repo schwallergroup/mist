@@ -78,7 +78,10 @@ def grpo_function(
     ###############
     # Load task
     ###############
-    task = CountdownTask(dataset_id_or_path=script_args.dataset_id_or_path, dataset_splits=script_args.dataset_splits)
+    task = CountdownTask(
+        dataset_id_or_path=script_args.dataset_id_or_path,
+        dataset_splits=script_args.dataset_splits
+    )
     dataset = task.load()
     dataset = dataset.shuffle(seed=42).select(range(50000))
 
@@ -89,11 +92,14 @@ def grpo_function(
 
     # This works for instruct models. Change for Base TODO
 
-    system_prompt = (
-        "You are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer."
+    SYSTEM_PROMPT = (
+        "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
+        "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
+        "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
+        "<think> reasoning process here </think><answer> answer here </answer>"
     )
     def generate_r1_prompt(numbers, target):
-        r1_prefix = [{"role": "system", "content": system_prompt},
+        r1_prefix = [{"role": "system", "content": SYSTEM_PROMPT},
           { 
             "role": "user",
             "content": f"Using the numbers {numbers}, create an equation that equals {target}. You can use basic arithmetic operations (+, -, *, /) one or multiple times but each number can only be used once. Show your work in <think> </think> tags. And return the final equation in <answer> </answer> tags, for example <answer> (1 + 2) / 3 </answer>. Think step by step inside <think> tags."
@@ -112,10 +118,12 @@ def grpo_function(
     #########################
     # Instantiate DPO trainer
     #########################
+    def reward_len(completions, **kwargs):
+        return [-abs(20 - len(completion)) for completion in completions]
 
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[task.format_reward, task.accuracy_reward],
+        reward_funcs=[reward_len], #[task.format_reward, task.accuracy_reward],
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
