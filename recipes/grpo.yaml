@@ -4,7 +4,6 @@ torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 bf16: true
 tf32: true
-output_dir: /cache/runs/qwen-2.5-1.5b-r1-countdown
 
 # Dataset arguments
 dataset_id_or_path: Jiayi-Pan/Countdown-Tasks-3to4
@@ -29,7 +28,7 @@ max_completion_length: 1024
 num_generations: 8
 use_vllm: true
 vllm_device: "cuda:3"
-vllm_gpu_memory_utilization: 0.5
+vllm_gpu_memory_utilization: 0.7
 
 # Logging arguments
 logging_strategy: steps
