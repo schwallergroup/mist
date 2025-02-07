@@ -4,9 +4,10 @@
 #SBATCH --time=24:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
-#SBATCH --output=./logs/%x-%j.out # Adjust this for your cluster
-#SBATCH --err=./logs/%x-%j.err    # Adjust this for your cluster
+#SBATCH --output=./logs/%x-%j.out
+#SBATCH --err=./logs/%x-%j.err
 #SBATCH --environment=vllm071
+#SBATCH -A a-a05
 
 
 # Run like:
@@ -31,10 +32,13 @@ MASTER_PORT=6000
 
 MODEL=/cache/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796
 MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323
+MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
 #MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 
 export HF_HOME=/cache/huggingface
+export WANDB_PROJECT=r1
+export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
@@ -57,7 +61,6 @@ export CMD=" \
 export LAUNCHER="conda deactivate;
 pip install hf_transfer;
 cd /Documents/sink/;
-WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c \
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -71,17 +74,6 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
    "
 
-# force crashing on nccl issues like hanging broadcast
-export NCCL_ASYNC_ERROR_HANDLING=1
-# export NCCL_DEBUG=INFO
-# export NCCL_DEBUG_SUBSYS=COLL
-# export NCCL_SOCKET_NTHREADS=1
-# export NCCL_NSOCKS_PERTHREAD=1
-# export CUDA_LAUNCH_BLOCKING=1
-
-# Specific configuration optimized for the Hugging Face Compute Cluster
-# Be ye warned this may not work on other clusters!
-module load cuda/12.1
 
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
