@@ -125,7 +125,7 @@ def grpo_function(
         ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 
-    def generate_mcqa_prompt(problem, options):
+    def generate_mcqa_prompt(problem):#, options):
         r1_prefix = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": task.question_template.format(problem)},#, *options)},
