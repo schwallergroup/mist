@@ -116,14 +116,11 @@ def grpo_function(
     test_dataset = train_test_split["test"]
 
     #########################
-    # Instantiate DPO trainer
+    # Instantiate GRPO trainer
     #########################
-    def reward_len(completions, **kwargs):
-        return [-abs(20 - len(completion)) for completion in completions]
-
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[reward_len], #[task.format_reward, task.accuracy_reward],
+        reward_funcs=[task.format_reward , task.accuracy_reward],
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
