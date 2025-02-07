@@ -13,7 +13,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
-from tasks import CountdownTask
+from tasks import CountdownTask, ForwardReaction
 
 
 ########################
@@ -78,12 +78,17 @@ def grpo_function(
     ###############
     # Load task
     ###############
-    task = CountdownTask(
-        dataset_id_or_path=script_args.dataset_id_or_path,
-        dataset_splits=script_args.dataset_splits
+    # task = CountdownTask(
+    #     dataset_id_or_path=script_args.dataset_id_or_path,
+    #     dataset_splits=script_args.dataset_splits
+    # )
+    # dataset = task.load()
+    # dataset = dataset.shuffle(seed=42).select(range(50000))
+
+    task = ForwardReaction(
+        data_dir=script_args.dataset_id_or_path
     )
     dataset = task.load()
-    dataset = dataset.shuffle(seed=42).select(range(50000))
 
     
     #####################
@@ -98,35 +103,35 @@ def grpo_function(
         "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
         "<think> reasoning process here </think><answer> answer here </answer>"
     )
-    def generate_r1_prompt(numbers, target):
-        r1_prefix = [{"role": "system", "content": SYSTEM_PROMPT},
-          { 
-            "role": "user",
-            "content": f"Using the numbers {numbers}, create an equation that equals {target}. You can use basic arithmetic operations (+, -, *, /) one or multiple times but each number can only be used once. Show your work in <think> </think> tags. And return the final equation in <answer> </answer> tags, for example <answer> (1 + 2) / 3 </answer>. Think step by step inside <think> tags."
-          }]
-        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "target": target, "nums": numbers}
+    def generate_r1_prompt(problem):
+        r1_prefix = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": problem},
+        ]
+        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 
-    # convert our dataset to the r1 prompt
-    dataset = dataset.map(lambda x: generate_r1_prompt(x["nums"], x["target"]))
+    dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))
+    dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
+    dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
 
     # split the dataset into train and test
-    train_test_split = dataset.train_test_split(test_size=0.1)
+    # train_test_split = dataset.train_test_split(test_size=0.1)
 
-    train_dataset = train_test_split["train"]
-    test_dataset = train_test_split["test"]
+    train_dataset = dataset["train"]
+    test_dataset = dataset["test"]
 
     #########################
     # Instantiate GRPO trainer
     #########################
+
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[task.format_reward , task.accuracy_reward],
+        reward_funcs=[task.format_reward, task.accuracy_reward],
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
         peft_config=get_peft_config(model_args),
     )
-
 
     ###############
     # Training loop

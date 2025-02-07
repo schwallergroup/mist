@@ -12,103 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-from dataclasses import dataclass, field
+import wandb
+from rdkit import RDLogger
+RDLogger.DisableLog('rdApp.*')
 
-from datasets import load_dataset
-
-from latex2sympy2_extended import NormalizationConfig
-from math_verify import LatexExtractionConfig, parse, verify
+from tasks.reactions import ForwardReaction
 from trl import GRPOConfig, GRPOTrainer, ModelConfig, ScriptArguments, TrlParser, get_peft_config
 
-
-@dataclass
-class GRPOScriptArguments(ScriptArguments):
-    """
-    Script arguments for the GRPO training script.
-
-    Args:
-        reward_funcs (`list[str]`):
-            List of reward functions. Possible values: 'accuracy', 'format'.
-    """
-
-    reward_funcs: list[str] = field(
-        default_factory=lambda: ["accuracy", "format"],
-        metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
-    )
-
-
-def accuracy_reward(completions, solution, **kwargs):
-    """Reward function that checks if the completion is the same as the ground truth."""
-    contents = [completion[0]["content"] for completion in completions]
-    rewards = []
-    for content, sol in zip(contents, solution):
-        gold_parsed = parse(sol, extraction_mode="first_match", extraction_config=[LatexExtractionConfig()])
-        if len(gold_parsed) != 0:
-            # We require the answer to be provided in correct latex (no malformed operators)
-            answer_parsed = parse(
-                content,
-                extraction_config=[
-                    LatexExtractionConfig(
-                        normalization_config=NormalizationConfig(
-                            nits=False,
-                            malformed_operators=False,
-                            basic_latex=True,
-                            equations=True,
-                            boxed=True,
-                            units=True,
-                        ),
-                        # Ensures that boxed is tried first
-                        boxed_match_priority=0,
-                        try_extract_without_anchor=False,
-                    )
-                ],
-                extraction_mode="first_match",
-            )
-            # Reward 1 if the content is the same as the ground truth, 0 otherwise
-            reward = float(verify(answer_parsed, gold_parsed))
-        else:
-            # If the gold solution is not parseable, we reward 1 to skip this example
-            reward = 1.0
-            print("Failed to parse gold solution: ", sol)
-        rewards.append(reward)
-
-    return rewards
-
-
-def format_reward(completions, **kwargs):
-    """Reward function that checks if the completion has a specific format."""
-    pattern = r"^<think>.*?</think><answer>.*?</answer>$"
-    completion_contents = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, content) for content in completion_contents]
-    return [1.0 if match else 0.0 for match in matches]
-
-
-reward_funcs_registry = {
-    "accuracy": accuracy_reward,
-    "format": format_reward,
-}
-
-SYSTEM_PROMPT = (
-    "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
-    "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
-    "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
-    "<think> reasoning process here </think><answer> answer here </answer>"
-)
-
+from prompts import system_prompt
 
 def main(script_args, training_args, model_args):
-    # Get reward functions
-    reward_funcs = [reward_funcs_registry[func] for func in script_args.reward_funcs]
-
     # Load the dataset
-    dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    task = ForwardReaction(
+        root_dir="data/USPTO",
+        src_train_file="src-train.txt",
+        tgt_train_file="tgt-train.txt",
+        src_test_file="src-test.txt",
+        tgt_test_file="tgt-test.txt",
+    )
+    dataset = task.load()
+
+    # Get reward functions
+    reward_funcs = [task.accuracy_reward, task.format_reward]
 
     # Format into conversation
     def make_conversation(example):
         return {
             "prompt": [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": example["problem"]},
             ],
         }
@@ -126,16 +57,33 @@ def main(script_args, training_args, model_args):
         peft_config=get_peft_config(model_args),
     )
 
-    # Train and push the model to the Hub
+    accelerator = trainer.accelerator
+    if accelerator.is_main_process:
+        wandb.init(
+            project="R1-Zero",
+            name=training_args.run_name,
+            config={
+                **script_args.__dict__,
+                **model_args.__dict__,
+                "system_prompt": system_prompt,
+                "question_template": task.question_template,
+
+            }
+        )
+    accelerator.wait_for_everyone()
+
     trainer.train()
 
-    # Save and push to hub
-    trainer.save_model(training_args.output_dir)
-    if training_args.push_to_hub:
-        trainer.push_to_hub(dataset_name=script_args.dataset_name)
+    if accelerator.is_main_process:
+        wandb.finish()
+    accelerator.wait_for_everyone()
 
+    # # Save and push to hub
+    # trainer.save_model(training_args.output_dir)
+    # if training_args.push_to_hub:
+    #     trainer.push_to_hub(dataset_name=script_args.dataset_name)
 
 if __name__ == "__main__":
-    parser = TrlParser((GRPOScriptArguments, GRPOConfig, ModelConfig))
+    parser = TrlParser((ScriptArguments, GRPOConfig, ModelConfig))
     script_args, training_args, model_args = parser.parse_args_and_config()
     main(script_args, training_args, model_args)

@@ -9,7 +9,6 @@
 #SBATCH --environment=vllm071
 #SBATCH -A a-a05
 
-
 # Run like:
 # sbatch launch.slurm recipes/grpo.yaml
 
@@ -36,6 +35,7 @@ MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb95
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
 #MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 
+MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT=r1
 export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
@@ -55,6 +55,8 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
+    --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
+    --dataset_id_or_path=/cache/data/ \
     --run_name grpo-${SLURM_JOB_ID} \
     "
 
@@ -74,6 +76,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
    "
 
+export NCCL_ASYNC_ERROR_HANDLING=1
 
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
