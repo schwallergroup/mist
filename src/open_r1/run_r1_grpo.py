@@ -13,7 +13,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
-from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles
+from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles
 
 
 ########################
@@ -90,7 +90,11 @@ def grpo_function(
     # )
     # dataset = task.load()
 
-    task = CanonicalizeSmiles(
+    # task = CanonicalizeSmiles(
+    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
+    # )
+    # dataset = task.load()
+    task = Iupac2Smiles(
         data_dir="data/CRLLM-PubChem-compounds1M.csv"
     )
     dataset = task.load()
@@ -172,13 +176,13 @@ def grpo_function(
     tokenizer.save_pretrained(training_args.output_dir)
     logger.info(f"Tokenizer saved to {training_args.output_dir}")
 
-    # Save everything else on main process
-    if trainer.accelerator.is_main_process:
-        trainer.create_model_card({"tags": ["rl","grpo", "tutorial", "philschmid"]})
-    # push to hub if needed
-    if training_args.push_to_hub is True:
-        logger.info("Pushing to hub...")
-        trainer.push_to_hub()
+    # # Save everything else on main process
+    # if trainer.accelerator.is_main_process:
+    #     trainer.create_model_card({"tags": ["rl", "grpo", "tutorial", "philschmid"]})
+    # # push to hub if needed
+    # if training_args.push_to_hub is True:
+    #     logger.info("Pushing to hub...")
+    #     trainer.push_to_hub()
 
     logger.info("*** Training complete! ***")
 
