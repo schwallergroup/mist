@@ -91,7 +91,7 @@ def grpo_function(
     # dataset = task.load()
 
     task = CanonicalizeSmiles(
-        data_dir="data/CRLLM-PubChem-compounds1M.csv"
+        data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     )
     dataset = task.load()
     
