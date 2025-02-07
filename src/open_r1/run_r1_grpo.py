@@ -13,7 +13,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
-from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles
+from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles, CanonicalizeSmilesMCQA
 
 
 ########################
@@ -94,7 +94,10 @@ def grpo_function(
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
     # )
     # dataset = task.load()
-    task = Iupac2Smiles(
+    # task = Iupac2Smiles(
+    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
+    # )
+    task = CanonicalizeSmilesMCQA(
         data_dir="data/CRLLM-PubChem-compounds1M.csv"
     )
     dataset = task.load()
@@ -111,16 +114,26 @@ def grpo_function(
         "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
         "<think> reasoning process here </think><answer> answer here </answer>"
     )
-    def generate_r1_prompt(problem):
+    def generate_r1_prompt(problem, options):
         r1_prefix = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": problem},
         ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 
+    def generate_mcqa_prompt(problem, options):
+        r1_prefix = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": task.question_template.format(problem, *options)},
+        ]
+        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem, "options": options}
+
     dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))
     dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
-    dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
+    # dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
+    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
+
+    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
 
     # split the dataset into train and test
     # train_test_split = dataset.train_test_split(test_size=0.1)
