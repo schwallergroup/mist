@@ -61,8 +61,9 @@ export CMD=" \
     "
 
 export LAUNCHER="conda deactivate;
-pip install hf_transfer;
 cd /Documents/sink/;
+pip install hf_transfer gdown;
+pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \

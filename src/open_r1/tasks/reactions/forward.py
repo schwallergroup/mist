@@ -27,7 +27,7 @@ class ForwardReaction(RLTask):
         self.tgt_test_file = os.path.join(data_dir, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
             "What is the product of the following reaction? Here are the reactants in SMILES notation: {} "
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=NC2=C1C(=O)N(C(=O)N2C)C </answer>. Think step by step inside <think> tags."
+            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
         )
 
     def process_line(self, line: str) -> str:
