@@ -136,7 +136,7 @@ def grpo_function(
     dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
     # dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
     # dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
-    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
+    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"]))#, x["options"]))
 
     # split the dataset into train and test
     # train_test_split = dataset.train_test_split(test_size=0.1)
