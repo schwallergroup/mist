@@ -32,7 +32,7 @@ class RLTask(BaseModel):
         """Define accuracy reward"""
         raise NotImplementedError
 
-    def format_reward(self, completions, target, **kwargs):
+    def format_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
         Args:
@@ -44,7 +44,7 @@ class RLTask(BaseModel):
         """
         rewards = []
 
-        for completion, gt in zip(completions, target):
+        for completion in completions:
             completion = "<think>" + completion
             try:
                 if random.random() < 0.1:  # 1% chance to write samples into a file

@@ -1,3 +1,3 @@
 
 from .countdown.cd_task import CountdownTask
-from .reactions import ForwardReaction
+from .reactions.forward import ForwardReaction

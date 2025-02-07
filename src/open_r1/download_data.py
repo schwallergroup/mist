@@ -1,7 +1,7 @@
 import os
 import gdown
 
-def download_data():
+def download_data(data_path = 'data/USPTO'):
     # links from https://github.com/coleygroup/Graph2SMILES/blob/main/scripts/download_raw_data.py
     USPTO_480k_links= [
             ("https://drive.google.com/uc?id=1RysNBvB2rsMP0Ap9XXi02XiiZkEXCrA8", "src-train.txt"),
@@ -11,7 +11,6 @@ def download_data():
             ("https://drive.google.com/uc?id=10t6pHj9yR8Tp3kDvG0KMHl7Bt_TUbQ8W", "src-test.txt"),
             ("https://drive.google.com/uc?id=1FeGuiGuz0chVBRgePMu0pGJA4FVReA-b", "tgt-test.txt")
         ]
-    data_path = 'data/USPTO'
     os.makedirs(data_path, exist_ok=True)
     for url, name in USPTO_480k_links:
         target_path = os.path.join(data_path, name)
@@ -22,4 +21,5 @@ def download_data():
 
 
 
-download_data()
+if __name__ == "__main__":
+    download_data()
