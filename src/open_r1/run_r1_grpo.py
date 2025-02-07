@@ -91,15 +91,18 @@ def grpo_function(
     # dataset = task.load()
 
     # task = CanonicalizeSmiles(
-    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
+    #     data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     # )
     # dataset = task.load()
     # task = Iupac2Smiles(
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
     # )
     task = CanonicalizeSmilesMCQA(
-        data_dir="data/CRLLM-PubChem-compounds1M.csv"
+         data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     )
+    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
+    # task = Iupac2Smiles(
+    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     dataset = task.load()
     
     #####################
