@@ -104,11 +104,11 @@ def grpo_function(
         "<think> reasoning process here </think><answer> answer here </answer>"
     )
     def generate_r1_prompt(problem):
-        r1_prefix = [{"role": "system", "content": SYSTEM_PROMPT},
-          { 
-            "role": "user",
-            "content": problem
-          }]
+        r1_prefix = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": problem},
+            {"role": "assistant", "content": ""},
+        ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 
     dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))

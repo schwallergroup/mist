@@ -102,16 +102,16 @@ class ForwardReaction(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>.*?</answer>"
-        if re.match(pattern, response):
-            smi = response.split("<answer>")[1].split("</answer>")[0]
+        pattern = r"<answer>(.*)<\/answer>"
+        m = re.search(pattern, response).groups()
+        if m:
+            smi = m[0]
 
             # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
             if "[BEGIN_SMILES]" in smi:
                 smi = smi.replace("[BEGIN_SMILES]", "")
             if "[END_SMILES]" in smi:
                 smi = smi.replace("[END_SMILES]", "")
-            print(smi)
             return smi
         else:
             return "NONE"
