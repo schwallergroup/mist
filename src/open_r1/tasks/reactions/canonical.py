@@ -65,6 +65,7 @@ class CanonicalizeSmiles(RLTask):
                 except:
                     # invalid generated smiles
                     rewards.append(-1)
+        return rewards
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
