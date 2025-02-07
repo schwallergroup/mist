@@ -107,7 +107,6 @@ def grpo_function(
         r1_prefix = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": problem},
-            {"role": "assistant", "content": ""},
         ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 

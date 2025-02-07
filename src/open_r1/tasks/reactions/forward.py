@@ -103,9 +103,9 @@ class ForwardReaction(RLTask):
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         pattern = r"<answer>(.*)<\/answer>"
-        m = re.search(pattern, response).groups()
+        m = re.search(pattern, response, re.DOTALL)
         if m:
-            smi = m[0]
+            smi = m.groups()[0]
 
             # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
             if "[BEGIN_SMILES]" in smi:
