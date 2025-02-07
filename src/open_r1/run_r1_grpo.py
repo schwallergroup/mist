@@ -97,12 +97,13 @@ def grpo_function(
     # task = Iupac2Smiles(
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
     # )
-    task = CanonicalizeSmilesMCQA(
+    # task = CanonicalizeSmilesMCQA(
+    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
+    # )
+    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
+    task = Iupac2Smiles(
          data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     )
-    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
-    # task = Iupac2Smiles(
-    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     dataset = task.load()
     
     #####################
@@ -127,15 +128,14 @@ def grpo_function(
     def generate_mcqa_prompt(problem, options):
         r1_prefix = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": task.question_template.format(problem, *options)},
+            {"role": "user", "content": task.question_template.format(problem)},#, *options)},
         ]
-        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem, "options": options}
+        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}#, "options": options}
 
     dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))
     dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
     # dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
-    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
-
+    # dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
     dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
 
     # split the dataset into train and test
