@@ -15,7 +15,7 @@ class CanonicalizeSmiles(RLTask):
         super().__init__(**kwargs)
         self.data_dir = data_dir
         self.question_template = (
-            "What is the product of the canonicalized version of this molecule? Here is a non-canonical SMILES: {} "
+            "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
         )
 
