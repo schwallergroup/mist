@@ -13,7 +13,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
-from tasks import CountdownTask, ForwardReaction
+from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles
 
 
 ########################
@@ -85,11 +85,15 @@ def grpo_function(
     # dataset = task.load()
     # dataset = dataset.shuffle(seed=42).select(range(50000))
 
-    task = ForwardReaction(
-        data_dir=script_args.dataset_id_or_path
+    # task = ForwardReaction(
+    #     data_dir=script_args.dataset_id_or_path
+    # )
+    # dataset = task.load()
+
+    task = CanonicalizeSmiles(
+        data_dir="data/CRLLM-PubChem-compounds1M.csv"
     )
     dataset = task.load()
-
     
     #####################
     # Prepare and format dataset
