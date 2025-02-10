@@ -15,6 +15,7 @@ class ForwardReaction(RLTask):
     tgt_test_file: str = ""
     question_template: str = ""
 
+<<<<<<< HEAD
     def __init__(self, data_dir, **kwargs):
         super().__init__(**kwargs)
         if not os.path.exists(data_dir):
@@ -25,6 +26,18 @@ class ForwardReaction(RLTask):
         self.tgt_train_file = os.path.join(data_dir, "tgt-train.txt")
         self.src_test_file = os.path.join(data_dir, "src-test.txt") if "src-test.txt" else None
         self.tgt_test_file = os.path.join(data_dir, "tgt-test.txt") if "tgt-test.txt" else None
+=======
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not os.path.exists(self.dataset_id_or_path):
+            os.makedirs(self.dataset_id_or_path)
+            download_data(self.dataset_id_or_path)
+
+        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
+        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
+        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
+        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
         self.question_template = (
             "What is the product of the following reaction? Here are the reactants in SMILES notation: {} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."

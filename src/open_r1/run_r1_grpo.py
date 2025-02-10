@@ -5,25 +5,45 @@ from datetime import datetime
 import logging
 import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+<<<<<<< HEAD
 import random
 import re 
 import torch
 from datasets import load_dataset
+=======
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles, CanonicalizeSmilesMCQA
 
+<<<<<<< HEAD
+=======
+CHEMTASKS = {
+    "CountdownTask": CountdownTask,
+    "ForwardReaction": ForwardReaction,
+    "CanonicalizeSmiles": CanonicalizeSmiles,
+    "Iupac2Smiles": Iupac2Smiles,
+    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA
+}
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 
 ########################
 # Custom dataclasses
 ########################
 @dataclass
 class ScriptArguments:
+<<<<<<< HEAD
     dataset_id_or_path: str = "Jiayi-Pan/Countdown-Tasks-3to4"
     dataset_splits: str = "train"
     tokenizer_name_or_path: str = None
+=======
+    dataset_id_or_path: str = "/cache/data/"
+    chem_task: str = "CountdownTask"
+    tokenizer_name_or_path: str = None
+    dataset_splits: str = "train"
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 
 
 ########################
@@ -78,6 +98,7 @@ def grpo_function(
     ###############
     # Load task
     ###############
+<<<<<<< HEAD
     # task = CountdownTask(
     #     dataset_id_or_path=script_args.dataset_id_or_path,
     #     dataset_splits=script_args.dataset_splits
@@ -89,6 +110,14 @@ def grpo_function(
     #     data_dir=script_args.dataset_id_or_path
     # )
     # dataset = task.load()
+=======
+    task = CHEMTASKS[script_args.chem_task](
+        dataset_id_or_path=script_args.dataset_id_or_path,
+        dataset_splits=script_args.dataset_splits
+    )
+    dataset = task.load()
+    dataset = dataset.shuffle(seed=42).select(range(min(50000, len(dataset))))
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 
     # task = CanonicalizeSmiles(
     #     data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
@@ -97,14 +126,24 @@ def grpo_function(
     # task = Iupac2Smiles(
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
     # )
+<<<<<<< HEAD
     task = CanonicalizeSmilesMCQA(
          data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     )
+=======
+    # task = CanonicalizeSmilesMCQA(
+    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
+    # )
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
     # task = Iupac2Smiles(
     #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     # )
+<<<<<<< HEAD
     dataset = task.load()
+=======
+    # dataset = task.load()
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
     
     #####################
     # Prepare and format dataset
@@ -125,18 +164,31 @@ def grpo_function(
         ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
 
+<<<<<<< HEAD
     def generate_mcqa_prompt(problem, options):
         r1_prefix = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": task.question_template.format(problem, *options)},
         ]
         return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem, "options": options}
+=======
+    def generate_mcqa_prompt(problem):#, options):
+        r1_prefix = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": task.question_template.format(problem)},#, *options)},
+        ]
+        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}#, "options": options}
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 
     dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))
     dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
     # dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
     # dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
+<<<<<<< HEAD
     dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
+=======
+    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"]))#, x["options"]))
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
 
     # split the dataset into train and test
     # train_test_split = dataset.train_test_split(test_size=0.1)

@@ -9,12 +9,19 @@ from rdkit import Chem
 import pandas as pd
 
 class CanonicalizeSmilesMCQA(RLTask):
+<<<<<<< HEAD
     data_dir: str = ""
     question_template: str = ""
 
     def __init__(self, data_dir, **kwargs):
         super().__init__(**kwargs)
         self.data_dir = data_dir
+=======
+    question_template: str = ""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
             "Choose from the following options, respond only with the option letter. Options: A. {}\nB. {}\nC. {}\nD. {}\n"
@@ -25,7 +32,11 @@ class CanonicalizeSmilesMCQA(RLTask):
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
+<<<<<<< HEAD
         df = pd.read_csv(self.data_dir)
+=======
+        df = pd.read_csv(self.dataset_id_or_path)
+>>>>>>> 5cf0e735bb74da7bc96b294dceecaaad4c851abc
         shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_variant2', 'SMILES_variant3', 'SMILES_variant4', "SMILES"]].values]
         train_dict = {
             'problem': df['SMILES_variant1'].tolist(),
