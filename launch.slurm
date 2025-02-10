@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=24:00:00
+#SBATCH --time=10:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
@@ -56,7 +56,6 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
-    --dataset_id_or_path=/cache/data/ \
     --run_name grpo-${SLURM_JOB_ID} \
     "
 
