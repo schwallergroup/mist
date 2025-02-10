@@ -23,11 +23,12 @@ CHEMTASKS = {
 # Custom dataclasses
 ########################
 @dataclass
-class ScriptArguments:
+class ExtendedGRPOConfig(GRPOConfig):
     dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
+    base_model_name: str = "None"
 
 
 ########################
@@ -55,7 +56,7 @@ def get_checkpoint(training_args: GRPOConfig):
 
 
 def grpo_function(
-    model_args: ModelConfig, script_args: ScriptArguments, training_args: GRPOConfig
+    model_args: ModelConfig, training_args: GRPOConfig
 ):
     logger.info(f"Model parameters {model_args}")
     logger.info(f"Training/evaluation parameters {training_args}")
@@ -63,8 +64,8 @@ def grpo_function(
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
         (
-            script_args.tokenizer_name_or_path
-            if script_args.tokenizer_name_or_path
+            training_args.tokenizer_name_or_path
+            if training_args.tokenizer_name_or_path
             else model_args.model_name_or_path
         ),
         revision=model_args.model_revision,
@@ -74,9 +75,9 @@ def grpo_function(
         tokenizer.pad_token = tokenizer.eos_token
 
     # Load task
-    task = CHEMTASKS[script_args.chem_task](
-        dataset_id_or_path=script_args.dataset_id_or_path,
-        dataset_splits=script_args.dataset_splits
+    task = CHEMTASKS[training_args.chem_task](
+        dataset_id_or_path=training_args.dataset_id_or_path,
+        dataset_splits=training_args.dataset_splits
     )
     dataset = task.load()
     dataset = task.dataset_preprocess(tokenizer)
@@ -143,9 +144,9 @@ def grpo_function(
 
 
 def main():
-    parser = TrlParser((ModelConfig, ScriptArguments, GRPOConfig))
-    model_args, script_args, training_args = parser.parse_args_and_config()
-    grpo_function(model_args, script_args, training_args)
+    parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
+    model_args, training_args = parser.parse_args_and_config()
+    grpo_function(model_args, training_args)
 
 
 if __name__ == "__main__":
