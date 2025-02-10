@@ -87,7 +87,7 @@ def grpo_function(
         dataset_splits=script_args.dataset_splits
     )
     dataset = task.load()
-    dataset = dataset.shuffle(seed=42).select(range(min(50000, len(dataset))))
+    # dataset = dataset.shuffle(seed=42).select(range(min(50000, len(dataset))))
 
     # task = CanonicalizeSmiles(
     #     data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
