@@ -57,6 +57,7 @@ export CMD=" \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
     --run_name grpo-${SLURM_JOB_ID} \
+    --base_model_name=$MODEL_NAME \
     "
 
 export LAUNCHER="conda deactivate;

@@ -1,6 +1,6 @@
 
 from ..base import RLTask
-from typing import Dict
+from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
@@ -65,12 +65,12 @@ class ForwardReaction(RLTask):
             test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
         
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""

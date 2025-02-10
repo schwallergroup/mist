@@ -1,11 +1,8 @@
 
 from ..base import RLTask
 import numpy as np
-from typing import Dict
 import re
-import os
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
 import pandas as pd
 
 class CanonicalizeSmilesMCQA(RLTask):
@@ -15,10 +12,9 @@ class CanonicalizeSmilesMCQA(RLTask):
         super().__init__(**kwargs)
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
-            "Choose from the following options, respond only with the option letter. Options: A. {}\nB. {}\nC. {}\nD. {}\n"
+            "Choose from the following options, respond only with the option letter. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [your response] </answer>. Think step by step inside <think> tags."
         )
-
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def load(self) -> DatasetDict:
@@ -36,11 +32,11 @@ class CanonicalizeSmilesMCQA(RLTask):
         test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, options, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -60,6 +56,26 @@ class CanonicalizeSmilesMCQA(RLTask):
             except:
                 rewards.append(-0.1)
         return rewards
+
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        """Generate prompt for the MCQA task."""
+        options = kwargs.get("options", [])
+        r1_prefix = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": self.question_template.format(problem, *options)},
+        ]
+        return {
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
+            "problem": problem,
+            "options": options
+        }
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
+        self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
+
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer, options=x["options"]))
+        return self.dataset
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""

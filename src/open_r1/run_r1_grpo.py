@@ -23,11 +23,12 @@ CHEMTASKS = {
 # Custom dataclasses
 ########################
 @dataclass
-class ScriptArguments:
+class ExtendedGRPOConfig(GRPOConfig):
     dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
+    base_model_name: str = "None"
 
 
 ########################
@@ -55,21 +56,16 @@ def get_checkpoint(training_args: GRPOConfig):
 
 
 def grpo_function(
-    model_args: ModelConfig, script_args: ScriptArguments, training_args: GRPOConfig
+    model_args: ModelConfig, training_args: GRPOConfig
 ):
-    #########################
-    # Log parameters
-    #########################
     logger.info(f"Model parameters {model_args}")
     logger.info(f"Training/evaluation parameters {training_args}")
 
-    ################
     # Load tokenizer
-    ################
     tokenizer = AutoTokenizer.from_pretrained(
         (
-            script_args.tokenizer_name_or_path
-            if script_args.tokenizer_name_or_path
+            training_args.tokenizer_name_or_path
+            if training_args.tokenizer_name_or_path
             else model_args.model_name_or_path
         ),
         revision=model_args.model_revision,
@@ -78,68 +74,13 @@ def grpo_function(
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-
-    ###############
     # Load task
-    ###############
-    task = CHEMTASKS[script_args.chem_task](
-        dataset_id_or_path=script_args.dataset_id_or_path,
-        dataset_splits=script_args.dataset_splits
+    task = CHEMTASKS[training_args.chem_task](
+        dataset_id_or_path=training_args.dataset_id_or_path,
+        dataset_splits=training_args.dataset_splits
     )
     dataset = task.load()
-    # dataset = dataset.shuffle(seed=42).select(range(min(50000, len(dataset))))
-
-    # task = CanonicalizeSmiles(
-    #     data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
-    # )
-    # dataset = task.load()
-    # task = Iupac2Smiles(
-    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
-    # )
-    # task = CanonicalizeSmilesMCQA(
-    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
-    # )
-    #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
-    # task = Iupac2Smiles(
-    #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
-    # )
-    # dataset = task.load()
-    
-    #####################
-    # Prepare and format dataset
-    #####################
-
-    # This works for instruct models. Change for Base TODO
-
-    SYSTEM_PROMPT = (
-        "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
-        "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
-        "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
-        "<think> reasoning process here </think><answer> answer here </answer>"
-    )
-    def generate_r1_prompt(problem, options):
-        r1_prefix = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": problem},
-        ]
-        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}
-
-    def generate_mcqa_prompt(problem):#, options):
-        r1_prefix = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": task.question_template.format(problem)},#, *options)},
-        ]
-        return {"prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True), "problem": problem}#, "options": options}
-
-    dataset["train"] = dataset["train"].shuffle(seed=42).select(range(50000))
-    dataset["test"] = dataset["test"].shuffle(seed=42).select(range(10000))
-    # dataset = dataset.map(lambda x: generate_r1_prompt(x["problem"]))
-    # dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"], x["options"]))
-    dataset = dataset.map(lambda x: generate_mcqa_prompt(x["problem"]))#, x["options"]))
-
-    # split the dataset into train and test
-    # train_test_split = dataset.train_test_split(test_size=0.1)
-
+    dataset = task.dataset_preprocess(tokenizer)
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
@@ -203,9 +144,9 @@ def grpo_function(
 
 
 def main():
-    parser = TrlParser((ModelConfig, ScriptArguments, GRPOConfig))
-    model_args, script_args, training_args = parser.parse_args_and_config()
-    grpo_function(model_args, script_args, training_args)
+    parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
+    model_args, training_args = parser.parse_args_and_config()
+    grpo_function(model_args, training_args)
 
 
 if __name__ == "__main__":
