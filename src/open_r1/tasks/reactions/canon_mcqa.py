@@ -1,7 +1,7 @@
 
 from ..base import RLTask
 import numpy as np
-from typing import Dict
+from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
@@ -36,11 +36,11 @@ class CanonicalizeSmilesMCQA(RLTask):
         test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, options, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -60,6 +60,26 @@ class CanonicalizeSmilesMCQA(RLTask):
             except:
                 rewards.append(-0.1)
         return rewards
+
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        """Generate prompt for the MCQA task."""
+        options = kwargs.get("options", options)
+        r1_prefix = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": self.question_template.format(problem, *options)},
+        ]
+        return {
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
+            "problem": problem,
+            "options": options
+        }
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
+        self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
+
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
+        return self.dataset
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
