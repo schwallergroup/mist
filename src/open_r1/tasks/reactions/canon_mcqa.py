@@ -12,8 +12,8 @@ class CanonicalizeSmilesMCQA(RLTask):
         super().__init__(**kwargs)
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
-            "Choose from the following options, respond only with the option letter. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [your response] </answer>. Think step by step inside <think> tags."
+            "Choose from the following options. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
+            "Respond only with the option letter inside <answer> </answer> tags. (A, B, C, or D)."
         )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
