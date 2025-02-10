@@ -5,6 +5,11 @@ attn_implementation: flash_attention_2
 bf16: true
 tf32: true
 
+# Chemical Task arguments
+chem_task: ForwardReaction
+dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
+#dataset_id_or_path: /cache/data/
+
 # Lora Arguments
 # No LoRA is used here
 

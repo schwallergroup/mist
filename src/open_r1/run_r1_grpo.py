@@ -5,25 +5,29 @@ from datetime import datetime
 import logging
 import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-import random
-import re 
-import torch
-from datasets import load_dataset
 from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles, CanonicalizeSmilesMCQA
 
+CHEMTASKS = {
+    "CountdownTask": CountdownTask,
+    "ForwardReaction": ForwardReaction,
+    "CanonicalizeSmiles": CanonicalizeSmiles,
+    "Iupac2Smiles": Iupac2Smiles,
+    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA
+}
 
 ########################
 # Custom dataclasses
 ########################
 @dataclass
 class ScriptArguments:
-    dataset_id_or_path: str = "Jiayi-Pan/Countdown-Tasks-3to4"
-    dataset_splits: str = "train"
+    dataset_id_or_path: str = "/cache/data/"
+    chem_task: str = "CountdownTask"
     tokenizer_name_or_path: str = None
+    dataset_splits: str = "train"
 
 
 ########################
@@ -78,21 +82,16 @@ def grpo_function(
     ###############
     # Load task
     ###############
-    # task = CountdownTask(
-    #     dataset_id_or_path=script_args.dataset_id_or_path,
-    #     dataset_splits=script_args.dataset_splits
-    # )
-    # dataset = task.load()
-    # dataset = dataset.shuffle(seed=42).select(range(50000))
-
-    # task = ForwardReaction(
-    #     data_dir=script_args.dataset_id_or_path
-    # )
-    # dataset = task.load()
-
-    task = CanonicalizeSmiles(
-        data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
+    task = CHEMTASKS[script_args.chem_task](
+        dataset_id_or_path=script_args.dataset_id_or_path,
+        dataset_splits=script_args.dataset_splits
     )
+    dataset = task.load()
+    dataset = dataset.shuffle(seed=42).select(range(min(50000, len(dataset))))
+
+    # task = CanonicalizeSmiles(
+    #     data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
+    # )
     # dataset = task.load()
     # task = Iupac2Smiles(
     #     data_dir="data/CRLLM-PubChem-compounds1M.csv"
@@ -104,7 +103,7 @@ def grpo_function(
     # task = Iupac2Smiles(
     #      data_dir="/iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv"
     # )
-    dataset = task.load()
+    # dataset = task.load()
     
     #####################
     # Prepare and format dataset
