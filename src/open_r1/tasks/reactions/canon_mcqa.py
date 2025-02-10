@@ -1,11 +1,8 @@
 
 from ..base import RLTask
 import numpy as np
-from typing import Dict, Optional
 import re
-import os
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
 import pandas as pd
 
 class CanonicalizeSmilesMCQA(RLTask):
@@ -15,10 +12,9 @@ class CanonicalizeSmilesMCQA(RLTask):
         super().__init__(**kwargs)
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
-            "Choose from the following options, respond only with the option letter. Options: A. {}\nB. {}\nC. {}\nD. {}\n"
+            "Choose from the following options, respond only with the option letter. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [your response] </answer>. Think step by step inside <think> tags."
         )
-
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def load(self) -> DatasetDict:
@@ -63,7 +59,7 @@ class CanonicalizeSmilesMCQA(RLTask):
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
         """Generate prompt for the MCQA task."""
-        options = kwargs.get("options", options)
+        options = kwargs.get("options", [])
         r1_prefix = [
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": self.question_template.format(problem, *options)},
@@ -78,7 +74,7 @@ class CanonicalizeSmilesMCQA(RLTask):
         self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
 
-        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer, options=x["options"]))
         return self.dataset
 
     def preprocess_response(self, response):
