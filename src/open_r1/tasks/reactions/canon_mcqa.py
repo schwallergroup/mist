@@ -13,7 +13,7 @@ class CanonicalizeSmilesMCQA(RLTask):
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
             "Choose from the following options. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
-            "Respond only with the option letter inside <answer> </answer> tags. (A, B, C, or D)."
+            "Respond with the option letter inside <answer> </answer> tags. (A, B, C, or D)."
         )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
@@ -52,9 +52,9 @@ class CanonicalizeSmilesMCQA(RLTask):
                 if select == sol:
                     rewards.append(1)
                 else:
-                    rewards.append(-0.1)
+                    rewards.append(0)
             except:
-                rewards.append(-0.1)
+                rewards.append(0)
         return rewards
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
