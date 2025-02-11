@@ -1,58 +1,14 @@
-import logging
 import os
-from dataclasses import dataclass
 from datetime import datetime
-import logging
 import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-from transformers.trainer_utils import get_last_checkpoint
 from transformers import AutoTokenizer
 
+from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
-from tasks import CountdownTask, ForwardReaction, CanonicalizeSmiles, Iupac2Smiles, CanonicalizeSmilesMCQA
+from tasks import CHEMTASKS
 
-CHEMTASKS = {
-    "CountdownTask": CountdownTask,
-    "ForwardReaction": ForwardReaction,
-    "CanonicalizeSmiles": CanonicalizeSmiles,
-    "Iupac2Smiles": Iupac2Smiles,
-    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA
-}
-
-########################
-# Custom dataclasses
-########################
-@dataclass
-class ExtendedGRPOConfig(GRPOConfig):
-    dataset_id_or_path: str = "/cache/data/"
-    chem_task: str = "CountdownTask"
-    tokenizer_name_or_path: str = None
-    dataset_splits: str = "train"
-    base_model_name: str = "None"
-
-
-########################
-# Setup logging
-########################
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setFormatter(
-    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-)
-logger.addHandler(handler)
-
-########################
-# Helper functions
-########################
-
-
-def get_checkpoint(training_args: GRPOConfig):
-    last_checkpoint = None
-    if os.path.isdir(training_args.output_dir):
-        last_checkpoint = get_last_checkpoint(training_args.output_dir)
-    return last_checkpoint
+logger = setup_logger(__name__)
 
 
 def grpo_function(
@@ -84,10 +40,7 @@ def grpo_function(
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
-    #########################
     # Instantiate GRPO trainer
-    #########################
-
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
         reward_funcs=[task.format_reward, task.accuracy_reward],
@@ -97,9 +50,6 @@ def grpo_function(
         peft_config=get_peft_config(model_args),
     )
 
-    ###############
-    # Training loop
-    ###############
     # Check for last checkpoint
     last_checkpoint = get_checkpoint(training_args)
     if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
@@ -110,6 +60,7 @@ def grpo_function(
         f'*** Starting training {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} for {training_args.num_train_epochs} epochs***'
     )
     train_result = trainer.train(resume_from_checkpoint=last_checkpoint)
+
     # Log and save metrics
     metrics = train_result.metrics
     metrics["train_samples"] = len(train_dataset)
@@ -119,10 +70,7 @@ def grpo_function(
 
     logger.info("*** Training complete ***")
 
-    ##################################
     # Save model and create model card
-    ##################################
-
     logger.info("*** Save model ***")
     trainer.model.config.use_cache = True
     trainer.save_model(training_args.output_dir)
@@ -132,22 +80,12 @@ def grpo_function(
     tokenizer.save_pretrained(training_args.output_dir)
     logger.info(f"Tokenizer saved to {training_args.output_dir}")
 
-    # # Save everything else on main process
-    # if trainer.accelerator.is_main_process:
-    #     trainer.create_model_card({"tags": ["rl", "grpo", "tutorial", "philschmid"]})
-    # # push to hub if needed
-    # if training_args.push_to_hub is True:
-    #     logger.info("Pushing to hub...")
-    #     trainer.push_to_hub()
-
     logger.info("*** Training complete! ***")
-
 
 def main():
     parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
     model_args, training_args = parser.parse_args_and_config()
     grpo_function(model_args, training_args)
-
 
 if __name__ == "__main__":
     main()
