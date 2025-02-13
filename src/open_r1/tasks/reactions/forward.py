@@ -5,7 +5,9 @@ from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
+from rdkit import Chem, DataStructs
+from rdkit.Chem import AllChem
+
 from open_r1.download_data import download_data
 
 
@@ -100,6 +102,54 @@ class ForwardReaction(RLTask):
                 self.log_correct(content)
             else:
                 rewards.append(-0.5) # no reward if incorrect
+        return rewards
+
+    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function using Tanimoto similarity between prediction and ground truth."""
+        answers = [self.preprocess_response(c) for c in completions]
+        
+        rewards = []
+        for content, sol in zip(answers, solution):
+            if content == "NONE":
+                rewards.append(-1)
+                continue
+                
+            try:
+                # Convert ground truth SMILES to molecule and fingerprint
+                gold_mol = Chem.MolFromSmiles(sol)
+                if gold_mol is None:
+                    rewards.append(-1)
+                    continue
+                gold_fp = AllChem.GetMorganFingerprintAsBitVect(gold_mol, 2)
+                
+                # Convert prediction SMILES to molecule and fingerprint
+                pred_mol = Chem.MolFromSmiles(content)
+                if pred_mol is None:
+                    rewards.append(-1)
+                    continue
+                pred_fp = AllChem.GetMorganFingerprintAsBitVect(pred_mol, 2)
+                
+                # Calculate Tanimoto similarity
+                tanimoto = DataStructs.TanimotoSimilarity(gold_fp, pred_fp)
+                
+                # Scale the reward: 
+                # 1.0 for perfect match
+                # Proportional to similarity for partial matches
+                # Still penalize very poor predictions
+                if tanimoto == 1.0:
+                    reward = 1.0
+                    self.log_correct(content)
+                elif tanimoto < 0.3:  # You can adjust this threshold
+                    reward = -0.5
+                else:
+                    reward = tanimoto - 0.3  # Shifts the reward to be negative for very low similarities
+                    
+                rewards.append(reward)
+                
+            except Exception as e:
+                rewards.append(-1)
+                continue
+                
         return rewards
 
     def preprocess_response(self, response):
