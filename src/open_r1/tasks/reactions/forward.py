@@ -1,5 +1,6 @@
 
 from ..base import RLTask
+from random import random
 from typing import Dict, Optional
 import re
 import os
@@ -96,6 +97,7 @@ class ForwardReaction(RLTask):
                 continue
             if gold_mol == completion_mol:
                 rewards.append(1)  # reward if correct
+                self.log_correct(content)
             else:
                 rewards.append(-0.5) # no reward if incorrect
         return rewards
