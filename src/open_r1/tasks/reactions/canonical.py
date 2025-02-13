@@ -3,6 +3,7 @@ from ..base import RLTask
 from typing import Dict, Optional
 import re
 import os
+from random import random
 from datasets import Dataset, DatasetDict
 from rdkit import Chem
 import pandas as pd
@@ -52,6 +53,7 @@ class CanonicalizeSmiles(RLTask):
                 continue
             if content == sol:
                 rewards.append(1)
+                self.log_correct(content)
             else:
                 # It gets a point if when we canonicalize it, it's the same
                 try:
