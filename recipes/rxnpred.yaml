@@ -6,9 +6,9 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: CanonicalizeSmiles
-dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
-#dataset_id_or_path: /cache/data/
+chem_task: ForwardReaction
+dataset_id_or_path: /cache/data/
+#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
 # Lora Arguments
 # No LoRA is used here
@@ -31,6 +31,7 @@ num_generations: 8
 use_vllm: true
 vllm_device: "cuda:3"
 vllm_gpu_memory_utilization: 0.7
+vllm_max_model_len: 2048
 
 # Logging arguments
 logging_strategy: steps
