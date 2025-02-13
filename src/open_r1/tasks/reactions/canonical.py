@@ -1,6 +1,6 @@
 
 from ..base import RLTask
-from typing import Dict
+from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
@@ -8,12 +8,10 @@ from rdkit import Chem
 import pandas as pd
 
 class CanonicalizeSmiles(RLTask):
-    data_dir: str = ""
     question_template: str = ""
 
-    def __init__(self, data_dir, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.data_dir = data_dir
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
@@ -23,7 +21,7 @@ class CanonicalizeSmiles(RLTask):
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.data_dir)
+        df = pd.read_csv(self.dataset_id_or_path)
         train_dict = {
             'problem': df['SMILES_variant1'].tolist(),
             'solution': df['SMILES'].tolist()
@@ -34,11 +32,11 @@ class CanonicalizeSmiles(RLTask):
         test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""

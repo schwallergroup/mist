@@ -1,31 +1,25 @@
 
 from ..base import RLTask
 import numpy as np
-from typing import Dict
 import re
-import os
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
 import pandas as pd
 
 class CanonicalizeSmilesMCQA(RLTask):
-    data_dir: str = ""
     question_template: str = ""
 
-    def __init__(self, data_dir, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.data_dir = data_dir
         self.question_template = (
             "What is the canonical SMILES for this molecule? Here is a non-canonical SMILES: {} "
-            "Choose from the following options, respond only with the option letter. Options: A. {}\nB. {}\nC. {}\nD. {}\n"
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [your response] </answer>. Think step by step inside <think> tags."
+            "Choose from the following options. Options: \nA. {}\nB. {}\nC. {}\nD. {}\n"
+            "Respond with the option letter inside <answer> </answer> tags. (A, B, C, or D)."
         )
-
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.data_dir)
+        df = pd.read_csv(self.dataset_id_or_path)
         shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_variant2', 'SMILES_variant3', 'SMILES_variant4', "SMILES"]].values]
         train_dict = {
             'problem': df['SMILES_variant1'].tolist(),
@@ -38,11 +32,11 @@ class CanonicalizeSmilesMCQA(RLTask):
         test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, options, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -58,10 +52,30 @@ class CanonicalizeSmilesMCQA(RLTask):
                 if select == sol:
                     rewards.append(1)
                 else:
-                    rewards.append(-0.1)
+                    rewards.append(0)
             except:
-                rewards.append(-0.1)
+                rewards.append(0)
         return rewards
+
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        """Generate prompt for the MCQA task."""
+        options = kwargs.get("options", [])
+        r1_prefix = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": self.question_template.format(problem, *options)},
+        ]
+        return {
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
+            "problem": problem,
+            "options": options
+        }
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
+        self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
+
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer, options=x["options"]))
+        return self.dataset
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""

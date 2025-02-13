@@ -1,6 +1,6 @@
 
 from ..base import RLTask
-from typing import Dict
+from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
@@ -15,16 +15,16 @@ class ForwardReaction(RLTask):
     tgt_test_file: str = ""
     question_template: str = ""
 
-    def __init__(self, data_dir, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-            download_data(data_dir)
+        if not os.path.exists(self.dataset_id_or_path):
+            os.makedirs(self.dataset_id_or_path)
+            download_data(self.dataset_id_or_path)
 
-        self.src_train_file = os.path.join(data_dir, "src-train.txt")
-        self.tgt_train_file = os.path.join(data_dir, "tgt-train.txt")
-        self.src_test_file = os.path.join(data_dir, "src-test.txt") if "src-test.txt" else None
-        self.tgt_test_file = os.path.join(data_dir, "tgt-test.txt") if "tgt-test.txt" else None
+        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
+        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
+        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
+        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
             "What is the product of the following reaction? Here are the reactants in SMILES notation: {} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
@@ -65,12 +65,12 @@ class ForwardReaction(RLTask):
             test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
-        dataset_dict = DatasetDict({
+        self.dataset = DatasetDict({
             'train': train_dataset,
             'test': test_dataset
         })
         
-        return dataset_dict
+        return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
