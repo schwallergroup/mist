@@ -4,7 +4,7 @@ import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint
+from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint, get_reward_list
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CHEMTASKS
 
@@ -43,7 +43,7 @@ def grpo_function(
     # Instantiate GRPO trainer
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[task.format_reward, task.accuracy_reward],
+        reward_funcs=get_reward_list(task, training_args.rewards),
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,

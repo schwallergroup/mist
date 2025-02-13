@@ -8,6 +8,12 @@ tf32: true
 # Chemical Task arguments
 chem_task: ForwardReaction
 dataset_id_or_path: /cache/data/
+rewards:
+- format
+- accuracy
+- reasoning_steps
+- tanimoto_accuracy
+
 #dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
 # Lora Arguments
