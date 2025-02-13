@@ -93,7 +93,7 @@ class RLTask(BaseModel):
                 rewards.append(0.0)
         return rewards
 
-    def reasoning_steps_reward(completions, **kwargs):
+    def reasoning_steps_reward(self, completions, **kwargs):
         r"""Reward function that checks for clear step-by-step reasoning.
         Regex pattern:
             Step \d+: - matches "Step 1:", "Step 2:", etc.
