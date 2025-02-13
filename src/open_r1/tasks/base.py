@@ -103,7 +103,7 @@ class RLTask(BaseModel):
             First,|Second,|Next,|Finally, - matches transition words
         """
         pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,)"
-        completion_contents = [completion[0]["content"] for completion in completions]
+        completion_contents = [completion for completion in completions]
         matches = [len(re.findall(pattern, content)) for content in completion_contents]
 
         # Magic nubmer 3 to encourage 3 steps and more, otherwise partial reward
