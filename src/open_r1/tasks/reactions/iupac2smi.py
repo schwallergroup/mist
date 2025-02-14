@@ -41,23 +41,21 @@ class Iupac2Smiles(RLTask):
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
-
-        answers = [self.preprocess_response(c) for c in completions]
-
         rewards = []
 
         # Here task is simple: check that the smiles is the same as the target smiles
-        for content, sol in zip(answers, solution):
-            if content == "NONE":
+        for content, sol in zip(completions, solution):
+            ans = self.preprocess_response(content)
+            if ans == "NONE":
                 rewards.append(-1)
                 continue
-            if content == sol:
+            if ans == sol:
                 rewards.append(1)
                 self.log_correct(content)
             else:
                 # It gets a point if when we canonicalize it, it's the same
                 try:
-                    completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
+                    completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(ans))
                     if completion_mol == sol:
                         rewards.append(0.2) # as it didnt directly predict the correct canonical smiles
                     else:
