@@ -29,7 +29,7 @@ class ForwardReaction(RLTask):
         self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
         self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
-            "What is the product of the following reaction? Here are the reactants in SMILES notation: {} "
+            f"What is the product of the following reaction? Here are the reactants in SMILES notation: {self.begin_smiles_tag} {{}} {self.end_smiles_tag} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
         )
 

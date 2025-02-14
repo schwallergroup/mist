@@ -27,6 +27,8 @@ class RLTask(BaseModel):
         "<think> reasoning process here </think><answer> answer here </answer>"
     )
     response_print: str = "\n\n======<CORRECT_RESPONSE>========\n{}"
+    begin_smiles_tag: str = "[BEGIN_SMILES]"
+    end_smiles_tag: str = "[END_SMILES]"
 
     def load(self) -> Any:
         """Define load method if not hf dataset."""

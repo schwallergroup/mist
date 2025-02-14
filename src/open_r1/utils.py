@@ -15,6 +15,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     dataset_splits: str = "train"
     base_model_name: str = "None"
     rewards: List[str] = Field(default_factory=["accuracy", "format"])
+    special_smiles_tags: bool = False
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
