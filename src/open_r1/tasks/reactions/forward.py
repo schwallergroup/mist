@@ -78,11 +78,10 @@ class ForwardReaction(RLTask):
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
 
-        answers = [self.preprocess_response(c) for c in completions]
-
         rewards = []
-        for content, sol in zip(answers, solution):
-            if content == "NONE":
+        for content, sol in zip(completions, solution):
+            ans = self.preprocess_response(content)
+            if ans == "NONE":
                 rewards.append(-1)
                 continue
             try:
@@ -92,7 +91,7 @@ class ForwardReaction(RLTask):
                 rewards.append(-1)
                 continue
             try:
-                completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
+                completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(ans))
             except:
                 # invalid generated smiles
                 rewards.append(-1) # penalize if invalid smiles
