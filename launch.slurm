@@ -28,7 +28,6 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
@@ -36,11 +35,13 @@ MODEL=/cache/huggingface/models--meta-llama--Llama-3.1-8B/snapshots/d04e592bb4f6
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796/
+MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
-#TASK=rxnpred
+# TASK=rxnpred
+# TASK=smi_permute
 
 TASK=$1
 
@@ -50,7 +51,8 @@ MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' 
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
-export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
+# export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
+export WANDB_API_KEY=fc356832222355f46cd87bdebb5fe69b52412b78
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
