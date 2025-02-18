@@ -8,6 +8,7 @@ import pandas as pd
 from Levenshtein import ratio as levenshtein_ratio
 
 class PermuteSmiles(RLTask):
+    question_template: str = ""
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

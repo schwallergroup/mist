@@ -34,7 +34,7 @@ class RLTask(BaseModel):
             )
             return self.dataset
 
-    def accuracy_reward(self, completions, target, **kwargs):
+    def accuracy_reward(self, completions, solution, **kwargs):
         """Define accuracy reward"""
         raise NotImplementedError
 
