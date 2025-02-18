@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/andres/anaconda3/envs/r1/bin/python",
+            "program": "python -m accelerate launch",
+            "args": [
+                "--config", "configs/deepspeed_zero3.yaml",
+                "src/open_r1/run_r1_grpo.py",
+                "--config", "recipes/rxnpred.yaml",
+                "--model_name_or_path", "~/.cache/huggingface/hub/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987/",
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
