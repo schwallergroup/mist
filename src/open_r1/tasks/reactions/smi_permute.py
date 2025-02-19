@@ -38,7 +38,7 @@ class PermuteSmiles(RLTask):
         })
         return self.dataset
     
-    def accuracy_reward(self, completions, reference, **kwargs):
+    def accuracy_reward(self, completions, solution, **kwargs):
         """
         Reward function - check that completed SMILES refers to the same molecule as the original SMILES.
         Bonus if the output SMILES is different from the original SMILES.
@@ -48,7 +48,7 @@ class PermuteSmiles(RLTask):
 
         rewards = []
 
-        for content, ref in zip(answers, reference):
+        for content, ref in zip(answers, solution):
             if content == "NONE":
                 rewards.append(-1)
                 continue
@@ -57,13 +57,17 @@ class PermuteSmiles(RLTask):
             if response_mol is None:
                 rewards.append(-1)
                 continue
+            
+            if content == ref:
+                rewards.append(-0.5)
+                continue
                         
             canon_response = Chem.MolToSmiles(response_mol, canonical=True)
             canon_reference = Chem.MolToSmiles(Chem.MolFromSmiles(ref), canonical=True)
             if canon_response != canon_reference:
                 rewards.append(-0.5)
                 continue
-                            
+              
             edit_distance_reward = 1 - levenshtein_ratio(content, ref) # range (0, 1)
             # reward = 0.2 + 0.8*edit_distance_reward
             reward = edit_distance_reward
