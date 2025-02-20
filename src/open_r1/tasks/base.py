@@ -70,7 +70,7 @@ class RLTask(BaseModel):
         for completion in completions:
             completion = "<think>" + completion
             try:
-                if random.random() < 0.1:  # 1% chance to write samples into a file
+                if random.random() < 0.001:  # 1% chance to write samples into a file
                     os.makedirs("completion_samples", exist_ok=True)
                     log_file = os.path.join("completion_samples", "completion_samples.txt")
                     with open(log_file, "a") as f:

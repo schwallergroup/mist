@@ -175,5 +175,6 @@ data/
 wandb/
 logs/
 completion_samples/
+output/
 
 *.ipynb
