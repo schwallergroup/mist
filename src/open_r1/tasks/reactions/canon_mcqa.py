@@ -2,6 +2,7 @@
 from ..base import RLTask
 import numpy as np
 import re
+from random import random
 from datasets import Dataset, DatasetDict
 import pandas as pd
 
@@ -51,6 +52,7 @@ class CanonicalizeSmilesMCQA(RLTask):
                 select = options[i][idx]
                 if select == sol:
                     rewards.append(1)
+                    self.log_correct(ans)
                 else:
                     rewards.append(0)
             except:

@@ -1,5 +1,7 @@
 
 import os
+from typing import List
+from pydantic import Field
 from dataclasses import dataclass
 from trl import GRPOConfig
 import logging
@@ -12,6 +14,8 @@ class ExtendedGRPOConfig(GRPOConfig):
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
     base_model_name: str = "None"
+    rewards: List[str] = Field(default_factory=["accuracy", "format"])
+    special_smiles_tags: bool = False
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
@@ -34,3 +38,9 @@ def get_checkpoint(training_args: GRPOConfig):
     if os.path.isdir(training_args.output_dir):
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
     return last_checkpoint
+
+def get_reward_list(task, rewards):
+    rwds = []
+    for r in rewards:
+        rwds.append(getattr(task, r+"_reward"))
+    return rwds

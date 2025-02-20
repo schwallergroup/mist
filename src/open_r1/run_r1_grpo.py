@@ -4,7 +4,7 @@ import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint
+from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint, get_reward_list
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CHEMTASKS
 
@@ -31,9 +31,18 @@ def grpo_function(
         tokenizer.pad_token = tokenizer.eos_token
 
     # Load task
+    if training_args.special_smiles_tags:
+        begin_smiles_tag = "[BEGIN_SMILES]"
+        end_smiles_tag = "[END_SMILES]"
+    else:
+        begin_smiles_tag = ""
+        end_smiles_tag = ""
+
     task = CHEMTASKS[training_args.chem_task](
         dataset_id_or_path=training_args.dataset_id_or_path,
-        dataset_splits=training_args.dataset_splits
+        dataset_splits=training_args.dataset_splits,
+        begin_smiles_tag=begin_smiles_tag,
+        end_smiles_tag=end_smiles_tag,
     )
     dataset = task.load()
     dataset = task.dataset_preprocess(tokenizer)
@@ -43,7 +52,7 @@ def grpo_function(
     # Instantiate GRPO trainer
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[task.format_reward, task.accuracy_reward],
+        reward_funcs=get_reward_list(task, training_args.rewards),
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,

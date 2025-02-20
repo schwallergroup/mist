@@ -1,10 +1,13 @@
 
 from ..base import RLTask
+from random import random
 from typing import Dict, Optional
 import re
 import os
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
+from rdkit import Chem, DataStructs
+from rdkit.Chem import AllChem
+
 from open_r1.download_data import download_data
 
 
@@ -26,7 +29,7 @@ class ForwardReaction(RLTask):
         self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
         self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
-            "What is the product of the following reaction? Here are the reactants in SMILES notation: {} "
+            f"What is the product of the following reaction? Here are the reactants in SMILES notation: {self.begin_smiles_tag} {{}} {self.end_smiles_tag} "
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
         )
 
@@ -60,8 +63,8 @@ class ForwardReaction(RLTask):
             test_dataset = Dataset.from_dict(test_dict)
         else:
             # Create test split from training data
-            train_test_split = train_dataset.train_test_split(test_size=0.001)
-            train_dataset = train_test_split['train']
+            train_test_split = train_dataset.train_test_split(test_size=0.1)
+            train_dataset = train_test_split['train'].unique(column='solution')
             test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
@@ -75,11 +78,10 @@ class ForwardReaction(RLTask):
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
 
-        answers = [self.preprocess_response(c) for c in completions]
-
         rewards = []
-        for content, sol in zip(answers, solution):
-            if content == "NONE":
+        for content, sol in zip(completions, solution):
+            ans = self.preprocess_response(content)
+            if ans == "NONE":
                 rewards.append(-1)
                 continue
             try:
@@ -89,15 +91,64 @@ class ForwardReaction(RLTask):
                 rewards.append(-1)
                 continue
             try:
-                completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
+                completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(ans))
             except:
                 # invalid generated smiles
                 rewards.append(-1) # penalize if invalid smiles
                 continue
             if gold_mol == completion_mol:
                 rewards.append(1)  # reward if correct
+                self.log_correct(content)
             else:
                 rewards.append(-0.5) # no reward if incorrect
+        return rewards
+
+    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function using Tanimoto similarity between prediction and ground truth."""
+        answers = [self.preprocess_response(c) for c in completions]
+        
+        rewards = []
+        for content, sol in zip(answers, solution):
+            if content == "NONE":
+                rewards.append(-1)
+                continue
+                
+            try:
+                # Convert ground truth SMILES to molecule and fingerprint
+                gold_mol = Chem.MolFromSmiles(sol)
+                if gold_mol is None:
+                    rewards.append(-1)
+                    continue
+                gold_fp = AllChem.GetMorganFingerprintAsBitVect(gold_mol, 2)
+                
+                # Convert prediction SMILES to molecule and fingerprint
+                pred_mol = Chem.MolFromSmiles(content)
+                if pred_mol is None:
+                    rewards.append(-1)
+                    continue
+                pred_fp = AllChem.GetMorganFingerprintAsBitVect(pred_mol, 2)
+                
+                # Calculate Tanimoto similarity
+                tanimoto = DataStructs.TanimotoSimilarity(gold_fp, pred_fp)
+                
+                # Scale the reward: 
+                # 1.0 for perfect match
+                # Proportional to similarity for partial matches
+                # Still penalize very poor predictions
+                if tanimoto == 1.0:
+                    reward = 1.0
+                    self.log_correct(content)
+                elif tanimoto < 0.3:  # You can adjust this threshold
+                    reward = -0.5
+                else:
+                    reward = tanimoto - 0.3  # Shifts the reward to be negative for very low similarities
+                    
+                rewards.append(reward)
+                
+            except Exception as e:
+                rewards.append(-1)
+                continue
+                
         return rewards
 
     def preprocess_response(self, response):
