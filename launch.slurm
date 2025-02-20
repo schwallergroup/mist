@@ -32,10 +32,10 @@ MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a26
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
 MODEL=/cache/huggingface/models--meta-llama--Llama-3.1-8B/snapshots/d04e592bb4f6aa9cfee91e2e20afa771667e1d4b
-MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796/
 MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
+MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
@@ -75,7 +75,7 @@ export CMD=" \
     "
 
 export LAUNCHER="conda deactivate;
-cd /Documents/sink/;
+cd /iopsstor/scratch/cscs/nnguyenx/repo/sink;
 pip install hf_transfer gdown levenshtein wandb;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
