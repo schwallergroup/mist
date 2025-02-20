@@ -20,7 +20,7 @@ rewards:
 
 # Training arguments
 max_steps: 1450
-per_device_train_batch_size: 1
+per_device_train_batch_size: 8
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
@@ -33,8 +33,8 @@ beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.noti
 max_prompt_length: 256
 max_completion_length: 1024
 num_generations: 8
-use_vllm: true
-vllm_device: "cuda:3"
+use_vllm: false
+vllm_device: "cuda:0"
 vllm_gpu_memory_utilization: 0.7
 vllm_max_model_len: 2048
 
