@@ -79,11 +79,10 @@ class RLTask(BaseModel):
         rewards = []
 
         for completion in completions:
-            completion = "<think>" + completion
             try:
-                if random.random() < 0.01:  # 1% chance to print a completion
+                if random.random() < 0.00:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
-            
+                completion = "<think>" + completion
                 regex = r"<think>(.*)<\/think>\n?<answer>(.*)<\/answer>"
                 match = re.search(regex, completion, re.DOTALL) 
                 # if the format is not correct, reward is 0

@@ -1,3 +1,4 @@
+import random
 from ..base import RLTask
 from typing import Dict, Optional
 import re
@@ -13,10 +14,11 @@ class PermuteSmiles(RLTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original SMILES sequence, but the original molecule does not change. Here is the original SMILES: {}. "
+            "Please permute the Simplified Molecular Input Line Entry System (SMILES) sequence for this molecule, in such a way that the SMILES sequence is different from the original SMILES sequence, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
             "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
-            "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "A reasoning pattern that you could follow is to visualize the molecule in your mind, and find another starting atom for the SMILES sequence. "
+            # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
+            "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [START_SMILES] CN1C=C... [END_SMILES] </answer>."
         )
     
     def load(self):
@@ -38,6 +40,18 @@ class PermuteSmiles(RLTask):
         })
         return self.dataset
     
+    def random_print(self, completions, solution, answers, out_rate = 0.01):
+        for reponse, answer, ref in zip(completions, answers, solution):
+            if random.random() < out_rate:  # 1% chance to print a completion
+                # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+                out = (
+                    "\n\n=======<RANDOM_RESPONSE>=======\n"
+                    f"# Answer: {answer}\n"
+                    f"# Reference: {ref}\n"
+                    f"# Full response: {reponse}"
+                )
+                print(out)
+    
     def accuracy_reward(self, completions, solution, **kwargs):
         """
         Reward function - check that completed SMILES refers to the same molecule as the original SMILES.
@@ -45,6 +59,7 @@ class PermuteSmiles(RLTask):
         """
 
         answers = [self.preprocess_response(c) for c in completions]
+        self.random_print(completions, solution, answers)
 
         rewards = []
 
@@ -84,11 +99,11 @@ class PermuteSmiles(RLTask):
             smi = m.groups()[0]
 
             # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
-            if "[BEGIN_SMILES]" in smi:
-                smi = smi.replace("[BEGIN_SMILES]", "")
-            if "[END_SMILES]" in smi:
-                smi = smi.replace("[END_SMILES]", "")
-
+            smi = smi.replace("[BEGIN_SMILES]", "")
+            smi = smi.replace("[START_SMILES]", "")
+            smi = smi.replace("[END_SMILES]", "")
+            smi = smi.strip()
+            
             return smi
         else:
             return "NONE"
