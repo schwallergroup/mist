@@ -103,7 +103,7 @@ class RLTask(BaseModel):
             \n\* - matches bullet points with asterisks
             First,|Second,|Next,|Finally, - matches transition words
         """
-        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,)"
+        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,|Wait|But)"
         completion_contents = [completion for completion in completions]
         matches = [len(re.findall(pattern, content)) for content in completion_contents]
 
