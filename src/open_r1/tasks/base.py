@@ -83,13 +83,15 @@ class RLTask(BaseModel):
                 if random.random() < 0.00:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
                 completion = "<think>" + completion
-                regex = r"^<think>(.*)<\/think>\n?<answer>(.*)<\/answer>$"
+                regex = r"<think>(.*)<\/think>\n+<answer>(.*?)<\/answer>"
                 match = re.search(regex, completion, re.DOTALL) 
                 # if the format is not correct, reward is 0
                 if match is None or len(match.groups()) != 2:
                     rewards.append(0.0)
                 else:
-                    rewards.append(1.0)
+                    # The model tends to generate gibberish outside of the tags
+                    reward = len(match.group()) / len(completion)
+                    rewards.append(reward)
             except Exception:
                 rewards.append(0.0)
         return rewards

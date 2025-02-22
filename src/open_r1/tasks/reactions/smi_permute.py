@@ -14,11 +14,15 @@ class PermuteSmiles(RLTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "Please permute the Simplified Molecular Input Line Entry System (SMILES) sequence for this molecule, in such a way that the SMILES sequence is different from the original SMILES sequence, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
+            "You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original one, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
             "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
             "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
+            "Don't hesitate to start over if you get stuck. You can reasoning as much as you want. "
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
-            "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> [START_SMILES] CN1C=C... [END_SMILES] </answer>."
+            "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
+            "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] c1ccccc1 [END_SMILES] </answer>. "
+            "Do not write anything else outside of the tags.\n"
+            "Your response: "
         )
     
     def load(self):
@@ -51,7 +55,7 @@ class PermuteSmiles(RLTask):
             print(out)
     
     def good_print(self, answer, ref, completion, out_rate = 0.1):
-        if random.random() < out_rate:  # 1% chance to print a completion
+        if random.random() < out_rate:  # 10% chance to print a completion
             # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
             out = (
                 "\n\n=======<GOOD_RESPONSE>=======\n"
@@ -107,7 +111,7 @@ class PermuteSmiles(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"^<think>(.*)<\/think>\n?<answer>(.*)<\/answer>$"
+        pattern = r"<think>(.*)<\/think>\n+<answer>(.*?)<\/answer>" # Answer is more strict.
         m = re.search(pattern, response, re.DOTALL)
         if m and len(m.groups()) == 2:
             smi = m.groups()[1]
