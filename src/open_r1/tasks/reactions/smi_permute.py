@@ -111,7 +111,7 @@ class PermuteSmiles(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<think>(.*)<\/think>\n+<answer>(.*?)<\/answer>" # Answer is more strict.
+        pattern = r"<think>(.*)<\/think>\s*<answer>(.*?)<\/answer>" # Answer is more strict.
         m = re.search(pattern, response, re.DOTALL)
         if m and len(m.groups()) == 2:
             smi = m.groups()[1]

@@ -83,7 +83,7 @@ class RLTask(BaseModel):
                 if random.random() < 0.00:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
                 completion = "<think>" + completion
-                regex = r"<think>(.*)<\/think>\n+<answer>(.*?)<\/answer>"
+                regex = r"<think>(.*)<\/think>\s*<answer>(.*?)<\/answer>"
                 match = re.search(regex, completion, re.DOTALL) 
                 # if the format is not correct, reward is 0
                 if match is None or len(match.groups()) != 2:
@@ -105,7 +105,7 @@ class RLTask(BaseModel):
             \n\* - matches bullet points with asterisks
             First,|Second,|Next,|Finally, - matches transition words
         """
-        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,|Wait|But)"
+        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,|Wait|But|but|However)"
         completion_contents = [completion for completion in completions]
         matches = [len(re.findall(pattern, content)) for content in completion_contents]
 
