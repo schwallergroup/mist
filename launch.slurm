@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=40:00:00
-#SBATCH --nodes=1
+#SBATCH --time=20:00:00
+#SBATCH --nodes=4
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
