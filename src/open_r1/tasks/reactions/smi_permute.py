@@ -22,7 +22,7 @@ class PermuteSmiles(RLTask):
             "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] c1ccccc1 [END_SMILES] </answer>. "
             "Do not write anything else outside of the tags.\n"
-            "Your response: <think>"
+            "Your response: <think> "
         )
     
     def load(self):
