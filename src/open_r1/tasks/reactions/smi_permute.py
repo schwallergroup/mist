@@ -22,7 +22,7 @@ class PermuteSmiles(RLTask):
             "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] c1ccccc1 [END_SMILES] </answer>. "
             "Do not write anything else outside of the tags.\n"
-            "Your response: "
+            "Your response: <think>"
         )
     
     def load(self):
@@ -90,13 +90,13 @@ class PermuteSmiles(RLTask):
                 continue
             
             if answer == ref:
-                rewards.append(-0.5)
+                rewards.append(-0.6)
                 continue
                         
             canon_response = Chem.MolToSmiles(response_mol, canonical=True)
             canon_reference = Chem.MolToSmiles(Chem.MolFromSmiles(ref), canonical=True)
             if canon_response != canon_reference:
-                rewards.append(-0.5)
+                rewards.append(-0.3)
                 continue
             
             self.good_print(answer, ref, completion)
@@ -111,7 +111,9 @@ class PermuteSmiles(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<think>(.*)<\/think>\s*<answer>(.*?)<\/answer>" # Answer is more strict.
+        if not response.startswith("<think>"):
+            response = "<think>" + response
+        pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         m = re.search(pattern, response, re.DOTALL)
         if m and len(m.groups()) == 2:
             smi = m.groups()[1]
