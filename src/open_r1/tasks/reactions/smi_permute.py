@@ -21,7 +21,7 @@ class PermuteSmiles(RLTask):
             "You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original one, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
             "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
             "For example, CC(=O)O can be permuted into O=C(O)C. "
-	    "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
+	        "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
             "Don't hesitate to start over if you get stuck. You can reasoning as much as you want. "
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
             "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
@@ -92,7 +92,7 @@ class PermuteSmiles(RLTask):
         def calc_reward(mol1, mol2, beta=30):
             edit_distance = 1-levenshtein_ratio(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
-            return edit_distance**(1+(1-tanimoto_sim(mol1, mol2))*beta)
+            return edit_distance**(1+(1-tanimoto_sim(mol1, mol2))*beta) / 0.3
 
         rewards = []
 
@@ -131,6 +131,22 @@ class PermuteSmiles(RLTask):
         
         return rewards
 
+    def reasoning_length_reward(self, completions, **kwargs):
+        max_length = 2000
+        rewards = []
+        for completion in completions:
+            if not completion.startswith("<think>"):
+                completion = "<think>" + completion
+            reasoning = re.search(r"<think>(.*?)<\/think>", completion, re.DOTALL)
+            if reasoning is None:
+                rewards.append(0.0)
+                continue
+            reasoning = reasoning.group(1)
+            reasoning_length = len(reasoning.split())
+            reasoning_reward = min(1, reasoning_length / max_length)
+            rewards.append(reasoning_reward)
+        return rewards
+    
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         if not response.startswith("<think>"):
