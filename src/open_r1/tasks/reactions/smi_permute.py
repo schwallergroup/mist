@@ -142,7 +142,7 @@ class PermuteSmiles(RLTask):
                 rewards.append(0.0)
                 continue
             reasoning = reasoning.group(1)
-            reasoning_length = len(reasoning.split())
+            reasoning_length = len(reasoning.strip().split())
             reasoning_reward = min(1, reasoning_length / max_length)
             rewards.append(reasoning_reward)
         return rewards
