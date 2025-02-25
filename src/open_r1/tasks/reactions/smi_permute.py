@@ -89,8 +89,10 @@ class PermuteSmiles(RLTask):
             
             return DataStructs.FingerprintSimilarity(fp1, fp2)
 
-        def calc_reward(mol1, mol2, beta=10):
-            return (1-levenshtein_ratio(mol1, mol2))**(1+(1-tanimoto_sim(mol1, mol2))*beta)
+        def calc_reward(mol1, mol2, beta=30):
+            edit_distance = 1-levenshtein_ratio(mol1, mol2)
+            edit_distance = min(edit_distance, 0.3)
+            return edit_distance**(1+(1-tanimoto_sim(mol1, mol2))*beta)
 
         rewards = []
 
@@ -104,7 +106,7 @@ class PermuteSmiles(RLTask):
             
             response_mol = Chem.MolFromSmiles(answer)
             if response_mol is None:
-                rewards.append(-1)
+                rewards.append(0)
                 continue
             
             reward = calc_reward(answer, ref)
