@@ -16,7 +16,8 @@ class PermuteSmiles(RLTask):
         self.question_template = (
             "You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original one, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
             "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
-            "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
+            "For example, CC(=O)O can be permuted into O=C(O)C. "
+	    "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
             "Don't hesitate to start over if you get stuck. You can reasoning as much as you want. "
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
             "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"

@@ -36,6 +36,7 @@ MODEL=/cache/huggingface/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af
 MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
 MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
+MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
