@@ -8,6 +8,10 @@ from rdkit import Chem
 import pandas as pd
 from Levenshtein import ratio as levenshtein_ratio
 
+from rdkit.Chem import AllChem
+from rdkit import Chem
+from rdkit import DataStructs
+
 class PermuteSmiles(RLTask):
     question_template: str = ""
     
@@ -74,6 +78,19 @@ class PermuteSmiles(RLTask):
 
         # answers = [self.preprocess_response(c) for c in completions]
         # self.random_print(completions, solution, answers)
+        
+        def tanimoto_sim(mol1, mol2):
+            mol1 = Chem.MolFromSmiles(mol1)
+            mol2 = Chem.MolFromSmiles(mol2)
+            
+            fpgen = AllChem.GetRDKitFPGenerator(fpSize=1024)
+            fp1 = fpgen.GetFingerprint(mol1)
+            fp2 = fpgen.GetFingerprint(mol2)
+            
+            return DataStructs.FingerprintSimilarity(fp1, fp2)
+
+        def calc_reward(mol1, mol2, beta=10):
+            return (1-levenshtein_ratio(mol1, mol2))**(1+(1-tanimoto_sim(mol1, mol2))*beta)
 
         rewards = []
 
@@ -90,21 +107,23 @@ class PermuteSmiles(RLTask):
                 rewards.append(-1)
                 continue
             
-            if answer == ref:
-                rewards.append(-0.6)
-                continue
-                        
-            canon_response = Chem.MolToSmiles(response_mol, canonical=True)
-            canon_reference = Chem.MolToSmiles(Chem.MolFromSmiles(ref), canonical=True)
-            if canon_response != canon_reference:
-                rewards.append(-0.3)
-                continue
+            reward = calc_reward(answer, ref)
             
-            self.good_print(answer, ref, completion)
+            # if answer == ref:
+            #     rewards.append(-0.6)
+            #     continue
+                        
+            # canon_response = Chem.MolToSmiles(response_mol, canonical=True)
+            # canon_reference = Chem.MolToSmiles(Chem.MolFromSmiles(ref), canonical=True)
+            # if canon_response != canon_reference:
+            #     rewards.append(-0.3)
+            #     continue
+            
+            # self.good_print(answer, ref, completion)
               
-            edit_distance_reward = 1 - levenshtein_ratio(answer, ref) # range (0, 1)
-            # reward = 0.2 + 0.8*edit_distance_reward
-            reward = edit_distance_reward
+            # edit_distance_reward = 1 - levenshtein_ratio(answer, ref) # range (0, 1)
+            # # reward = 0.2 + 0.8*edit_distance_reward
+            # reward = edit_distance_reward
             
             rewards.append(reward)
         
