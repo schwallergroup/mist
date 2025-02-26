@@ -61,7 +61,7 @@ export CMD=" \
     "
 
 export LAUNCHER="conda deactivate;
-cd /Documents/sink/;
+cd $(pwd);
 pip install hf_transfer gdown;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
