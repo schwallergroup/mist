@@ -28,11 +28,6 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-#TASK=canonic
-#TASK=canonmc
-#TASK=iupacsm
-#TASK=rxnpred
-
 MODEL_ID=$1
 TASK=$2
 
