@@ -4,8 +4,8 @@
 #SBATCH --time=10:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
-#SBATCH --output=./logs/%x-%j.out
-#SBATCH --err=./logs/%x-%j.err
+#SBATCH --output=../sink_logs/%x-%j.out
+#SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --environment=vllm071
 #SBATCH -A a-a05
 
