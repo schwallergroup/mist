@@ -42,7 +42,7 @@ CONFIG_FILE=recipes/$TASK.yaml
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
-export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
+export WANDB_API_KEY=$(cat wandb_api_key.txt)
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
@@ -61,7 +61,7 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID} \
+    --run_name grpo-${MODEL_ID}-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
