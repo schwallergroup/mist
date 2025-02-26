@@ -10,7 +10,7 @@
 #SBATCH -A a-a05
 
 # Run like:
-# sbatch launch.slurm Qwen2.5-3B canonic
+# sbatch launch.slurm Qwen2.5-0.5B canonmc
 
 set -x -e
 
