@@ -30,6 +30,8 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
+echo "MODEL ID: ${MODEL_ID}"
+echo "TASK: ${TASK}"
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
@@ -55,7 +57,7 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
+    --output_dir=/cache/checkpoints/${MODEL_ID}/${SLURM_JOB_ID} \
     --run_name grpo-${MODEL_ID}-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     "
