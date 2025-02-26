@@ -62,8 +62,9 @@ export CMD=" \
     --base_model_name=$MODEL_NAME \
     "
 
+PWD=$(pwd) 
 export LAUNCHER="conda deactivate;
-cd $(pwd);
+cd ${PWD};
 pip install hf_transfer gdown;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
@@ -79,7 +80,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
