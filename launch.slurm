@@ -15,6 +15,7 @@
 set -x -e
 
 source ~/.bashrc
+cd /base/sink
 echo "START TIME: $(date)"
 
 
