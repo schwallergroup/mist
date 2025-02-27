@@ -18,15 +18,17 @@ class PermuteSmiles(RLTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original one, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
+            "Question: You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the SMILES sequence for this molecule, in such a way that the SMILES sequence is different from the original one, but the original molecule does not change. Here is the original SMILES: [START_SMILES] {} [END_SMILES]. "
             "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
-            "For example, CC(=O)O can be permuted into O=C(O)C. "
-	        "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
-            "Don't hesitate to start over if you get stuck. You can reasoning as much as you want. "
+            "For example, [START_SMILES] CC(=O)O [END_SMILES] can be permuted into [START_SMILES] O=C(O)C [END_SMILES]. "
+            "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] O=C(O)C [END_SMILES] </answer>. "
+	        # "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
+            "Don't hesitate to start over again if you get stuck or get the molecule wrong. "
+            "Remember that your answer SMILES must satisfy two criteria: 1) it must be different from the input SMILES, and 2) it must represent the same molecule. "
+            "You can revise your reasoning as many times as you want. "
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
             "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
-            "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] c1ccccc1 [END_SMILES] </answer>. "
-            "Do not write anything else outside of the tags.\n"
+            # "Do not write anything else outside of the tags.\n"
             "Your response: <think> "
         )
     
