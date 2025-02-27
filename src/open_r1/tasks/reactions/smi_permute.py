@@ -27,7 +27,7 @@ class PermuteSmiles(RLTask):
             "Remember that your answer SMILES must satisfy two criteria: 1) it must be different from the input SMILES, and 2) it must represent the same molecule. "
             "You can revise your reasoning as many times as you want. "
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
-            "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
+            # "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             # "Do not write anything else outside of the tags.\n"
             "Your response: <think> "
         )
