@@ -15,7 +15,7 @@
 set -x -e
 
 source ~/.bashrc
-cd /base/sink
+cd /Documents/sink
 echo "START TIME: $(date)"
 
 
@@ -64,7 +64,7 @@ export CMD=" \
     "
 
 export LAUNCHER="conda deactivate;
-cd /base/sink;
+cd /Documents/sink;
 pip install hf_transfer gdown;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
