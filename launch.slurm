@@ -2,7 +2,7 @@
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=20:00:00
-#SBATCH --nodes=4
+#SBATCH --nodes=8
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
@@ -38,6 +38,7 @@ MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb95
 MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
+MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot-207163-checkpoint-25/
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
