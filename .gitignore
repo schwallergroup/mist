@@ -175,5 +175,8 @@ data/
 wandb/
 logs/
 
+# Others
+.idea
+
 # WANDB API KEY (PERSONAL & SECRET)
 wandb_api_key.txt
