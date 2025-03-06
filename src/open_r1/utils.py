@@ -11,6 +11,7 @@ from transformers.trainer_utils import get_last_checkpoint
 class ExtendedGRPOConfig(GRPOConfig):
     dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
+    task_mode: str = "base"
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
     base_model_name: str = "None"

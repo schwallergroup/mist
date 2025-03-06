@@ -41,6 +41,7 @@ def grpo_function(
     task = CHEMTASKS[training_args.chem_task](
         dataset_id_or_path=training_args.dataset_id_or_path,
         dataset_splits=training_args.dataset_splits,
+        task_mode=training_args.task_mode,
         begin_smiles_tag=begin_smiles_tag,
         end_smiles_tag=end_smiles_tag,
     )
