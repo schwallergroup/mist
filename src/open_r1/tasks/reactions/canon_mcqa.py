@@ -36,7 +36,7 @@ class CanonicalizeSmilesMCQA(RLTask):
             # Build the wrong SMILES (different from the correct one but with the same molecular formula and also canonicalized)
             df_smiles = df['SMILES'].tolist()
             df_formulas = df['MolecularFormula'].tolist()
-            random.seed(0)
+            random.seed(42)
             df_smiles_wrong = [random.sample([sw for sw in formula_mapping[f] if sw != s], k=3) for s, f in zip(df_smiles, df_formulas)]
             df['SMILES_wrong1'] = [sw[0] for sw in df_smiles_wrong]
             df['SMILES_wrong2'] = [sw[1] for sw in df_smiles_wrong]
