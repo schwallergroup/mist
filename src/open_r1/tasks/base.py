@@ -63,7 +63,7 @@ class RLTask(BaseModel):
         self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
 
-    def log_correct(self, content, p=0.5):
+    def log_correct(self, content, p=0.05):
         if random.random() < p:
             print(self.response_print.format(content))
 
