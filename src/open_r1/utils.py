@@ -1,11 +1,45 @@
 
 import os
-from typing import List
+from typing import List, Optional, Union, Callable
 from pydantic import Field
 from dataclasses import dataclass
-from trl import GRPOConfig
+from trl import GRPOConfig, GRPOTrainer
 import logging
 from transformers.trainer_utils import get_last_checkpoint
+
+
+MetricFunc = Callable[[], dict]
+
+class ExtendedGRPOTrainer(GRPOTrainer):
+    def __init__(
+        self,
+        metric_funcs: Optional[Union[MetricFunc, list[MetricFunc]]] = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        # Define metric functions to use (default is None)
+        if metric_funcs is None:
+            metric_funcs = []
+        elif not isinstance(metric_funcs, list):
+            metric_funcs = [metric_funcs]
+        self._metric_funcs = metric_funcs
+
+    def _generate_and_score_completions(self, *args, **kwargs):
+        """
+        Overload the method to add custom metric to log.
+        """
+        output = super()._generate_and_score_completions(*args, **kwargs)
+
+        # Additional logging
+        mode = "eval" if self.control.should_evaluate else "train"
+        for metric_func in self._metric_funcs:
+            metrics = metric_func()
+            for metric_name, metric_value in metrics.items():
+                self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+
+        return output
 
 @dataclass
 class ExtendedGRPOConfig(GRPOConfig):
