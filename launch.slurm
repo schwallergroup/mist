@@ -10,7 +10,12 @@
 #SBATCH -A a-a05
 
 # Run like:
-# sbatch launch.slurm Qwen2.5-0.5B canonmc
+# Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
+# Example 2: sbatch launch.slurm Qwen2.5-0.5B canonmc base
+# Argument 1: model id (from model_paths.txt)
+# Argument 2: task name (in folder recipes)
+# Argument 3 (optional): task mode
+# Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
 
@@ -31,8 +36,17 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
+TASK_MODE="${3:-base}"
+if [ "$TASK_MODE" != "base" ]; then
+    TASK_MODE_SUFFIX="_$TASK_MODE"
+else
+    TASK_MODE_SUFFIX=""
+fi
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
+echo "TASK_MODE: ${TASK_MODE}"
+
+
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
@@ -59,8 +73,9 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/${MODEL_ID}/${SLURM_JOB_ID} \
-    --run_name grpo-${MODEL_ID}-${SLURM_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
+    --task_mode=$TASK_MODE \
     "
 
 export LAUNCHER="conda deactivate;

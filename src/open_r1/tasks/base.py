@@ -20,6 +20,7 @@ class RLTask(BaseModel):
     dataset_splits: Optional[str] = None
     dataset: Optional[Any] = None
     task_variant: Optional[str] = "base"
+    task_mode: Optional[str] = "base"
 
     system_prompt: Optional[str] = Field(
         "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
