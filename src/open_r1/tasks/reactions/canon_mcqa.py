@@ -23,9 +23,9 @@ class CanonicalizeSmilesMCQA(RLTask):
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
 
-        if self.task_mode == 'base':
+        if self.task_variant == 'base':
             shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_variant2', 'SMILES_variant3', 'SMILES_variant4', "SMILES"]].values]
-        elif self.task_mode == 'options_sameformula_canon':
+        elif self.task_variant == 'options_sameformula_canon':
             # Drop duplicates (same SMILES)
             df = df.drop_duplicates(subset='SMILES', keep=False)
             # Drop compounds with rare molecular formulas (less than 4 occurrences)
@@ -44,7 +44,7 @@ class CanonicalizeSmilesMCQA(RLTask):
             # Create shuffled with the new values (wrong SMILES but canonicalized & with the same molecular formula)
             shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_wrong1', 'SMILES_wrong2', 'SMILES_wrong3', "SMILES"]].values]
         else:
-            raise ValueError(f"task_mode {self.task_mode} not recognized")
+            raise ValueError(f"task_variant {self.task_variant} not recognized")
 
         train_dict = {
             'problem': df['SMILES_variant1'].tolist(),
