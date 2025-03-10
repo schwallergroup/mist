@@ -4,6 +4,7 @@ from .reactions.forward import ForwardReaction
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.iupac2smi import Iupac2Smiles
+from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 
 
 CHEMTASKS = {
@@ -11,5 +12,6 @@ CHEMTASKS = {
     "ForwardReaction": ForwardReaction,
     "CanonicalizeSmiles": CanonicalizeSmiles,
     "Iupac2Smiles": Iupac2Smiles,
-    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA
+    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA,
+    "SmilesHydrogen": SmilesHydrogen,
 }
