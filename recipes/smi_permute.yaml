@@ -7,7 +7,7 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: PermuteSmiles
-dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/CRLLM-PubChem-compounds1M-very_simple.csv
+dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/CRLLM-PubChem-compounds1M-very_very_simple.csv
 rewards:
 - format
 - accuracy
@@ -33,11 +33,11 @@ warmup_ratio: 0.03
 # GRPO specific parameters
 beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
 max_prompt_length: 256
-max_completion_length: 8000
+max_completion_length: 3000
 num_generations: 8
 use_vllm: true
 vllm_device: "cuda:3"
-vllm_gpu_memory_utilization: 0.7
+vllm_gpu_memory_utilization: 0.8
 vllm_max_model_len: 2048
 
 # Logging arguments

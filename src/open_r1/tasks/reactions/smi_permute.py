@@ -14,22 +14,23 @@ from rdkit import DataStructs
 
 class PermuteSmiles(RLTask):
     question_template: str = ""
+    system_prompt: str = ""
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "Question: You are a student in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the given SMILES sequence of a molecule, in such a way that the resulted SMILES is different from the input SMILES as much as possible, but the original molecule is not changed. "
+            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the given SMILES sequence of a molecule, in such a way that the resulted SMILES is different from the input SMILES as much as possible, but the original molecule is not changed. "
             # "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
-            "Here is an example to help you understand the task:\n"
-            "Given an example input SMILES [START_SMILES] CCCC(C)C1CC1C [END_SMILES]. "
-            "<think> First, I visualize the molecule by numbering the atoms: [START_SMILES] [C:1][C:2][C:3][C:4]([C:5])[C:6]1[C:7][C:8]1[C:9] [END_SMILES]. "
-            "This structure is a cyclopropane ([START_SMILES] [C:6]1[C:7][C:8]1 [END_SMILES]) with a 1-methylbutyl ([START_SMILES] [C:1][C:2][C:3][C:4]([C:5])- [END_SMILES]) and a methyl ([START_SMILES] -[C:9] [END_SMILES]) substitutions. "
-            "I could try to permute this SMILES by starting from another atom, for example, the methyl group [START_SMILES] -[C:9] [END_SMILES]. "
-            "In that case, a possible permutation could be [START_SMILES] [C:9][C:8]1[C:7][C:6]1[C:4]([C:5])[C:3][C:2][C:1] [END_SMILES]. "
-            "Removing the atom numbering, this would give [START_SMILES] CC1CC1C(C)CCC [END_SMILES]. "
-            "This SMILES represents the same molecule as the input SMILES, with a cyclopropane substituted by a methyl group and a 1-methylbutyl group. "
-            "Therefore, I submit [START_SMILES] CC1CC1C(C)CCC [END_SMILES] as the final answer </think>. "
-            "<answer> [START_SMILES] CC1CC1C(C)CCC [END_SMILES] </answer>.\n"
+            # "Here is an example to help you understand the task:\n"
+            # "Given an example input SMILES [START_SMILES] CCCC(C)C1CC1C [END_SMILES]. "
+            # "<think> First, I visualize the molecule by numbering the atoms: [START_SMILES] [C:1][C:2][C:3][C:4]([C:5])[C:6]1[C:7][C:8]1[C:9] [END_SMILES]. "
+            # "This structure is a cyclopropane ([START_SMILES] [C:6]1[C:7][C:8]1 [END_SMILES]) with a 1-methylbutyl ([START_SMILES] [C:1][C:2][C:3][C:4]([C:5])- [END_SMILES]) and a methyl ([START_SMILES] -[C:9] [END_SMILES]) substitutions. "
+            # "I could try to permute this SMILES by starting from another atom, for example, the methyl group [START_SMILES] -[C:9] [END_SMILES]. "
+            # "In that case, a possible permutation could be [START_SMILES] [C:9][C:8]1[C:7][C:6]1[C:4]([C:5])[C:3][C:2][C:1] [END_SMILES]. "
+            # "Removing the atom numbering, this would give [START_SMILES] CC1CC1C(C)CCC [END_SMILES]. "
+            # "This SMILES represents the same molecule as the input SMILES, with a cyclopropane substituted by a methyl group and a 1-methylbutyl group. "
+            # "Therefore, I submit [START_SMILES] CC1CC1C(C)CCC [END_SMILES] as the final answer </think>. "
+            # "<answer> [START_SMILES] CC1CC1C(C)CCC [END_SMILES] </answer>.\n"
             # "For example, [START_SMILES] CC(=O)O [END_SMILES] can be permuted into [START_SMILES] O=C(O)C [END_SMILES]. "
             # "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] O=C(O)C [END_SMILES] </answer>. "
 	        # "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
@@ -44,6 +45,12 @@ class PermuteSmiles(RLTask):
         )
         self.question_template = self.question_template.replace("[START_SMILES] ", "")
         self.question_template = self.question_template.replace(" [END_SMILES]", "")
+        
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        return {
+            'prompt': self.question_template.format(problem),
+            'problem': problem
+        }
     
     def load(self):
         """Load and return the complete dataset."""
@@ -64,25 +71,30 @@ class PermuteSmiles(RLTask):
         })
         return self.dataset
     
-    def random_print(self, answer, ref, completion, out_rate = 0.01):
+    def random_print(self, print_data, out_rate = 0.01):
         if random.random() < out_rate:  # 1% chance to print a completion
             out = (
                 "\n\n=======<RANDOM_RESPONSE>=======\n"
-                f"*** ANSWER: {answer}\n"
-                f"*** REFERENCE: {ref}\n"
-                f"*** FULL RESPONSE: {completion}"
+                # f"*** ANSWER: {answer}\n"
+                # f"*** REFERENCE: {ref}\n"
+                # f"*** FULL RESPONSE: {completion}"
             )
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
             print(out)
     
-    def good_print(self, answer, ref, completion, out_rate = 0.1):
+    def good_print(self, print_data, out_rate = 0.5):
         if random.random() < out_rate:  # 10% chance to print a completion
             # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
             out = (
                 "\n\n=======<GOOD_RESPONSE>=======\n"
-                f"*** ANSWER: {answer}\n"
-                f"*** REFERENCE: {ref}\n"
-                f"*** FULL RESPONSE: {completion}"
+                # f"*** ANSWER: {answer}\n"
+                # f"*** REFERENCE: {ref}\n"
+                # f"*** FULL RESPONSE: {completion}"
             )
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
+                
             print(out)
     
     def accuracy_reward(self, completions, solution, **kwargs):
@@ -94,7 +106,7 @@ class PermuteSmiles(RLTask):
         # answers = [self.preprocess_response(c) for c in completions]
         # self.random_print(completions, solution, answers)
         
-        def tanimoto_sim(mol1, mol2):
+        def _tanimoto_sim(mol1, mol2):
             mol1 = Chem.MolFromSmiles(mol1)
             mol2 = Chem.MolFromSmiles(mol2)
             
@@ -104,43 +116,47 @@ class PermuteSmiles(RLTask):
             
             return DataStructs.FingerprintSimilarity(fp1, fp2)
 
-        def calc_reward(mol1, mol2, beta=30):
+        def _calc_score(mol1, mol2, beta=30):
             edit_distance = 1-levenshtein_ratio(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
-            return edit_distance**(1+(1-tanimoto_sim(mol1, mol2))*beta) / 0.3
+            return edit_distance**(1+(1-_tanimoto_sim(mol1, mol2))*beta) / 0.3
+        
+        def _extract_smiles(completion: str):
+            excluded_smiles = set(('I'))
+            words = completion.split()
+            words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
+            # words_tkns = [smiles_tokenizer(w) for w in words]
+            # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
+            smiles = words
+            smiles = [s for s in smiles if s and s not in excluded_smiles]
+            smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
+            return smiles
+            
 
         rewards = []
 
         for completion, ref in zip(completions, solution):
+            smiles = _extract_smiles(completion)
+            scores = [_calc_score(smi, ref) for smi in smiles]
+            reward = max(scores) if scores else -0.5
+            
+            # if answer == "NONE":
+            #     rewards.append(-1)
+            #     continue
+            
+            # response_mol = Chem.MolFromSmiles(answer)
+            # if response_mol is None:
+            #     rewards.append(0)
+            #     continue
+            
+            # reward = _calc_score(answer, ref)
             answer = self.preprocess_response(completion)
-            self.random_print(answer, ref, completion)
+            answer_score = _calc_score(answer, ref) if Chem.MolFromSmiles(answer) else 0
+            reward += answer_score
             
-            if answer == "NONE":
-                rewards.append(-1)
-                continue
-            
-            response_mol = Chem.MolFromSmiles(answer)
-            if response_mol is None:
-                rewards.append(0)
-                continue
-            
-            reward = calc_reward(answer, ref)
-            
-            # if answer == ref:
-            #     rewards.append(-0.6)
-            #     continue
-                        
-            # canon_response = Chem.MolToSmiles(response_mol, canonical=True)
-            # canon_reference = Chem.MolToSmiles(Chem.MolFromSmiles(ref), canonical=True)
-            # if canon_response != canon_reference:
-            #     rewards.append(-0.3)
-            #     continue
-            
-            # self.good_print(answer, ref, completion)
-              
-            # edit_distance_reward = 1 - levenshtein_ratio(answer, ref) # range (0, 1)
-            # # reward = 0.2 + 0.8*edit_distance_reward
-            # reward = edit_distance_reward
+            self.random_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
+            if reward > 0:
+                self.good_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
             
             rewards.append(reward)
         
