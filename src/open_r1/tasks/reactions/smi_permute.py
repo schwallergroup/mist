@@ -117,11 +117,18 @@ class PermuteSmiles(RLTask):
             return DataStructs.FingerprintSimilarity(fp1, fp2)
 
         def _calc_score(mol1, mol2, beta=30):
+            # mol1_nH = len([_ for l in mol1 if l=="H"])
             edit_distance = 1-levenshtein_ratio(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
             return edit_distance**(1+(1-_tanimoto_sim(mol1, mol2))*beta) / 0.3
         
         def _extract_smiles(completion: str):
+            def _post_process_smiles(smiles):
+                smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
+                smiles = re.sub(r'\[CH\d\]', 'C', smiles)
+                smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
+                
+                return smiles
             excluded_smiles = set(('I'))
             words = completion.split()
             words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
@@ -130,9 +137,7 @@ class PermuteSmiles(RLTask):
             smiles = words
             smiles = [s for s in smiles if s and s not in excluded_smiles]
             smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
-            # smiles = [re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', s) for s in smiles]
-            # smiles = [re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), s) for s in smiles]
-            smiles = [Chem.MolToSmiles(Chem.MolFromSmiles(s), canonical=False) for s in smiles]
+            smiles = [_post_process_smiles(s) for s in smiles]
             return smiles
             
 
