@@ -83,7 +83,7 @@ class PermuteSmiles(RLTask):
                 out += f"*** {k.upper()}: {v}\n"
             print(out)
     
-    def good_print(self, print_data, out_rate = 0.5):
+    def good_print(self, print_data, out_rate = 0.1):
         if random.random() < out_rate:  # 10% chance to print a completion
             # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
             out = (
@@ -130,6 +130,9 @@ class PermuteSmiles(RLTask):
             smiles = words
             smiles = [s for s in smiles if s and s not in excluded_smiles]
             smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
+            # smiles = [re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', s) for s in smiles]
+            # smiles = [re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), s) for s in smiles]
+            smiles = [Chem.MolToSmiles(Chem.MolFromSmiles(s), canonical=False) for s in smiles]
             return smiles
             
 
@@ -155,7 +158,7 @@ class PermuteSmiles(RLTask):
             reward += answer_score
             
             self.random_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
-            if reward > 0:
+            if reward > 0.3:
                 self.good_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
             
             rewards.append(reward)
