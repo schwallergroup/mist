@@ -114,7 +114,12 @@ class PermuteSmiles(RLTask):
             fp1 = fpgen.GetFingerprint(mol1)
             fp2 = fpgen.GetFingerprint(mol2)
             
-            return DataStructs.FingerprintSimilarity(fp1, fp2)
+            charge1 = Chem.GetFormalCharge(mol1)
+            charge2 = Chem.GetFormalCharge(mol2)
+            
+            charge_penalty = 0.85 if charge1 != charge2 else 1.0
+            
+            return DataStructs.FingerprintSimilarity(fp1, fp2) * charge_penalty
 
         def _calc_score(mol1, mol2, beta=30):
             # mol1_nH = len([_ for l in mol1 if l=="H"])
