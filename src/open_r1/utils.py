@@ -17,6 +17,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         *args,
         **kwargs
     ):
+        # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args, **kwargs)
 
         # Define metric functions to use (default is None)
@@ -26,18 +27,27 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             metric_funcs = [metric_funcs]
         self._metric_funcs = metric_funcs
 
-    def _generate_and_score_completions(self, *args, **kwargs):
-        """
-        Overload the method to add custom metric to log.
-        """
-        output = super()._generate_and_score_completions(*args, **kwargs)
-
+    def add_custom_metrics(self):
         # Additional logging
         mode = "eval" if self.control.should_evaluate else "train"
         for metric_func in self._metric_funcs:
             metrics = metric_func()
             for metric_name, metric_value in metrics.items():
-                self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                if mode in self._metrics.keys():
+                    # Compatible with the current version 'main' of trl repository
+                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                else:
+                    # Compatible with the "older versions" of trl repository (0.14.0 included)
+                    self._metrics[f"custom/{metric_name}"].append(metric_value)
+
+    def compute_loss(self, *args, **kwargs):
+        """
+        Override the method to add custom metrics to log.
+        """
+        output = super().compute_loss(*args, **kwargs)
+
+        # Additional logging
+        self.add_custom_metrics()
 
         return output
 
