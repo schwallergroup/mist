@@ -371,8 +371,8 @@ class SmilesHydrogen(RLTask):
                 else:
                     reward = -0.5
             elif levenshtein_distance_solution < levenshtein_distance_problem_solution:
-                # Reward from 0.1 to 1.0 if the answer contains correctly inferred information
-                reward = max(1 - levenshtein_distance_solution / levenshtein_distance_problem_solution, 0.1)
+                # Reward from 0.2 to 1.0 if the answer contains correctly inferred information
+                reward = max(1 - levenshtein_distance_solution / levenshtein_distance_problem_solution, 0.2)
             elif levenshtein_distance_input == 0:
                 # Small reward if the answer is a copy-paste of the input
                 reward = 0.1
