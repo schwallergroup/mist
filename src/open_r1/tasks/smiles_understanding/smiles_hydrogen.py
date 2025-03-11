@@ -5,6 +5,7 @@ import random
 from datasets import Dataset, DatasetDict
 from rdkit import RDLogger, Chem
 import pandas as pd
+import numpy as np
 RDLogger.DisableLog('rdApp.*')
 
 
@@ -80,6 +81,8 @@ class SmilesHydrogen(RLTask):
             'removeH/tanimoto_accuracy_reward': [],
             'addH/levenstein_accuracy_reward': [],
             'removeH/levenstein_accuracy_reward': [],
+            'addH/sequential_reward': [],
+            'removeH/sequential_reward': [],
         }
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
@@ -399,6 +402,53 @@ class SmilesHydrogen(RLTask):
             self.custom_metrics['removeH/levenstein_accuracy_reward'].extend([r for r, c in zip(rewards, question_category) if c == 'removeH'])
 
         return rewards
+    def sequential_reward(self, completions, problem, solution, question_category, **kwargs):
+        reward_funcs_ordered = [
+            self.format_reward,
+            self.reasoning_steps_reward,
+            self.levenstein_accuracy_reward,
+            self.smiles_validity_reward,
+            self.tanimoto_accuracy_reward,
+            self.accuracy_reward,
+        ]
+        reward_rescaling_funcs = [
+            lambda x: (x+1)/2,  # format_reward [-1, 1] -> [0, 1]
+            lambda x: x,  # reasoning_steps_reward [0, 1] -> [0, 1]
+            lambda x: (x+0.5)/1.5,  # levenstein_accuracy_reward [-0.5, 1] -> [0, 1]
+            lambda x: (x+0.5)/0.5,  # smiles_validity_reward [-0.5, 0] -> [0, 1]
+            lambda x: np.maximum(x, 0),  # tanimoto_accuracy_reward [-0.5, 1] -> [0, 1]
+            lambda x: x,  # accuracy_reward [0, 1] -> [0, 1]
+        ]
+
+        # Compute rewards
+        reward_kwargs = {
+            'completions': completions,
+            'problem': problem,
+            'solution': solution,
+            'question_category': question_category,
+            **kwargs,
+        }
+        rewards = [np.array(reward_func(**reward_kwargs)) for reward_func in reward_funcs_ordered]
+
+        # Compute rewards_rescaled (rescaled to [0, 1])
+        rewards_rescaled = [reward_rescaling_func(_rewards) for reward_rescaling_func, _rewards in zip(reward_rescaling_funcs, rewards)]
+
+        # Sum rewards - compute the reward scaling factors
+        n_rewards = len(reward_funcs_ordered)
+        n_samples = len(completions)
+        reward_scaling_factors = np.ones((n_rewards, n_samples), dtype=float)
+        for i in range(n_rewards-1):
+            reward_scaling_factors[i+1:] = reward_scaling_factors[i+1:] * rewards_rescaled[i].reshape(1, -1)
+        # Sum rewards - compute final rewards
+        sequential_rewards = np.sum(np.stack(rewards, axis=0) * reward_scaling_factors, axis=0)
+        sequential_rewards = sequential_rewards.tolist()
+
+        # Logging custom metrics
+        if self.log_custom_metrics:
+            self.custom_metrics['addH/sequential_reward'].extend([r for r, c in zip(sequential_rewards, question_category) if c == 'addH'])
+            self.custom_metrics['removeH/sequential_reward'].extend([r for r, c in zip(sequential_rewards, question_category) if c == 'removeH'])
+
+        return sequential_rewards
     def get_metrics(self) -> dict:
         """
         Get task metrics to log in WANDB.
