@@ -121,16 +121,19 @@ class PermuteSmiles(RLTask):
             
             return DataStructs.FingerprintSimilarity(fp1, fp2) * charge_penalty
         
-        def _remove_stereo(smiles: str):
+        def _edit_distance_preprocess(smiles: str):
+            # Remove stereo symbols
             smiles = re.sub(r'\/|\\|@', '', smiles)
             smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-            smiles = re.sub(r'\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?\]', lambda m: m.group(1), smiles)
+            smiles = re.sub(r'\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?(?:\:\d)?\]', lambda m: m.group(1), smiles)
+            # Remove ring numbers
+            smiles = re.sub(r'\d', '', smiles)
             
             return smiles
         
         def _edit_distance(mol1, mol2):
-            mol1 = _remove_stereo(mol1)
-            mol2 = _remove_stereo(mol2)
+            mol1 = _edit_distance_preprocess(mol1)
+            mol2 = _edit_distance_preprocess(mol2)
             if mol1 in mol2 or mol2 in mol1:
                 return 0.0
             return 1-levenshtein_ratio(mol1, mol2)
