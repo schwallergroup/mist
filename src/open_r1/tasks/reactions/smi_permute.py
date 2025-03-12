@@ -124,7 +124,7 @@ class PermuteSmiles(RLTask):
         def _remove_stereo(smiles: str):
             smiles = re.sub(r'\/|\\|@', '', smiles)
             smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-            smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
+            smiles = re.sub(r'\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?\]', lambda m: m.group(1), smiles)
             
             return smiles
         
