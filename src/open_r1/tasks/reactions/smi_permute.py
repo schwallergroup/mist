@@ -40,7 +40,7 @@ class PermuteSmiles(RLTask):
             # "A strategy you could try, but not obligatory to do, is to reverse the order of the atoms. "
             # "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             # "Do not write anything else outside of the tags.\n"
-            "Here is the SMILES that you need to work on: [START_SMILES] {} [END_SMILES]."
+            "Here is the SMILES that you need to work on: [START_SMILES] {} [END_SMILES]. "
             "Your response: <think> "
         )
         self.question_template = self.question_template.replace("[START_SMILES] ", "")
@@ -128,6 +128,8 @@ class PermuteSmiles(RLTask):
             smiles = re.sub(r'\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?(?:\:\d)?\]', lambda m: m.group(1), smiles)
             # Remove ring numbers
             smiles = re.sub(r'\d', '', smiles)
+            # Remove redundant symbols
+            smiles = re.sub(r'-', '', smiles)
             
             return smiles
         
