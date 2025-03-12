@@ -121,8 +121,9 @@ class PermuteSmiles(RLTask):
             
             return DataStructs.FingerprintSimilarity(fp1, fp2) * charge_penalty
 
-        def _calc_score(mol1, mol2, beta=30):
-            # mol1_nH = len([_ for l in mol1 if l=="H"])
+        def _calc_score(mol1: str, mol2: str, beta=30):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
+                return 0.0
             edit_distance = 1-levenshtein_ratio(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
             return edit_distance**(1+(1-_tanimoto_sim(mol1, mol2))*beta) / 0.3
@@ -141,8 +142,8 @@ class PermuteSmiles(RLTask):
             # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
             smiles = words
             smiles = [s for s in smiles if s and s not in excluded_smiles]
-            smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
             smiles = [_post_process_smiles(s) for s in smiles]
+            smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
             return smiles
             
 
