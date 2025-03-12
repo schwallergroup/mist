@@ -120,20 +120,34 @@ class PermuteSmiles(RLTask):
             charge_penalty = 0.85 if charge1 != charge2 else 1.0
             
             return DataStructs.FingerprintSimilarity(fp1, fp2) * charge_penalty
+        
+        def _remove_stereo(smiles: str):
+            smiles = re.sub(r'\/|\\|@', '', smiles)
+            smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
+            smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
+            
+            return smiles
+        
+        def _edit_distance(mol1, mol2):
+            mol1 = _remove_stereo(mol1)
+            mol2 = _remove_stereo(mol2)
+            if mol1 in mol2 or mol2 in mol1:
+                return 0.0
+            return 1-levenshtein_ratio(mol1, mol2)
 
         def _calc_score(mol1: str, mol2: str, beta=30):
             if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
                 return 0.0
-            edit_distance = 1-levenshtein_ratio(mol1, mol2)
+            edit_distance = _edit_distance(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
             return edit_distance**(1+(1-_tanimoto_sim(mol1, mol2))*beta) / 0.3
         
         def _extract_smiles(completion: str):
             def _post_process_smiles(smiles):
                 smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
-                smiles = re.sub(r'\[CH\d\]', 'C', smiles)
+                smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
                 smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
-                
+                smiles = smiles.split('.')[0]
                 return smiles
             excluded_smiles = set(('I'))
             words = completion.split()
