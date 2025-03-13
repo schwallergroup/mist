@@ -49,8 +49,10 @@ MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
 TASK=$1
 RESUME_JOB_ID=$2
 
-if [$RESUME_JOB_ID = -1]; then
+if [[ $RESUME_JOB_ID = -1 ]]
+then
 	RESUME_JOB_ID=$SLURM_JOB_ID
+fi
 
 CONFIG_FILE=recipes/$TASK.yaml
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
