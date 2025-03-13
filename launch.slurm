@@ -47,7 +47,10 @@ MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
 # TASK=smi_permute
 
 TASK=$1
+RESUME_JOB_ID=$2
 
+if [$RESUME_JOB_ID = -1]; then
+	RESUME_JOB_ID=$SLURM_JOB_ID
 
 CONFIG_FILE=recipes/$TASK.yaml
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
@@ -73,7 +76,7 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
+    --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
     --run_name grpo-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     "
