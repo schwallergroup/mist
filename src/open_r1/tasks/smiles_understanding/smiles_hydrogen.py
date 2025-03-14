@@ -6,6 +6,7 @@ from datasets import Dataset, DatasetDict
 from rdkit import RDLogger, Chem
 import pandas as pd
 import numpy as np
+from dataclasses import field
 RDLogger.DisableLog('rdApp.*')
 
 
@@ -13,7 +14,7 @@ class SmilesHydrogen(RLTask):
     question_template_addH: str = ""
     question_template_removeH: str = ""
     log_custom_metrics: bool = True
-    custom_metrics: dict = {}
+    custom_metrics: dict = field(default_factory=dict)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
