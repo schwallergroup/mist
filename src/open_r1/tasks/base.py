@@ -113,4 +113,9 @@ class RLTask(BaseModel):
         # Magic nubmer 3 to encourage 3 steps and more, otherwise partial reward
         return [min(1.0, count / 3) for count in matches]
         
-    
+    def get_metrics(self) -> dict:
+        """
+        Get task metrics to log in WANDB.
+        This function takes no arguments and returns a dictionary of metrics {key[str]: value[float]}.
+        """
+        return dict()

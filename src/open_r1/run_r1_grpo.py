@@ -4,7 +4,7 @@ import os
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint, get_reward_list
+from utils import ExtendedGRPOTrainer, ExtendedGRPOConfig, setup_logger, get_checkpoint, get_reward_list
 from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CHEMTASKS
 
@@ -50,13 +50,14 @@ def grpo_function(
     test_dataset = dataset["test"]
 
     # Instantiate GRPO trainer
-    trainer = GRPOTrainer(
+    trainer = ExtendedGRPOTrainer(
         model=model_args.model_name_or_path,
         reward_funcs=get_reward_list(task, training_args.rewards),
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
         peft_config=get_peft_config(model_args),
+        metric_funcs=[getattr(task, "get_metrics")],
     )
 
     # Check for last checkpoint

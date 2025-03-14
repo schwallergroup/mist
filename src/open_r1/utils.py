@@ -1,11 +1,54 @@
 
 import os
-from typing import List
+from typing import Callable, List, Optional, Union
 from pydantic import Field
 from dataclasses import dataclass
-from trl import GRPOConfig
+from trl import GRPOConfig, GRPOTrainer
 import logging
 from transformers.trainer_utils import get_last_checkpoint
+
+MetricFunc = Callable[[], dict]
+
+class ExtendedGRPOTrainer(GRPOTrainer):
+    def __init__(
+        self,
+        metric_funcs: Optional[Union[MetricFunc, list[MetricFunc]]] = None,
+        *args,
+        **kwargs
+    ):
+        # Note: current trl library version used in the sink repo: 0.14.0
+        super().__init__(*args, **kwargs)
+
+        # Define metric functions to use (default is None)
+        if metric_funcs is None:
+            metric_funcs = []
+        elif not isinstance(metric_funcs, list):
+            metric_funcs = [metric_funcs]
+        self._metric_funcs = metric_funcs
+
+    def add_custom_metrics(self):
+        # Additional logging
+        mode = "eval" if self.control.should_evaluate else "train"
+        for metric_func in self._metric_funcs:
+            metrics = metric_func()
+            for metric_name, metric_value in metrics.items():
+                if mode in self._metrics.keys():
+                    # Compatible with the current version 'main' of trl repository
+                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                else:
+                    # Compatible with the "older versions" of trl repository (0.14.0 included)
+                    self._metrics[f"custom/{metric_name}"].append(metric_value)
+
+    def compute_loss(self, *args, **kwargs):
+        """
+        Override the method to add custom metrics to log.
+        """
+        output = super().compute_loss(*args, **kwargs)
+
+        # Additional logging
+        self.add_custom_metrics()
+
+        return output
 
 @dataclass
 class ExtendedGRPOConfig(GRPOConfig):

@@ -15,6 +15,7 @@ from rdkit import DataStructs
 class PermuteSmiles(RLTask):
     question_template: str = ""
     system_prompt: str = ""
+    custom_metrics: dict = {}
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -32,7 +33,7 @@ class PermuteSmiles(RLTask):
             # "Therefore, I submit [START_SMILES] CC1CC1C(C)CCC [END_SMILES] as the final answer </think>. "
             # "<answer> [START_SMILES] CC1CC1C(C)CCC [END_SMILES] </answer>.\n"
             # "For example, [START_SMILES] CC(=O)O [END_SMILES] can be permuted into [START_SMILES] O=C(O)C [END_SMILES]. "
-            # "Show your reasoning step-by-step in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] O=C(O)C [END_SMILES] </answer>. "
+            # "Show your reasoning in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] O=C(O)C [END_SMILES] </answer>. "
 	        # "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
             # "Don't hesitate to start over again if you get stuck or get the molecule wrong. "
             "Remember that your answer SMILES must satisfy two criteria: 1) it must be different from the input SMILES, and 2) it must represent the same molecule. "
@@ -45,6 +46,13 @@ class PermuteSmiles(RLTask):
         )
         self.question_template = self.question_template.replace("[START_SMILES] ", "")
         self.question_template = self.question_template.replace(" [END_SMILES]", "")
+        
+        self.custom_metrics = {
+            'n_samples': 0,
+            'n_waits': [],
+            'full_response_scores': [],
+            'answer_scores': [],
+        }
         
     def generate_prompt(self, problem, tokenizer, **kwargs):
         return {
@@ -164,34 +172,47 @@ class PermuteSmiles(RLTask):
             smiles = [_post_process_smiles(s) for s in smiles]
             smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
             return smiles
-            
+        
+        def _extract_smiles_from_answer(answer: str, input_smi: str):
+            '''Extract the longest SMILES from the answer that is different from the input SMILES'''
+            smiles = _extract_smiles(answer)
+            smiles = [s for s in smiles if s != input_smi]
+            smiles = max(smiles, key=len) if smiles else None
+            return smiles
+        
+        def count_waits(completion: str):
+            return completion.lower().count("wait")
 
         rewards = []
 
         for completion, ref in zip(completions, solution):
             smiles = _extract_smiles(completion)
             scores = [_calc_score(smi, ref) for smi in smiles]
-            reward = max(scores) if scores else -0.5
+            completion_score = max(scores) if scores else -0.5
             
-            # if answer == "NONE":
-            #     rewards.append(-1)
-            #     continue
-            
-            # response_mol = Chem.MolFromSmiles(answer)
-            # if response_mol is None:
-            #     rewards.append(0)
-            #     continue
-            
-            # reward = _calc_score(answer, ref)
             answer = self.preprocess_response(completion)
-            answer_score = _calc_score(answer, ref) if Chem.MolFromSmiles(answer) else 0
-            reward += answer_score
+            answer_smiles = _extract_smiles_from_answer(answer, ref)
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             
-            self.random_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
+            reward = completion_score + answer_score
+            
+            report = {'answer': answer, 
+                      'reference': ref, 
+                      'full_reponse_score [0, 1]': completion_score,
+                      'answer_score [0, 1]': answer_score, 
+                      'accuracy_reward [0, 2]': reward, 
+                      'full_completion': completion}
+            
+            self.random_print(report)
             if reward > 0.3:
-                self.good_print({'answer': answer, 'reference': ref, 'reward': reward, 'full_completion': completion})
+                self.good_print(report)
             
             rewards.append(reward)
+            
+            self.custom_metrics['n_samples'] += 1
+            self.custom_metrics['n_waits'].append(count_waits(completion))
+            self.custom_metrics['full_response_scores'].append(completion_score)
+            self.custom_metrics['answer_scores'].append(answer_score)
         
         return rewards
 
@@ -218,14 +239,64 @@ class PermuteSmiles(RLTask):
         pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         m = re.search(pattern, response, re.DOTALL)
         if m and len(m.groups()) == 2:
-            smi = m.groups()[1]
+            # smi = m.groups()[1]
 
-            # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
-            smi = smi.replace("[BEGIN_SMILES]", "")
-            smi = smi.replace("[START_SMILES]", "")
-            smi = smi.replace("[END_SMILES]", "")
-            smi = smi.replace(' ', '')
+            # smi = self._post_process_smiles(smi)
             
-            return smi
+            # return smi
+            return m.groups()[1]
         else:
             return "NONE"
+    
+    # def _post_process_smiles(self, smiles):
+    #     # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
+    #     smiles = smiles.replace("[BEGIN_SMILES]", "")
+    #     smiles = smiles.replace("[START_SMILES]", "")
+    #     smiles = smiles.replace("[END_SMILES]", "")
+    #     smiles = smiles.replace(' ', '')
+    #     smiles = smiles.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~')
+    #     return smiles
+        
+    def format_reward(self, completions, **kwargs):
+        """
+        Format: <think>...</think><answer>...</answer>
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+        
+        Returns:
+            list[float]: Reward scores
+        """
+        rewards = []
+
+        for completion in completions:
+            try:
+                if not completion.startswith("<think>"):
+                    completion = "<think>" + completion
+                regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+                match = re.search(regex, completion, re.DOTALL) 
+                # if the format is not correct, reward is 0
+                if match is None or len(match.groups()) != 2:
+                    rewards.append(0.0)
+                else:
+                    # The model tends to generate gibberish outside of the tags
+                    reward = len(match.group()) / len(completion)
+                    # smi = match.group(2)
+                    # smi = self._post_process_smiles(smi)
+                    # if Chem.MolFromSmiles(smi):
+                    #     reward += 0.5
+                    rewards.append(reward)
+            except Exception:
+                rewards.append(0.0)
+        return rewards
+    
+    def get_metrics(self):
+        metrics = {}
+        if self.custom_metrics['n_samples'] > 0:
+            metrics['n_samples'] = self.custom_metrics['n_samples']
+            for k, v in self.custom_metrics.items():
+                if k != 'n_samples':
+                    metrics[k] = sum(v) / len(v)
+        
+        return metrics
+        
