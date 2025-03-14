@@ -11,7 +11,7 @@ dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compound
 rewards:
 - format
 - accuracy
-task_variant: options_sameformula_canon
+task_kwargs.task_variant: options_sameformula_canon
 
 # Lora Arguments
 # No LoRA is used here

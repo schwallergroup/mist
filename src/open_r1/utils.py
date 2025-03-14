@@ -1,8 +1,8 @@
 
 import os
-from typing import List, Optional, Union, Callable
+from typing import List, Optional, Union, Callable, Any, Dict
 from pydantic import Field
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from trl import GRPOConfig, GRPOTrainer
 import logging
 from transformers.trainer_utils import get_last_checkpoint
@@ -55,8 +55,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 class ExtendedGRPOConfig(GRPOConfig):
     dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
-    task_variant: str = "base"
     task_mode: str = "base"
+    task_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
     base_model_name: str = "None"
