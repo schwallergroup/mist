@@ -36,7 +36,11 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
-TASK_SUFFIX=$([[ "$TASK" == *_* ]] && echo "_${TASK#*_}")
+if [[ "$TASK" == *_* ]]; then
+    TASK_SUFFIX="_${TASK#*_}"
+else
+    TASK_SUFFIX=""
+fi
 TASK_MODE="${3:-base}"
 if [ "$TASK_MODE" != "base" ]; then
     TASK_MODE_SUFFIX="_$TASK_MODE"
