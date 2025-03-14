@@ -36,6 +36,7 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
+TASK_SUFFIX=$([[ "$TASK" == *_* ]] && echo "_${TASK#*_}")
 TASK_MODE="${3:-base}"
 if [ "$TASK_MODE" != "base" ]; then
     TASK_MODE_SUFFIX="_$TASK_MODE"
@@ -73,7 +74,7 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/${MODEL_ID}/${SLURM_JOB_ID} \
-    --run_name grpo-${MODEL_ID}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --task_mode=$TASK_MODE \
     "
