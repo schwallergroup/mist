@@ -8,7 +8,8 @@ import random
 import re
 import os
 from pydantic import BaseModel, Field
-from typing import Any, Optional
+from dataclasses import field
+from typing import Any, Optional, Dict
 
 from datasets import load_dataset
 
@@ -20,7 +21,7 @@ class RLTask(BaseModel):
     dataset_splits: Optional[str] = None
     dataset: Optional[Any] = None
     task_mode: Optional[str] = "base"
-    task_kwargs: dict = dict()
+    task_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     system_prompt: Optional[str] = Field(
         "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
