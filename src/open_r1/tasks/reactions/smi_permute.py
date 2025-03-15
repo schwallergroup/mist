@@ -189,7 +189,9 @@ class PermuteSmiles(RLTask):
             reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
             smiles = _extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in smiles]
-            reasoning_score = max(scores) if scores else -0.5
+            max_score = max(scores) if scores else -0.5
+            reasoning_score = max_score
+            best_smiles_reasoning = smiles[scores.index(max_score)] if max_score in scores else 'None'
             
             answer = self.preprocess_response(completion)
             answer_smiles = _extract_smiles_from_answer(answer, ref)
@@ -197,8 +199,10 @@ class PermuteSmiles(RLTask):
             
             reward = reasoning_score + answer_score
             
-            report = {'answer': answer, 
-                      'reference': ref, 
+            answer_smiles = answer_smiles if answer_smiles else 'None'
+            report = {'reference': ref,
+                      'answer': answer_smiles,
+                      'best_smiles_in_reasoning': best_smiles_reasoning,
                       'reasoning_score [0, 1]': reasoning_score,
                       'answer_score [0, 1]': answer_score, 
                       'accuracy_reward [0, 2]': reward, 
