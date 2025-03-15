@@ -105,7 +105,7 @@ class PermuteSmiles(RLTask):
                 
             print(out)
     
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions: list[str], solution, **kwargs):
         """
         Reward function - check that completed SMILES refers to the same molecule as the original SMILES.
         Bonus if the output SMILES is different from the original SMILES.
@@ -186,7 +186,7 @@ class PermuteSmiles(RLTask):
         rewards = []
 
         for completion, ref in zip(completions, solution):
-            reasoning = completion.split('<answer>')[0]
+            reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
             smiles = _extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in smiles]
             reasoning_score = max(scores) if scores else -0.5
@@ -248,6 +248,7 @@ class PermuteSmiles(RLTask):
             return m.groups()[1]
         else:
             return "NONE"
+
     
     # def _post_process_smiles(self, smiles):
     #     # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
