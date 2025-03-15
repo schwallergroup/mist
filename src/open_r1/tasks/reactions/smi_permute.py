@@ -50,7 +50,7 @@ class PermuteSmiles(RLTask):
         self.custom_metrics = {
             'n_samples': 0,
             'n_waits': [],
-            'full_response_scores': [],
+            'reasoning_score': [],
             'answer_scores': [],
         }
         
@@ -186,19 +186,20 @@ class PermuteSmiles(RLTask):
         rewards = []
 
         for completion, ref in zip(completions, solution):
-            smiles = _extract_smiles(completion)
+            reasoning = completion.split('<answer>')[0]
+            smiles = _extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in smiles]
-            completion_score = max(scores) if scores else -0.5
+            reasoning_score = max(scores) if scores else -0.5
             
             answer = self.preprocess_response(completion)
             answer_smiles = _extract_smiles_from_answer(answer, ref)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             
-            reward = completion_score + answer_score
+            reward = reasoning_score + answer_score
             
             report = {'answer': answer, 
                       'reference': ref, 
-                      'full_reponse_score [0, 1]': completion_score,
+                      'reasoning_score [0, 1]': reasoning_score,
                       'answer_score [0, 1]': answer_score, 
                       'accuracy_reward [0, 2]': reward, 
                       'full_completion': completion}
@@ -211,7 +212,7 @@ class PermuteSmiles(RLTask):
             
             self.custom_metrics['n_samples'] += 1
             self.custom_metrics['n_waits'].append(count_waits(completion))
-            self.custom_metrics['full_response_scores'].append(completion_score)
+            self.custom_metrics['reasoning_score'].append(reasoning_score)
             self.custom_metrics['answer_scores'].append(answer_score)
         
         return rewards
