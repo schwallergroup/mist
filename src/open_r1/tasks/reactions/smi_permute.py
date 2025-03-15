@@ -299,6 +299,7 @@ class PermuteSmiles(RLTask):
             for k, v in self.custom_metrics.items():
                 if k != 'n_samples':
                     metrics[k] = sum(v) / len(v)
+                    self.custom_metrics[k] = []
         
         return metrics
         
