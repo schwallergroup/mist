@@ -1,7 +1,7 @@
+import re
+from typing import Dict
 
 from .base import CustomDatasetLoader
-from typing import Dict
-import re
 
 
 class ForwardReactionDataset(CustomDatasetLoader):
@@ -17,17 +17,20 @@ class ForwardReactionDataset(CustomDatasetLoader):
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
-        with open(src_file, 'r', encoding='utf-8') as f:
-            problems = [self.question_template.format(self.process_line(line)) for line in f.readlines()]
-            
-        with open(tgt_file, 'r', encoding='utf-8') as f:
+        with open(src_file, "r", encoding="utf-8") as f:
+            problems = [
+                self.question_template.format(self.process_line(line))
+                for line in f.readlines()
+            ]
+
+        with open(tgt_file, "r", encoding="utf-8") as f:
             solutions = [self.process_line(line) for line in f.readlines()]
-            
+
         # Create empty messages list for each example
         messages = [[] for _ in range(len(problems))]
-        
+
         return {
-            'problem': problems,
-            'solution': solutions,
-            'messages': messages
+            "problem": problems,
+            "solution": solutions,
+            "messages": messages,
         }

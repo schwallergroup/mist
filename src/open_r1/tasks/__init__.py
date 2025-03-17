@@ -1,7 +1,6 @@
-
-from .reactions.forward import ForwardReaction
-from .reactions.canonical import CanonicalizeSmiles
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
+from .reactions.canonical import CanonicalizeSmiles
+from .reactions.forward import ForwardReaction
 from .reactions.iupac2smi import Iupac2Smiles
 
 
@@ -10,5 +9,5 @@ CHEMTASKS = {
     "rxnpred": ForwardReaction,
     "canonic": CanonicalizeSmiles,
     "iupacsm": Iupac2Smiles,
-    "canonmc": CanonicalizeSmilesMCQA
+    "canonmc": CanonicalizeSmilesMCQA,
 }

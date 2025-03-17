@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'sink'
-copyright = '2025, Andres M Bran'
-author = 'Andres M Bran'
+project = "sink"
+copyright = "2025, Andres M Bran"
+author = "Andres M Bran"
 
 
 # -- General configuration ---------------------------------------------------
@@ -27,11 +27,10 @@ author = 'Andres M Bran'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -44,37 +43,41 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 
 # In docs/source/conf.py
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../src'))
+
+
+sys.path.insert(0, os.path.abspath("../../src"))
 
 # Add any Sphinx extension module names here
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx',
-    'myst_parser',
-    'sphinx_copybutton',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "myst_parser",
+    "sphinx_copybutton",
 ]
 
 # In docs/source/conf.py
 
 # Add to extensions if not already present
-extensions.extend([
-    'sphinx.ext.autosectionlabel',
-    'sphinx.ext.todo',
-])
+extensions.extend(
+    [
+        "sphinx.ext.autosectionlabel",
+        "sphinx.ext.todo",
+    ]
+)
 
 # Configure napoleon for Google-style docstrings
 napoleon_google_docstring = True
@@ -94,13 +97,15 @@ napoleon_attr_annotations = True
 # In docs/source/conf.py
 
 autodoc_default_options = {
-    'members': True,
-    'member-order': 'bysource',
-    'undoc-members': True,
-    'show-inheritance': True,
-    'no-special-members': True,
+    "members": True,
+    "member-order": "bysource",
+    "undoc-members": True,
+    "show-inheritance": True,
+    "no-special-members": True,
 }
 
 # Hide default values in signatures
 autodoc_hide_paramtypes = True
-autodoc_class_signature = 'separated'  # This will show the class signature separately from __init__
+autodoc_class_signature = (
+    "separated"  # This will show the class signature separately from __init__
+)
