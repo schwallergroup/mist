@@ -7,7 +7,7 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: Iupac2Smiles
-dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M-simple.csv # max 20 atoms
+dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/CRLLM-PubChem-compounds1M-simple.csv # max 20 atoms
 rewards:
 - format
 - accuracy
