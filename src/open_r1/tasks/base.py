@@ -81,7 +81,7 @@ class RLTask(BaseModel):
         for completion in completions:
             completion = "<think>" + completion
             try:
-                if random.random() < 0.1:  # 1% chance to print a completion
+                if random.random() < 0.01:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
             
                 regex = r"<think>(.*)<\/think>\n?<answer>(.*)<\/answer>"
