@@ -20,7 +20,7 @@ class PermuteSmiles(RLTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's an exercise for you. Please permute the given SMILES sequence of a molecule, in such a way that the resulted SMILES is different from the input SMILES as much as possible, but the original molecule is not changed. "
+            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. Please permute the given SMILES sequence of a molecule, in such a way that the resulted SMILES is different from the input SMILES as much as possible, but the original molecule is not changed. "
             # "It is preferred that the resulted SMILES is different from the input SMILES as much as possible. "
             # "Here is an example to help you understand the task:\n"
             # "Given an example input SMILES [START_SMILES] CCCC(C)C1CC1C [END_SMILES]. "
@@ -63,6 +63,7 @@ class PermuteSmiles(RLTask):
     def load(self):
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
+        df = df.drop_duplicates(subset=['SMILES'])
         train_dict = {
             'problem': df['SMILES'].tolist(),
             'solution': df['SMILES'].tolist()
@@ -79,31 +80,7 @@ class PermuteSmiles(RLTask):
         })
         return self.dataset
     
-    def random_print(self, print_data, out_rate = 0.01):
-        if random.random() < out_rate:  # 1% chance to print a completion
-            out = (
-                "\n\n=======<RANDOM_RESPONSE>=======\n"
-                # f"*** ANSWER: {answer}\n"
-                # f"*** REFERENCE: {ref}\n"
-                # f"*** FULL RESPONSE: {completion}"
-            )
-            for k, v in print_data.items():
-                out += f"*** {k.upper()}: {v}\n"
-            print(out)
     
-    def good_print(self, print_data, out_rate = 0.1):
-        if random.random() < out_rate:  # 10% chance to print a completion
-            # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
-            out = (
-                "\n\n=======<GOOD_RESPONSE>=======\n"
-                # f"*** ANSWER: {answer}\n"
-                # f"*** REFERENCE: {ref}\n"
-                # f"*** FULL RESPONSE: {completion}"
-            )
-            for k, v in print_data.items():
-                out += f"*** {k.upper()}: {v}\n"
-                
-            print(out)
     
     def accuracy_reward(self, completions: list[str], solution, **kwargs):
         """

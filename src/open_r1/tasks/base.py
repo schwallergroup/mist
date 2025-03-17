@@ -119,3 +119,23 @@ class RLTask(BaseModel):
         This function takes no arguments and returns a dictionary of metrics {key[str]: value[float]}.
         """
         return dict()
+
+    def random_print(self, print_data: dict, out_rate = 0.01):
+        if random.random() < out_rate:  # 1% chance to print a completion
+            out = (
+                "\n\n=======<RANDOM_RESPONSE>=======\n"
+            )
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
+            print(out)
+    
+    def good_print(self, print_data: dict, out_rate = 0.1):
+        if random.random() < out_rate:  # 10% chance to print a completion
+            # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+            out = (
+                "\n\n=======<GOOD_RESPONSE>=======\n"
+            )
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
+                
+            print(out)
