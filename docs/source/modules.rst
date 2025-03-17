@@ -6,7 +6,7 @@ Modules Reference
    :caption: Modules Documentation
 
    tasks/base
-   tasks/forward_rxn
+   tasks/rxnpred
    tasks/canonic
    tasks/canonmc
    tasks/iupacsm

@@ -1,15 +1,14 @@
 
-from .countdown.cd_task import CountdownTask
 from .reactions.forward import ForwardReaction
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.iupac2smi import Iupac2Smiles
 
 
+# Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
-    "CountdownTask": CountdownTask,
-    "ForwardReaction": ForwardReaction,
-    "CanonicalizeSmiles": CanonicalizeSmiles,
-    "Iupac2Smiles": Iupac2Smiles,
-    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA
+    "rxnpred": ForwardReaction,
+    "canonic": CanonicalizeSmiles,
+    "iupacsm": Iupac2Smiles,
+    "canonmc": CanonicalizeSmilesMCQA
 }
