@@ -1,30 +1,136 @@
-# Open R1
+# Sink
 
-*A fully open reproduction of DeepSeek-R1. This repo is a work in progress, let's build it together!*
+Chemical reasoning emerges from RL in simple chemical tasks.
+This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1), an open reproduction of DeepSeek-R1, from the HF Team.
 
-## Overview
 
-The goal of this repo is to build the missing pieces of the R1 pipeline such that everybody can reproduce and build on top of it. The project is simple by design and mostly consists of:
+## Documentation
 
-- `src/open_r1` contains the scripts to train and evaluate models as well as generate synthetic data:
-    - `grpo.py`: trains a model with GRPO on a given dataset.
-    - `sft.py`: simple SFT of a model on a dataset.
-    - `evaluate.py`: evaluates a model on the R1 benchmarks.
-    - `generate.py`: generate synthetic data from a model using [Distilabel](https://github.com/argilla-io/distilabel).
-- `Makefile` contains an easy to run command for each step in the R1 pipeline leveraging the scripts above.
+The documentation is built using Sphinx. To build and view the documentation locally:
 
-### Plan of attack
+```bash
+cd docs
+make html
+python -m http.server -d build/html
+```
 
-We will use the DeepSeek-R1 [tech report](https://github.com/deepseek-ai/DeepSeek-R1) as a guide, which can roughly be broken down into three main steps:
+Then open `http://localhost:8000` in your browser.
 
-* Step 1: replicate the R1-Distill models by distilling a high-quality corpus from DeepSeek-R1.
-* Step 2: replicate the pure RL pipeline that DeepSeek used to create R1-Zero. This will likely involve curating new, large-scale datasets for math, reasoning, and code.
-* Step 3: show we can go from base model to RL-tuned via multi-stage training.
+## Contributing New Tasks
 
-<center>
-    <img src="assets/plan-of-attack.png" width="500">
-</center>
+**Sink** is designed to be easily extensible with new chemsitry tasks suitable for reasoning. Each task inherits from the base `RLTask` class and implements specific logic for data handling and reward calculation.
 
+### Creating a New Task
+
+1. Create a new file in `src/open_r1/tasks/` for your task
+2. Inherit from the base `RLTask` class
+3. Implement required methods
+4. Add documentation
+
+Here's a template for creating a new task:
+
+```python
+from open_r1.tasks.base import RLTask
+from datasets import DatasetDict
+
+class NewTask(RLTask):
+    """
+    Description of your new task.
+    
+    This task should [describe what the task does and its purpose].
+    """
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.question_template = "Your task-specific question format: {}"
+        
+    def load(self) -> DatasetDict:
+        """
+        Load and prepare the dataset for the task.
+        
+        Returns:
+            DatasetDict: Dataset with 'train' and 'test' splits
+        """
+        # Implement dataset loading logic
+        pass
+        
+    def accuracy_reward(self, completions, solution, **kwargs):
+        """
+        Calculate rewards for model completions.
+        
+        Args:
+            completions (List[str]): Model generated responses
+            solution (List[str]): Ground truth solutions
+            
+        Returns:
+            List[float]: Rewards for each completion
+        """
+        # Implement reward calculation
+        pass
+```
+
+### Example: Forward Reaction Task
+
+The Forward Reaction task demonstrates how to implement a chemical reaction prediction task:
+
+```python
+from open_r1.tasks.base import RLTask
+from rdkit import Chem
+
+class ForwardReaction(RLTask):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.question_template = (
+            f"What is the product of the following reaction? "
+            f"Reactants: {self.begin_smiles_tag} {{}} {self.end_smiles_tag}"
+        )
+    
+    def accuracy_reward(self, completions, solution, **kwargs):
+        rewards = []
+        for content, sol in zip(completions, solution):
+            ans = self.preprocess_response(content)
+            try:
+                if Chem.MolToSmiles(Chem.MolFromSmiles(ans)) == \
+                   Chem.MolToSmiles(Chem.MolFromSmiles(sol)):
+                    rewards.append(1)
+                else:
+                    rewards.append(-0.5)
+            except:
+                rewards.append(-1)
+        return rewards
+```
+
+### Task Requirements
+
+When creating a new task, ensure:
+
+1. **Base Class Inheritance**: Inherit from `RLTask`
+2. **Required Methods**: Implement at minimum:
+   - `load()`: Dataset loading
+   - `accuracy_reward()`: Reward calculation
+3. **Documentation**:
+   - Class docstring explaining the task
+   - Method docstrings
+   - Example usage
+4. **Testing**: Add tests for your task in `tests/`
+
+### Adding Documentation
+
+1. Create a new RST file in `docs/source/api/` for your task
+2. Add your task to `docs/source/modules.rst`
+3. Include examples and usage instructions
+4. Build and verify the documentation
+
+### Current Tasks
+
+- **Forward Reaction**: Chemical reaction product prediction
+- [Add your task here]
+
+For detailed examples and API reference, please check the [documentation](link-to-docs).
+
+
+
+---
 
 ## Installation
 
