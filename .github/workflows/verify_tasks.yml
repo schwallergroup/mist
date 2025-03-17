@@ -25,7 +25,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install -e .
+        python -m pip install -e . --no-deps
+        python -m pip install -f dev-requirements.txt
 
     - name: Run task verification script
       run: |
