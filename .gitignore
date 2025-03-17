@@ -174,3 +174,4 @@ cython_debug/
 data/
 wandb/
 logs/
+docs/build/
