@@ -116,6 +116,8 @@ class Iupac2Smiles(RLTask):
             answer = self.preprocess_response(completion)
             answer_smiles = _extract_smiles_from_answer(answer, ref)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
+            if answer_score == 1.0:
+                answer_score += 1.0 # massive bonus for truly correct answer
             
             reward = reasoning_score + answer_score
             
@@ -124,8 +126,8 @@ class Iupac2Smiles(RLTask):
                       'answer': answer_smiles,
                       'best_smiles_in_reasoning': best_smiles_reasoning,
                       'reasoning_score [0, 1]': reasoning_score,
-                      'answer_score [0, 1]': answer_score, 
-                      'accuracy_reward [0, 2]': reward, 
+                      'answer_score [0, 2]': answer_score, 
+                      'accuracy_reward [0, 3]': reward, 
                       'full_completion': completion}
             
             self.random_print(report)
