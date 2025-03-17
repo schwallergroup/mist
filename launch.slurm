@@ -34,6 +34,7 @@ TASK=$2
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
 
+
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
 CONFIG_FILE=recipes/$TASK.yaml
