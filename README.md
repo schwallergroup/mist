@@ -1,13 +1,14 @@
 # Sink
 
 Chemical reasoning emerges from RL in simple chemical tasks.
+
 This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1), an open reproduction of DeepSeek-R1, from the HF Team.
 
 
-## How to
+## 🔥 How to
 
 > [!IMPORTANT]  
-> Clone this repo into $HOME/Documents/.
+> Clone this repo into `$HOME/Documents/`.
 > The repository needs to be accessible from this location, and your environment file should mount /Documents
 
 Sample environment file:
@@ -33,22 +34,18 @@ Run the following script to initialize a `launch.slurm`, which will set you up f
 python CSCS_setup.py
 ```
 
-After this, you'll be able to run jobs like this
-
-```
-sbatch launch.slurm [MODEL] [TASK]
-```
-
-Where  `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
+After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
 
 ```bash
+sbatch launch.slurm [MODEL] [TASK]
+
 # Launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
 sbatch launch.slurm Qwen2.5-3B rxnpred
 ```
 
 
 
-## Documentation
+## 📖 Documentation
 
 The documentation is built using Sphinx. To build and view the documentation locally:
 
