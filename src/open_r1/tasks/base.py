@@ -16,19 +16,58 @@ from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
 
 class RLTask(BaseModel):
+    """
+    Reinforcement Learning Task configuration class.
+
+    This class handles the configuration for RL tasks, including dataset specifications
+    and prompt formatting settings.
+
+    Attributes:
+        dataset_id_or_path (Optional[str]): 
+            HuggingFace dataset identifier or path to local dataset.
+        
+        dataset_splits (Optional[str]): 
+            Specification of dataset splits to use (e.g., "train", "validation").
+        
+        dataset (Optional[Any]): 
+            Loaded dataset object.
+        
+        system_prompt (Optional[str]): 
+            Template for system prompts. Default format:
+            ```
+            A conversation between User and Assistant. The user asks a question,
+            and the Assistant solves it. The assistant first thinks about the
+            reasoning process in the mind and then provides the user with the
+            answer. The reasoning process and answer are enclosed within
+            <think> </think> and <answer> </answer> tags.
+            ```
+        
+        response_print (str): 
+            Template for formatting correct responses.
+            Default: "======<CORRECT_RESPONSE>========{}"
+        
+        begin_smiles_tag (str): 
+            Start delimiter for SMILES notation. Default: "[BEGIN_SMILES]"
+        
+        end_smiles_tag (str): 
+            End delimiter for SMILES notation. Default: "[END_SMILES]"
+    """
+
     dataset_id_or_path: Optional[str] = None
     dataset_splits: Optional[str] = None
     dataset: Optional[Any] = None
-
     system_prompt: Optional[str] = Field(
-        "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
-        "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
-        "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
-        "<think> reasoning process here </think><answer> answer here </answer>"
+        "A conversation between User and Assistant. The user asks a question, and the "
+        "Assistant solves it. The assistant first thinks about the reasoning process "
+        "in the mind and then provides the user with the answer. The reasoning process "
+        "and answer are enclosed within <think> </think> and <answer> </answer> tags, "
+        "respectively, i.e., <think> reasoning process here </think>"
+        "<answer> answer here </answer>"
     )
     response_print: str = "\n\n======<CORRECT_RESPONSE>========\n{}"
     begin_smiles_tag: str = "[BEGIN_SMILES]"
     end_smiles_tag: str = "[END_SMILES]"
+
 
     def load(self) -> Any:
         """Define load method if not hf dataset."""
