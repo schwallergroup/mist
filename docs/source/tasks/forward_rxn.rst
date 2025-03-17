@@ -1,4 +1,4 @@
-Forward Reaction Task
+Forward Reaction
 ===================
 
 .. currentmodule:: open_r1.tasks.forward

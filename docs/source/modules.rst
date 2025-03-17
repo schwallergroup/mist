@@ -7,4 +7,7 @@ Modules Reference
 
    tasks/base
    tasks/forward_rxn
+   tasks/canonic
+   tasks/canonmc
+   tasks/iupacsm
    tasks/template
