@@ -72,16 +72,18 @@ Reward Functions
    - Scaled value based on Tanimoto coefficient
    - Negative values for poor predictions
 
-Response Processing
-----------------
 
-The task expects responses in the format:
+Task Example
+-----------
+
+.. image:: _static/forward_reaction_example.png
+   :width: 200
+   :align: center
+   :alt: Reaction scheme showing acetyl chloride reacting with ammonia to form acetamide
+
+In this task, the model gets the SMILES string of the reactants, and the task is to predict the product:
 
 .. code-block:: text
 
-    <think>
-    Reasoning steps...
-    </think>
-    <answer>
-    SMILES_notation
-    </answer>
+   Input: CC(=O)Cl.N
+   Output: CC(=O)N

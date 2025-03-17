@@ -7,3 +7,4 @@ Modules Reference
 
    tasks/base
    tasks/forward_rxn
+   tasks/template
