@@ -29,7 +29,7 @@ class Iupac2Smiles(RLTask):
         }
         train_dataset = Dataset.from_dict(train_dict)
         train_test_split = train_dataset.train_test_split(test_size=0.1)
-        train_dataset = train_test_split['train'].unique(column='solution')
+        train_dataset = train_test_split['train']
         test_dataset = train_test_split['test']
         
         # Combine into DatasetDict
