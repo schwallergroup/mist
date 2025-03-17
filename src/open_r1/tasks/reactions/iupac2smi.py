@@ -92,7 +92,7 @@ class Iupac2Smiles(RLTask):
             return smiles
         
         def _extract_smiles_from_answer(answer: str):
-            '''Extract the longest SMILES from the answer that is different from the input SMILES'''
+            '''Extract the longest SMILES from the answer '''
             smiles = _extract_smiles(answer)
             smiles = max(smiles, key=len) if smiles else None
             return smiles
@@ -116,7 +116,7 @@ class Iupac2Smiles(RLTask):
                 reasoning_score += 1.0 # massive bonus for truly correct reasoning
             
             answer = self.preprocess_response(completion)
-            answer_smiles = _extract_smiles_from_answer(answer, ref)
+            answer_smiles = _extract_smiles_from_answer(answer)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0 # massive bonus for truly correct answer
