@@ -178,3 +178,5 @@ docs/build/
 
 # WANDB API KEY (PERSONAL & SECRET)
 wandb_api_key.txt
+
+completion_samples/
