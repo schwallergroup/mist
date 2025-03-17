@@ -4,17 +4,18 @@
 #SBATCH --time=24:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
-#SBATCH --output=./logs/%x-%j.out
-#SBATCH --err=./logs/%x-%j.err
+#SBATCH --output=../sink_logs/%x-%j.out
+#SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --environment=vllm071
 #SBATCH -A a-a05
 
 # Run like:
-# sbatch launch.slurm canonic
+# sbatch launch.slurm Qwen2.5-0.5B canonmc
 
 set -x -e
 
 source ~/.bashrc
+cd /Documents/sink
 echo "START TIME: $(date)"
 
 
@@ -28,30 +29,19 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
-MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323
-MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
-MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
-MODEL=/cache/huggingface/models--meta-llama--Llama-3.1-8B/snapshots/d04e592bb4f6aa9cfee91e2e20afa771667e1d4b
-MODEL=/cache/huggingface/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796/
-MODEL=/cache/huggingface/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa
-MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
-MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
-
-#TASK=canonic
-#TASK=canonmc
-#TASK=iupacsm
-#TASK=rxnpred
-
-TASK=$1
+MODEL_ID=$1
+TASK=$2
+echo "MODEL ID: ${MODEL_ID}"
+echo "TASK: ${TASK}"
 
 
-CONFIG_FILE=recipes/$TASK.yaml
+MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
+CONFIG_FILE=recipes/$TASK.yaml
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
-export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
+export WANDB_API_KEY=$(cat wandb_api_key.txt)
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
@@ -69,13 +59,13 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/$MODEL_NAME/${SLURM_JOB_ID} \
-    --run_name ${MODEL_NAME}-${SLURM_JOB_ID} \
+    --output_dir=/cache/checkpoints/${MODEL_ID}/${SLURM_JOB_ID} \
+    --run_name grpo-${MODEL_ID}-${SLURM_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
 export LAUNCHER="conda deactivate;
-cd /Documents/sink/;
+cd /Documents/sink;
 pip install hf_transfer gdown;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
@@ -91,7 +81,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="" #wandb sync \$(cat logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 

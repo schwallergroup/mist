@@ -13,6 +13,7 @@ rewards:
 - accuracy
 - tanimoto_accuracy
 #- reasoning_steps
+special_smiles_tags: true
 
 #dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
