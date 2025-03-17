@@ -160,10 +160,11 @@ When creating a new task, ensure:
 
 ### Adding Documentation
 
-1. Create a new RST file in `docs/source/api/` for your task
+1. Create a new RST file in `docs/source/tasks/` for your task. Use the template under `tasks/template.rst`.
 2. Add your task to `docs/source/modules.rst`
 3. Include examples and usage instructions
-4. Build and verify the documentation
+4. Build and verify the documentation:
+    ```cd docs; make clean; make html; python -m http.server 7000```
 
 ### Current Tasks
 
