@@ -22,7 +22,7 @@ class ForwardReaction(RLTask):
         super().__init__(**kwargs)
         if not os.path.exists(self.dataset_id_or_path):
             os.makedirs(self.dataset_id_or_path)
-            download_data(self.dataset_id_or_path)
+        download_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
