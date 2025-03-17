@@ -10,6 +10,8 @@ This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1),
 > [!IMPORTANT]  
 > Clone this repo into `$HOME/Documents/`.
 > The repository needs to be accessible from this location, and your environment file should mount /Documents
+> 
+> Also make sure to store all your LLMs in a directory and mount that into `/LLMs`.
 
 Sample environment file:
 
@@ -22,6 +24,7 @@ mounts = [
     "/users",
     "/users/amarulan/Documents/:/Documents",
     "/iopsstor/scratch/cscs/amarulan/.cache/:/cache",
+    "/iopsstor/scratch/cscs/amarulan/.cache/huggingface/:/LLMs"
 ]
 workdir = "/workspace"
 [annotations]
