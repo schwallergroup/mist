@@ -66,10 +66,14 @@ Then open `http://localhost:8000` in your browser.
 
 ### Creating a New Task
 
-1. Create a new file in `src/open_r1/tasks/` for your task
-2. Inherit from the base `RLTask` class
-3. Implement required methods
-4. Add documentation
+1. Create a new file in `src/open_r1/tasks/` for your task, e.g. `sampletask.py`
+2. Inherit from the base `RLTask` class and implement required methods, e.g. `SampleTask(RLTask)`
+3. Add class to `CHEMTASKS` in `tasks/__init__.py`, e.g. `'sampletask': SampleTask`
+4. Write a recipe with the same name as the task `recipes/sampletask.yaml`
+5. Add documentation:
+    - Create an entry under `docs/source/tasks/sampletask.rst` (use the template.rst)
+    - Add it to the modules index: `docs/source/modules.rst` as `tasks/sampletask.rst`
+
 
 Here's a template for creating a new task:
 
