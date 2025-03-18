@@ -140,7 +140,7 @@ class RLTask(BaseModel):
                 
             print(out)
     
-    def count_waits(completion: str):
+    def count_waits(self, completion: str):
         return completion.lower().count("wait")
     
     def get_metrics(self):
