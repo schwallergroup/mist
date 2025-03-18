@@ -205,4 +205,4 @@ class Iupac2Smiles(RLTask):
             return "NONE"
         
     def get_metrics(self):
-        self.super().get_metrics()
+        return super().get_metrics()
