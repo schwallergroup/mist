@@ -137,6 +137,12 @@ class Iupac2Smiles(RLTask):
                 self.good_print(report)
                 
             rewards.append(reward)
+            
+            self.custom_metrics['n_samples'] += 1
+            self.custom_metrics['n_waits'].append(self.count_waits(completion))
+            self.custom_metrics['reasoning_score'].append(reasoning_score)
+            self.custom_metrics['answer_scores'].append(answer_score)
+            
         return rewards
 
     def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
@@ -197,3 +203,6 @@ class Iupac2Smiles(RLTask):
             return m.groups()[1]
         else:
             return "NONE"
+        
+    def get_metrics(self):
+        self.super().get_metrics()
