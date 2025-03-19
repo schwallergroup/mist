@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=10:00:00
-#SBATCH --nodes=4
+#SBATCH --time=00:30:00
+#SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
@@ -33,6 +33,7 @@ MODEL_ID=$1
 TASK=$2
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
+
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')

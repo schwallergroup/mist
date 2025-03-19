@@ -1,0 +1,6 @@
+pytest>=6.0.0  # Only if you plan to write test cases for the script
+rdkit
+pydantic
+typing
+datasets
+gdown
