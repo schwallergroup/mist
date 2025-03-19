@@ -71,7 +71,6 @@ class RLTask(BaseModel):
     begin_smiles_tag: str = "[BEGIN_SMILES]"
     end_smiles_tag: str = "[END_SMILES]"
 
-
     def load(self) -> Any:
         """Define load method if not hf dataset."""
         if self.dataset_id_or_path is None:
