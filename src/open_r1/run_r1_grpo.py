@@ -1,19 +1,19 @@
 import os
 from datetime import datetime
-import os
+
+
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from utils import ExtendedGRPOConfig, setup_logger, get_checkpoint
-from trl import GRPOConfig, GRPOTrainer, get_peft_config, ModelConfig, TrlParser
 from tasks import CHEMTASKS
+from trl import GRPOConfig, GRPOTrainer, ModelConfig, TrlParser, get_peft_config
+from utils import ExtendedGRPOConfig, get_checkpoint, get_reward_list, setup_logger
+
 
 logger = setup_logger(__name__)
 
 
-def grpo_function(
-    model_args: ModelConfig, training_args: GRPOConfig
-):
+def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
     logger.info(f"Model parameters {model_args}")
     logger.info(f"Training/evaluation parameters {training_args}")
 
@@ -31,9 +31,18 @@ def grpo_function(
         tokenizer.pad_token = tokenizer.eos_token
 
     # Load task
+    if training_args.special_smiles_tags:
+        begin_smiles_tag = "[BEGIN_SMILES]"
+        end_smiles_tag = "[END_SMILES]"
+    else:
+        begin_smiles_tag = ""
+        end_smiles_tag = ""
+
     task = CHEMTASKS[training_args.chem_task](
         dataset_id_or_path=training_args.dataset_id_or_path,
-        dataset_splits=training_args.dataset_splits
+        dataset_splits=training_args.dataset_splits,
+        begin_smiles_tag=begin_smiles_tag,
+        end_smiles_tag=end_smiles_tag,
     )
     dataset = task.load()
     dataset = task.dataset_preprocess(tokenizer)
@@ -43,7 +52,7 @@ def grpo_function(
     # Instantiate GRPO trainer
     trainer = GRPOTrainer(
         model=model_args.model_name_or_path,
-        reward_funcs=[task.format_reward, task.accuracy_reward],
+        reward_funcs=get_reward_list(task, training_args.rewards),
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
@@ -52,8 +61,13 @@ def grpo_function(
 
     # Check for last checkpoint
     last_checkpoint = get_checkpoint(training_args)
-    if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
-        logger.info(f"Checkpoint detected, resuming training at {last_checkpoint}.")
+    if (
+        last_checkpoint is not None
+        and training_args.resume_from_checkpoint is None
+    ):
+        logger.info(
+            f"Checkpoint detected, resuming training at {last_checkpoint}."
+        )
 
     # Train the model
     logger.info(
@@ -82,10 +96,12 @@ def grpo_function(
 
     logger.info("*** Training complete! ***")
 
+
 def main():
     parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
     model_args, training_args = parser.parse_args_and_config()
     grpo_function(model_args, training_args)
+
 
 if __name__ == "__main__":
     main()

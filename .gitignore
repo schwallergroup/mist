@@ -174,3 +174,12 @@ cython_debug/
 data/
 wandb/
 logs/
+docs/build/
+
+# Others
+.idea
+
+# WANDB API KEY (PERSONAL & SECRET)
+wandb_api_key.txt
+
+completion_samples/

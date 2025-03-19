@@ -1,10 +1,12 @@
-
-from ..base import RLTask
-import numpy as np
 import re
 from random import random
-from datasets import Dataset, DatasetDict
+
+import numpy as np
 import pandas as pd
+from datasets import Dataset, DatasetDict
+
+from ..base import RLTask
+
 
 class CanonicalizeSmilesMCQA(RLTask):
     question_template: str = ""
@@ -21,22 +23,31 @@ class CanonicalizeSmilesMCQA(RLTask):
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
-        shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_variant2', 'SMILES_variant3', 'SMILES_variant4', "SMILES"]].values]
+        shuffled = [
+            np.random.permutation(row).tolist()
+            for row in df[
+                [
+                    "SMILES_variant2",
+                    "SMILES_variant3",
+                    "SMILES_variant4",
+                    "SMILES",
+                ]
+            ].values
+        ]
         train_dict = {
-            'problem': df['SMILES_variant1'].tolist(),
-            'solution': df['SMILES'].tolist(),
-            'options': shuffled
+            "problem": df["SMILES_variant1"].tolist(),
+            "solution": df["SMILES"].tolist(),
+            "options": shuffled,
         }
         train_dataset = Dataset.from_dict(train_dict)
         train_test_split = train_dataset.train_test_split(test_size=0.1)
-        train_dataset = train_test_split['train']
-        test_dataset = train_test_split['test']
-        
+        train_dataset = train_test_split["train"]
+        test_dataset = train_test_split["test"]
+
         # Combine into DatasetDict
-        self.dataset = DatasetDict({
-            'train': train_dataset,
-            'test': test_dataset
-        })
+        self.dataset = DatasetDict(
+            {"train": train_dataset, "test": test_dataset}
+        )
         return self.dataset
 
     def accuracy_reward(self, completions, solution, options, **kwargs):
@@ -64,19 +75,36 @@ class CanonicalizeSmilesMCQA(RLTask):
         options = kwargs.get("options", [])
         r1_prefix = [
             {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": self.question_template.format(problem, *options)},
+            {
+                "role": "user",
+                "content": self.question_template.format(problem, *options),
+            },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
+            "prompt": tokenizer.apply_chat_template(
+                r1_prefix, tokenize=False, continue_final_message=True
+            ),
             "problem": problem,
-            "options": options
+            "options": options,
         }
 
     def dataset_preprocess(self, tokenizer):
-        self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
-        self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
+        self.dataset["train"] = (
+            self.dataset["train"]
+            .shuffle(seed=42)
+            .select(range(min(50000, len(self.dataset["train"]))))
+        )
+        self.dataset["test"] = (
+            self.dataset["test"]
+            .shuffle(seed=42)
+            .select(range(min(10000, len(self.dataset["test"]))))
+        )
 
-        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer, options=x["options"]))
+        self.dataset = self.dataset.map(
+            lambda x: self.generate_prompt(
+                x["problem"], tokenizer, options=x["options"]
+            )
+        )
         return self.dataset
 
     def preprocess_response(self, response):
