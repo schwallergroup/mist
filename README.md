@@ -8,33 +8,11 @@ This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1),
 ## 🔥 How to
 
 > [!IMPORTANT]  
-> Clone this repo into `$HOME/Documents/`.
-> The repository needs to be accessible from this location, and your environment file should mount /Documents
-> 
-> Also make sure to store all your LLMs in a directory and mount that into `/LLMs`.
+> Clone this repo into `$HOME/`. This partition has no cleaning policy and your code should be stored there. You can clone it into `$HOME/`, `$HOME/Documents/` or into any other folder of your choice.
 
-Sample environment file:
-
-```toml
-# env.toml
-image = "/iopsstor/scratch/cscs/amarulan/vllm_trl_sink.sqsh"
-mounts = [
-    "/capstor",
-    "/iopsstor",
-    "/users",
-    "/users/amarulan/Documents/:/Documents",
-    "/iopsstor/scratch/cscs/amarulan/.cache/:/cache",
-    "/iopsstor/scratch/cscs/amarulan/.cache/huggingface/:/LLMs"
-]
-workdir = "/workspace"
-[annotations]
-com.hooks.aws_ofi_nccl.enabled = "true"
-com.hooks.aws_ofi_nccl.variant = "cuda12"
-```
-
-Run the following script to initialize a `launch.slurm`, which will set you up for running jobs on the CSCS cluster.
+Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS cluster.
 ```bash
-python CSCS_setup.py
+python3 CSCS_setup.py
 ```
 
 After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
