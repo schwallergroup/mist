@@ -1,13 +1,16 @@
 #!/bin/bash
 #SBATCH --job-name=deepseek-r1-generation
-#SBATCH --partition=hopper-prod
 #SBATCH --qos=normal
 #SBATCH --nodes=2
 #SBATCH --exclusive
-#SBATCH --gpus-per-node=8
+#SBATCH --gpus-per-node=4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
-#SBATCH --time=04-00:00:00
+#SBATCH --time=24:00:00
+#SBATCH --environment=vllm071
+#SBATCH -A a-a05
+
+# /cache/huggingface/models--deepseek-ai--DeepSeek-R1-Distill-Llama-70B/snapshots/0d6d11a6ea1187363aa7b78543f824fc02e06b14
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -130,6 +133,8 @@ echo "SLURM_JOB_ID: $SLURM_JOB_ID"
 echo "SLURM_JOB_NODELIST: $SLURM_JOB_NODELIST"
 
 source .venv/bin/activate
+srun bash -c "pip install 'distilabel[vllm,ray,openai]>=1.5.2'"
+
 
 # Getting the node names
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")

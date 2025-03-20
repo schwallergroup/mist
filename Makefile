@@ -1,5 +1,6 @@
 .PHONY: style quality
 
+
 # make sure to test the local checkout in scripts and not the pre-installed one (don't use quotes!)
 export PYTHONPATH = src
 
@@ -40,3 +41,8 @@ evaluate:
 #   make evaluate MODEL=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B TASK=aime24 PARALLEL=data NUM_GPUS=8
 # Tensor parallel:
 #   make evaluate MODEL=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B TASK=aime24 PARALLEL=tensor NUM_GPUS=8
+
+
+.PHONY: docs
+docs:
+	cd docs && make html
