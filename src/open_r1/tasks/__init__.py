@@ -1,6 +1,6 @@
-from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
-from .reactions.canonical import CanonicalizeSmiles
 from .reactions.forward import ForwardReaction
+from .reactions.canonical import CanonicalizeSmiles
+from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.iupac2smi import Iupac2Smiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 
@@ -9,8 +9,7 @@ from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 CHEMTASKS = {
     "rxnpred": ForwardReaction,
     "canonic": CanonicalizeSmiles,
-    "iupacsm": Iupac2Smiles,
     "canonmc": CanonicalizeSmilesMCQA,
-    "CountdownTask": CountdownTask,
-    "SmilesHydrogen": SmilesHydrogen,
+    "iupacsm": Iupac2Smiles,
+    "smhydrogen": SmilesHydrogen,
 }
