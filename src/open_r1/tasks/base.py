@@ -120,7 +120,7 @@ class RLTask(BaseModel):
         )
         return self.dataset
 
-    def log_correct(self, content, p=0.05):
+    def log_correct(self, content, p=0.5):
         if random.random() < p:
             print(self.response_print.format(content))
 
