@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=08:00:00
-#SBATCH --nodes=4
+#SBATCH --time=01:00:00
+#SBATCH --nodes=16
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
@@ -40,6 +40,7 @@ MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot-207163-checkpoint-25/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
+MODEL=/iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-7B/snapshots/916b56a44061fd5cd7d6a8fb632557ed4f724f60
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
@@ -56,6 +57,7 @@ fi
 
 CONFIG_FILE=recipes/$TASK.yaml
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
+MODEL_SHORT_NAME=$(basename $MODEL)
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
@@ -79,7 +81,7 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-$MODEL_NAME \
+    --run_name grpo-${SLURM_JOB_ID}-$MODEL_SHORT_NAME \
     --base_model_name=$MODEL_NAME \
     "
 
