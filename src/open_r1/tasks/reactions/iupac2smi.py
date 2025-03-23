@@ -62,6 +62,31 @@ class Iupac2Smiles(RLTask):
             'test': test_dataset
         })
         return self.dataset
+    
+    def _post_process_smiles(self, smiles):
+        smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
+        smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
+        smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
+        return smiles
+    
+    def _extract_smiles(self, completion: str):
+        
+        excluded_smiles = set(('I'))
+        words = completion.split()
+        words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
+        # words_tkns = [smiles_tokenizer(w) for w in words]
+        # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
+        smiles = words
+        smiles = [s for s in smiles if s and s not in excluded_smiles]
+        smiles = [self._post_process_smiles(s) for s in smiles]
+        smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
+        return smiles
+    
+    def _extract_smiles_from_answer(self, answer: str):
+        '''Extract the longest SMILES from the answer '''
+        smiles = self._extract_smiles(answer)
+        smiles = max(smiles, key=len) if smiles else None
+        return smiles
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -74,28 +99,6 @@ class Iupac2Smiles(RLTask):
                         
             return DataStructs.TanimotoSimilarity(fp1, fp2)
         
-        def _extract_smiles(completion: str):
-            def _post_process_smiles(smiles):
-                smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
-                smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-                smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
-                return smiles
-            excluded_smiles = set(('I'))
-            words = completion.split()
-            words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
-            # words_tkns = [smiles_tokenizer(w) for w in words]
-            # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
-            smiles = words
-            smiles = [s for s in smiles if s and s not in excluded_smiles]
-            smiles = [_post_process_smiles(s) for s in smiles]
-            smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
-            return smiles
-        
-        def _extract_smiles_from_answer(answer: str):
-            '''Extract the longest SMILES from the answer '''
-            smiles = _extract_smiles(answer)
-            smiles = max(smiles, key=len) if smiles else None
-            return smiles
         
         def _calc_score(mol1: str, mol2: str, beta=10):
             if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
@@ -107,7 +110,7 @@ class Iupac2Smiles(RLTask):
 
         for completion, ref in zip(completions, solution):
             reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
-            reasoning_smiles = _extract_smiles(reasoning)
+            reasoning_smiles = self._extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
             best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else 'None'
@@ -116,7 +119,7 @@ class Iupac2Smiles(RLTask):
                 reasoning_score += 1.0 # massive bonus for truly correct reasoning
             
             answer = self.preprocess_response(completion)
-            answer_smiles = _extract_smiles_from_answer(answer)
+            answer_smiles = self._extract_smiles_from_answer(answer)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0 # massive bonus for truly correct answer
@@ -218,3 +221,8 @@ class Iupac2SmilesWithTags(Iupac2Smiles):
             # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
             "Your response: <think> "
         )
+        
+    def _extract_smiles(self, completion: str):
+        smiles = re.findall(r'\[START_SMILES\](.*?)\[END_SMILES\]', completion)
+        smiles = [s.replace(' ', '') for s in smiles]
+        return smiles
