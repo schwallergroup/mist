@@ -206,3 +206,15 @@ class Iupac2Smiles(RLTask):
         
     def get_metrics(self):
         return super().get_metrics()
+    
+class Iupac2SmilesWithTags(Iupac2Smiles):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.question_template = (
+            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
+            "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
+            # "What is the SMILES for this molecule? {}. "
+            "Here is the IUPAC name: [START_MOL] {} [END_MOL].\n"
+            # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "Your response: <think> "
+        )

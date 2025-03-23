@@ -40,6 +40,7 @@ MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot-207163-checkpoint-25/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
+MODEL=/capstor/store/cscs/swissai/a05/qwen_3b_sft/
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
