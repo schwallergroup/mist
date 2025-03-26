@@ -1,5 +1,6 @@
 
-from ..base import RLTask
+from ..base import SMILESBasedTask
+from .utils import tanimoto_sim
 from typing import Any, Dict
 import re
 import os
@@ -9,9 +10,11 @@ from rdkit.Chem import AllChem
 import pandas as pd
 from random import random
 
-class Iupac2Smiles(RLTask):
+class Iupac2Smiles(SMILESBasedTask):
     question_template: str = ""
+    
     custom_metrics: Dict[str, Any] = {}
+    random_log: Dict[str, Any] = {}
     printed_sample_prompt: bool = False
 
     def __init__(self, **kwargs):
@@ -37,6 +40,7 @@ class Iupac2Smiles(RLTask):
             'prompt': self.question_template.format(problem),
             'problem': problem
         }
+        
         if not self.printed_sample_prompt: # print sample prompt once
             print(f"***SAMPLE PROMPT:\n{prompt['prompt']}")
             self.printed_sample_prompt = True
@@ -63,54 +67,31 @@ class Iupac2Smiles(RLTask):
         })
         return self.dataset
     
-    def _post_process_smiles(self, smiles):
-        smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
-        smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-        smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
-        return smiles
     
-    def _extract_smiles(self, completion: str):
-        
-        excluded_smiles = set(('I'))
-        words = completion.split()
-        words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
-        # words_tkns = [smiles_tokenizer(w) for w in words]
-        # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
-        smiles = words
-        smiles = [s for s in smiles if s and s not in excluded_smiles]
-        smiles = [self._post_process_smiles(s) for s in smiles]
-        smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
-        return smiles
-    
-    def _extract_smiles_from_answer(self, answer: str):
-        '''Extract the longest SMILES from the answer '''
-        smiles = self._extract_smiles(answer)
-        smiles = max(smiles, key=len) if smiles else None
-        return smiles
 
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
-        def _tanimoto_sim(mol1, mol2):
-            mol1 = Chem.MolFromSmiles(mol1)
-            mol2 = Chem.MolFromSmiles(mol2)
+        # def tanimoto_sim(mol1, mol2):
+        #     mol1 = Chem.MolFromSmiles(mol1)
+        #     mol2 = Chem.MolFromSmiles(mol2)
             
-            fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, radius=2, useChirality=True)
-            fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, radius=2, useChirality=True)
+        #     fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, radius=2, useChirality=True)
+        #     fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, radius=2, useChirality=True)
                         
-            return DataStructs.TanimotoSimilarity(fp1, fp2)
+        #     return DataStructs.TanimotoSimilarity(fp1, fp2)
         
         
         def _calc_score(mol1: str, mol2: str, beta=10):
             if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
                 return 0.0
-            sim = _tanimoto_sim(mol1, mol2)
+            sim = tanimoto_sim(mol1, mol2)
             return sim ** beta
         
         rewards = []
 
-        for completion, ref in zip(completions, solution):
+        for completion, ref, prompt in zip(completions, solution, prompts):
             reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
-            reasoning_smiles = self._extract_smiles(reasoning)
+            reasoning_smiles = self.extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
             best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else 'None'
@@ -119,7 +100,7 @@ class Iupac2Smiles(RLTask):
                 reasoning_score += 1.0 # massive bonus for truly correct reasoning
             
             answer = self.preprocess_response(completion)
-            answer_smiles = self._extract_smiles_from_answer(answer)
+            answer_smiles = self.extract_smiles_from_answer(answer)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0 # massive bonus for truly correct answer
@@ -127,17 +108,19 @@ class Iupac2Smiles(RLTask):
             reward = reasoning_score + answer_score
             
             answer_smiles = answer_smiles if answer_smiles else 'None'
-            report = {'reference': ref,
-                      'answer': answer_smiles,
-                      'best_smiles_in_reasoning': best_smiles_reasoning,
-                      'reasoning_score [0, 2]': reasoning_score,
-                      'answer_score [0, 2]': answer_score, 
-                      'accuracy_reward [0, 4]': reward, 
-                      'full_completion': completion}
+            self.random_log = {
+                'prompt': prompt,
+                'reference': ref,
+                'answer': answer_smiles,
+                'best_smiles_in_reasoning': best_smiles_reasoning,
+                'reasoning_score [0, 2]': reasoning_score,
+                'answer_score [0, 2]': answer_score, 
+                'accuracy_reward [0, 4]': reward, 
+                'full_completion': completion}
             
-            self.random_print(report)
+            self.random_print(self.random_log)
             if reward > 0.3:
-                self.good_print(report)
+                self.good_print(self.random_log)
                 
             rewards.append(reward)
             
@@ -222,7 +205,7 @@ class Iupac2SmilesWithTags(Iupac2Smiles):
             "Your response: <think> "
         )
         
-    def _extract_smiles(self, completion: str):
+    def extract_smiles(self, completion: str):
         smiles = re.findall(r'\[START_SMILES\](.*?)\[END_SMILES\]', completion)
         smiles = [s.replace(' ', '') for s in smiles]
         return smiles

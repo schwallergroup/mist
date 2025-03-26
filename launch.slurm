@@ -16,8 +16,8 @@
 set -x -e
 
 source ~/.bashrc
+cd /Documents/sink
 echo "START TIME: $(date)"
-
 
 NUM_NODES=$SLURM_NNODES
 GPUS_PER_NODE=4
@@ -47,16 +47,24 @@ MODEL=/capstor/store/cscs/swissai/a05/qwen_3b_sft/
 # TASK=rxnpred
 # TASK=smi_permute
 
-TASK=$1
-RESUME_JOB_ID=$2
+MODEL_ID=$1
+TASK=$2
+RESUME_JOB_ID=$3
 
-if [[ $RESUME_JOB_ID = -1 ]]
+MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
+
+if [[ $RESUME_JOB_ID = 0 ]]
 then
 	RESUME_JOB_ID=$SLURM_JOB_ID
 fi
 
 CONFIG_FILE=recipes/$TASK.yaml
-MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
+
+echo "MODEL ID: ${MODEL_ID}"
+echo "MODEL PATH: ${MODEL}"
+echo "TASK: ${TASK}"
+echo "TASK_MODE: ${TASK_MODE}"
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
@@ -85,7 +93,7 @@ export CMD=" \
     "
 
 export LAUNCHER="conda deactivate;
-cd /iopsstor/scratch/cscs/nnguyenx/repo/sink;
+cd /Documents/sink;
 pip install hf_transfer gdown levenshtein wandb;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
