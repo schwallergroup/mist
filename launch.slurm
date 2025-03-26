@@ -2,7 +2,7 @@
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=08:00:00
-#SBATCH --nodes=4
+#SBATCH --nodes=16
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
@@ -20,9 +20,10 @@ echo "START TIME: $(date)"
 
 
 NUM_NODES=$SLURM_NNODES
+NUM_NODES_FOR_TRAINING=$(($NUM_NODES - 1))
 GPUS_PER_NODE=4
-WORLD_SIZE=$(($NUM_NODES*$GPUS_PER_NODE))
-NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
+WORLD_SIZE=$(($NUM_NODES_FOR_TRAINING*$GPUS_PER_NODE))
+NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE))
 
 
 # so processes know who to talk to
@@ -39,8 +40,9 @@ MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb95
 MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
 MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot-207163-checkpoint-25/
-MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
 MODEL=/capstor/store/cscs/swissai/a05/qwen_3b_sft/
+MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
+MODEL=/iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-7B/snapshots/916b56a44061fd5cd7d6a8fb632557ed4f724f60
 #TASK=canonic
 #TASK=canonmc
 #TASK=iupacsm
@@ -50,7 +52,7 @@ MODEL=/capstor/store/cscs/swissai/a05/qwen_3b_sft/
 TASK=$1
 RESUME_JOB_ID=$2
 
-if [[ $RESUME_JOB_ID = -1 ]]
+if [[ $RESUME_JOB_ID = 0 ]]
 then
 	RESUME_JOB_ID=$SLURM_JOB_ID
 fi
@@ -75,6 +77,12 @@ export NCCL_SOCKET_TIMEOUT=23
 export NCCL_TREE_THRESHOLD=0
 export CUDA_LAUNCH_BLOCKING=1
 
+NODE_LIST=$(scontrol show hostnames $SLURM_JOB_NODELIST)
+echo "Available nodes: $(NODE_LIST)"
+TRAIN_NODE=$(echo $NODE_LIST | head -n 15 | paste -sd ",")
+VLLM_NODE=$(echo $NODE_LIST | tail -n 1)
+echo "Training on: $TRAIN_NODE"
+echo "Running vllm on: $VLLM_NODE"
 
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
@@ -82,6 +90,7 @@ export CMD=" \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
     --run_name grpo-${SLURM_JOB_ID}-$MODEL_NAME \
     --base_model_name=$MODEL_NAME \
+    --vllm_server_host $VLLM_NODE \
     "
 
 export LAUNCHER="conda deactivate;
@@ -113,6 +122,10 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     "
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID --nodes=15 --nodelist="$TRAIN_NODE"  bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1 &
+
+srun --nodes=1 --ntasks=1 --nodelist="$VLLM_NODE" trl vllm-serve --model "$MODEL"  --tensor_parallel_size 4 & 
+
+wait
 
 echo "END TIME: $(date)"
