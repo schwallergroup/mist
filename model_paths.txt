@@ -10,3 +10,4 @@ DeepSeek-R1-Distill-Llama-70B:          /LLM_models/models--deepseek-ai--DeepSee
 Qwen2.5-3B_pretrained-v1:               /iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/Qwen2.5-3B_pretrained-v1
 Qwen2.5-3B_pretrained-v1_cot-v1:        /iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/Qwen2.5-3B_pretrained-v1_cot-v1
 QwenCOT:                /iopsstor/store/cscs/swissai/a05/chem/qwen-cot 
+Qwen-3B-SFT:                   /capstor/store/cscs/swissai/a05/qwen_3b_sft/
