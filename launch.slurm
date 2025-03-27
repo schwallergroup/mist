@@ -88,7 +88,7 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-$MODEL_NAME \
+    --run_name grpo-${SLURM_JOB_ID}-${RESUME_JOB_ID}-${MODEL_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
