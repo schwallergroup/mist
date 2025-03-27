@@ -162,7 +162,7 @@ class SMILESBasedTask(RLTask):
         smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
         return smiles
     
-    def extract_smiles(self, completion: str):
+    def extract_smiles(self, completion: str, **kwargs):
         
         excluded_smiles = set(('I'))
         words = completion.split()
@@ -175,7 +175,7 @@ class SMILESBasedTask(RLTask):
         smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
         return smiles
     
-    def extract_smiles_from_answer(self, answer: str):
+    def extract_smiles_from_answer(self, answer: str, **kwargs):
         '''Extract the longest SMILES from the answer '''
         smiles = self.extract_smiles(answer)
         smiles = max(smiles, key=len) if smiles else None

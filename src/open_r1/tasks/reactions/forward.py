@@ -108,6 +108,15 @@ class ForwardReaction(SMILESBasedTask):
         })
         
         return self.dataset
+    
+    def extract_smiles_from_answer(self, answer, prompt):
+        '''To prevent the longest smiles in answer turns out to be the copy of the starting reagents'''
+        answer_smiles = self.extract_smiles(answer)
+        input_smiles = self.extract_smiles(prompt)
+        
+        answer_smiles = [s for s in answer_smiles if s not in input_smiles]
+        answer_smiles = max(answer_smiles, key=len) if answer_smiles else None
+        return answer_smiles
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -130,7 +139,7 @@ class ForwardReaction(SMILESBasedTask):
                 reasoning_score += 1.0 # massive bonus for truly correct reasoning
             
             answer = self.preprocess_response(completion)
-            answer_smiles = self.extract_smiles_from_answer(answer)
+            answer_smiles = self.extract_smiles_from_answer(answer, prompt)
             answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0 # massive bonus for truly correct answer
@@ -169,7 +178,7 @@ class ForwardReactionWithTags(ForwardReaction):
             "Question: You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
             "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
-            "Here are the reactants: [START_MOL] {} [END_MOL]. "
+            "Here are the reactants: [START_SMILES] {} [END_SMILES]. "
             "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
             "Your response: <think> "
         )
