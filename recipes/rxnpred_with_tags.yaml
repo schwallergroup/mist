@@ -34,7 +34,10 @@ beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.noti
 max_prompt_length: 256
 max_completion_length: 2048
 num_generations: 8
+
 use_vllm: true
+top_k: 20
+
 vllm_device: "cuda:3"
 vllm_gpu_memory_utilization: 0.8
 vllm_max_model_len: 2048
