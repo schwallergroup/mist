@@ -86,15 +86,14 @@ export CUDA_LAUNCH_BLOCKING=1
 
 NODE_LIST=$(scontrol show hostnames $SLURM_JOB_NODELIST)
 echo "Available nodes: $NODE_LIST"
-TRAIN_NODE=$(echo $NODE_LIST | head -n $(($NUM_NODES-1)) | sed 's/nid//' | paste -sd "," | sed 's/^/nid[/' | sed 's/$/]/') # nid[123,456,789]
-VLLM_NODE=$(echo $NODE_LIST | tail -n 1)
+TRAIN_NODE=$(echo "$NODE_LIST" | head -n $(($NUM_NODES-1)) | sed 's/nid//' | paste -sd "," | sed 's/^/nid[/' | sed 's/$/]/') # nid[123,456,789]
+VLLM_NODE=$(echo "$NODE_LIST" | tail -n 1)
 echo "Training on: $TRAIN_NODE"
 echo "Running vllm on: $VLLM_NODE"
 
 
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
-    --vllm_server_host $VLLM_NODE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
     --run_name grpo-${SLURM_JOB_ID}-${RESUME_JOB_ID}-${MODEL_ID} \
