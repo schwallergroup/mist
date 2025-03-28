@@ -85,7 +85,8 @@ export CUDA_LAUNCH_BLOCKING=1
 
 
 NODE_LIST=$(scontrol show hostnames $SLURM_JOB_NODELIST)
-echo "Available nodes: $NODE_LIST"
+echo "Available nodes:"
+echo $NODE_LIST
 TRAIN_NODE=$(echo "$NODE_LIST" | head -n $(($NUM_NODES-1)) | sed 's/nid//' | paste -sd "," | sed 's/^/nid[/' | sed 's/$/]/') # nid[123,456,789]
 VLLM_NODE=$(echo "$NODE_LIST" | tail -n 1)
 echo "Training on: $TRAIN_NODE"
@@ -116,7 +117,11 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --role \$(hostname -s): \
    --tee 3 \
 "
-export VLLM_RUN="CUDA_VISIBLE_DEVICES=3 trl vllm-serve \
+export VLLM_RUN="conda deactivate;
+cd /Documents/sink;
+pip install hf_transfer gdown levenshtein wandb 'trl[vllm]';
+pip install -e . --no-deps;
+CUDA_VISIBLE_DEVICES=3 trl vllm-serve \
     --model $MODEL \
     --max_model_len 2018 \
     --gpu_memory_utilization 0.8 \
