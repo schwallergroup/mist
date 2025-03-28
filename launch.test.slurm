@@ -86,7 +86,7 @@ export CUDA_LAUNCH_BLOCKING=1
 
 NODE_LIST=$(scontrol show hostnames $SLURM_JOB_NODELIST)
 echo "Available nodes: $NODE_LIST"
-TRAIN_NODE=$(echo $NODE_LIST | head -n ($NUM_NODES-1) | sed 's/nid//' | paste -sd "," | sed 's/^/nid[/' | sed 's/$/]/') # nid[123,456,789]
+TRAIN_NODE=$(echo $NODE_LIST | head -n $(($NUM_NODES-1)) | sed 's/nid//' | paste -sd "," | sed 's/^/nid[/' | sed 's/$/]/') # nid[123,456,789]
 VLLM_NODE=$(echo $NODE_LIST | tail -n 1)
 echo "Training on: $TRAIN_NODE"
 echo "Running vllm on: $VLLM_NODE"
