@@ -123,7 +123,7 @@ pip install hf_transfer gdown levenshtein wandb 'trl[vllm]';
 pip install -e . --no-deps;
 CUDA_VISIBLE_DEVICES=3 trl vllm-serve \
     --model $MODEL \
-    --max_model_len 2018 \
+    --max_model_len 2048 \
     --gpu_memory_utilization 0.8 \
     --presence_penalty 0.0 \
     --frequency_penalty 0.0 \
@@ -149,7 +149,7 @@ SRUN_ARGS=" \
 
 clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1 &
 
-srun --nodes=1 --ntasks=1 --nodelist="$VLLM_NODE" "$VLLM_RUN" &
+srun $SRUN_ARGS --jobid $SLURM_JOB_ID --nodes=1 --ntasks=1 --nodelist="$VLLM_NODE" bash -c "$VLLM_RUN" 2>&1 &
 
 wait
 
