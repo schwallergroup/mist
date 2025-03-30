@@ -79,9 +79,6 @@ class KineticDataClassification(RLTask):
         
         {}
         """
-        if 'dataset_path' not in kwargs:
-            raise ValueError("dataset_path must be provided in kwargs")
-        self.dataset_path = kwargs['dataset_path']
         
     def load(self) -> DatasetDict:
         """
@@ -92,13 +89,13 @@ class KineticDataClassification(RLTask):
         """
 
         # Assume the dataset is in the same directory as the script
-        x1_train_path = os.path.join(self.dataset_path, "x_train", "x1_train_M1_M20_train_val_test_set.pkl")
-        x2_train_path = os.path.join(self.dataset_path, "x_train", "x2_train_M1_M20_train_val_test_set.pkl")
-        y_train_path = os.path.join(self.dataset_path, "y_train", "y_train_M1_M20_train_val_test_set.pkl")
+        x1_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x1_train_M1_M20_train_val_test_set.pkl")
+        x2_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x2_train_M1_M20_train_val_test_set.pkl")
+        y_train_path = os.path.join(self.dataset_id_or_path, "y_train", "y_train_M1_M20_train_val_test_set.pkl")
 
-        x1_test_path = os.path.join(self.dataset_path, "x_val", "x1_val_M1_M20_train_val_test_set.pkl")
-        x2_test_path = os.path.join(self.dataset_path, "x_val", "x2_val_M1_M20_train_val_test_set.pkl")
-        y_test_path = os.path.join(self.dataset_path, "y_val", "y_val_M1_M20_train_val_test_set.pkl")
+        x1_test_path = os.path.join(self.dataset_id_or_path, "x_val", "x1_val_M1_M20_train_val_test_set.pkl")
+        x2_test_path = os.path.join(self.dataset_id_or_path, "x_val", "x2_val_M1_M20_train_val_test_set.pkl")
+        y_test_path = os.path.join(self.dataset_id_or_path, "y_val", "y_val_M1_M20_train_val_test_set.pkl")
 
         # Implement dataset loading logic
         with open(x1_train_path, "rb") as f:
