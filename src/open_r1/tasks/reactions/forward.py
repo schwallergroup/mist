@@ -39,7 +39,7 @@ class ForwardReaction(SMILESBasedTask):
         #     "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
         # )
         self.question_template = (
-            "Question: You are an organic chemistry expert, and I have a task for you. "
+            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
             "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
             "Here are the reagents: {}. "
@@ -175,7 +175,7 @@ class ForwardReactionWithTags(ForwardReaction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "Question: You are an organic chemistry expert, and I have a task for you. "
+            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
             "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
             "Here are the reactants: [START_SMILES] {} [END_SMILES]. "

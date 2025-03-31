@@ -95,6 +95,7 @@ export CMD=" \
 export LAUNCHER="conda deactivate;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein wandb;
+pip install -U git+https://github.com/schwallergroup/trl.git;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
