@@ -1,16 +1,22 @@
+import os
+import pickle
+from typing import List
+
 from open_r1.tasks.base import RLTask
-from datasets import DatasetDict
+from datasets import DatasetDict, Dataset
 
 class KineticDataClassification(RLTask):
-    """
-    Description of your new task.
-    
-    This task should [describe what the task does and its purpose].
-    """
-    
+    question_template: str = ""
+    x1_train: List = None
+    x2_train: List = None
+    y_train: List = None
+    x1_test: List = None
+    x2_test: List = None
+    y_test: List = None
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = """
+        self.question_template = ("""
         Reason and estimate the reaction class for the following reaction.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
@@ -78,7 +84,7 @@ class KineticDataClassification(RLTask):
         S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
         
         {}
-        """
+        """)
         
     def load(self) -> DatasetDict:
         """
@@ -89,8 +95,8 @@ class KineticDataClassification(RLTask):
         """
 
         # Assume the dataset is in the same directory as the script
-        x1_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x1_train_M1_M20_train_val_test_set.pkl")
-        x2_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x2_train_M1_M20_train_val_test_set.pkl")
+        x1_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x1_train_M1_M20_train_val_test_set_part_0.pkl")
+        x2_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x2_train_M1_M20_train_val_test_set_part_0.pkl")
         y_train_path = os.path.join(self.dataset_id_or_path, "y_train", "y_train_M1_M20_train_val_test_set.pkl")
 
         x1_test_path = os.path.join(self.dataset_id_or_path, "x_val", "x1_val_M1_M20_train_val_test_set.pkl")
@@ -99,75 +105,75 @@ class KineticDataClassification(RLTask):
 
         # Implement dataset loading logic
         with open(x1_train_path, "rb") as f:
-            x1_train = pickle.load(f)
+            self.x1_train = pickle.load(f)
         with open(x2_train_path, "rb") as f:
-            x2_train = pickle.load(f)
+            self.x2_train = pickle.load(f)
         with open(y_train_path, "rb") as f:
-            y_train = pickle.load(f)
+            self.y_train = pickle.load(f)
         
-        y_train = y_train.reshape(-1, 1)
+        self.y_train = self.y_train.reshape(-1, 1)[:self.x1_train.shape[0]]
 
         with open(x1_test_path, "rb") as f:
-            x1_test = pickle.load(f)
+            self.x1_test = pickle.load(f)
         with open(x2_test_path, "rb") as f:
-            x2_test = pickle.load(f)
+            self.x2_test = pickle.load(f)
         with open(y_test_path, "rb") as f:
-            y_test = pickle.load(f)
+            self.y_test = pickle.load(f)
 
-        y_test = y_test.reshape(-1, 1)
+        self.y_test = self.y_test.reshape(-1, 1)[:self.x1_test.shape[0]]
 
         prompt_template_data = f"""
         # Data Run 1
-        - Initial concentration of catalyst (normalized to [S]0): {run_1[initial_concentration_of_catalyst]}
-        - Initial concentration of substrate (normalized to [S]0): {run_1[substrate_data][0]}
+        - Initial concentration of catalyst (normalized to [S]0): {{run_1[initial_concentration_of_catalyst]}}
+        - Initial concentration of substrate (normalized to [S]0): {{run_1[substrate_data][0]}}
         - Initial concentration of ES: 0.0
-        - Initial concentration of product (normalized to [S]0): {run_1[product_data][0]}
-        - Time_data (normalized, unitless): {run_1[time_data]}
-        - Substrate_data (normalized to [S]0): {run_1[substrate_data]}
-        - Product_data (normalized to [S]0): {run_1[product_data]}
+        - Initial concentration of product (normalized to [S]0): {{run_1[product_data][0]}}
+        - Time_data (normalized, unitless): {{run_1[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_1[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_1[product_data]}}
 
         # Data Run 2
-        - Initial concentration of catalyst (normalized to [S]0): {run_2[initial_concentration_of_catalyst]}
-        - Initial concentration of substrate (normalized to [S]0): {run_2[substrate_data][0]}
+        - Initial concentration of catalyst (normalized to [S]0): {{run_2[initial_concentration_of_catalyst]}}
+        - Initial concentration of substrate (normalized to [S]0): {{run_2[substrate_data][0]}}
         - Initial concentration of ES: 0.0
-        - Initial concentration of product (normalized to [S]0): {run_2[product_data][0]}
-        - Time_data (normalized, unitless): {run_2[time_data]}
-        - Substrate_data (normalized to [S]0): {run_2[substrate_data]}
-        - Product_data (normalized to [S]0): {run_2[product_data]}
+        - Initial concentration of product (normalized to [S]0): {{run_2[product_data][0]}}
+        - Time_data (normalized, unitless): {{run_2[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_2[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_2[product_data]}}
 
         # Data Run 3
-        - Initial concentration of catalyst (normalized to [S]0): {run_3[initial_concentration_of_catalyst]}
-        - Initial concentration of substrate (normalized to [S]0): {run_3[substrate_data][0]}
+        - Initial concentration of catalyst (normalized to [S]0): {{run_3[initial_concentration_of_catalyst]}}
+        - Initial concentration of substrate (normalized to [S]0): {{run_3[substrate_data][0]}}
         - Initial concentration of ES: 0.0
-        - Initial concentration of product (normalized to [S]0): {run_3[product_data][0]}
-        - Time_data (normalized, unitless): {run_3[time_data]}
-        - Substrate_data (normalized to [S]0): {run_3[substrate_data]}
-        - Product_data (normalized to [S]0): {run_3[product_data]}
+        - Initial concentration of product (normalized to [S]0): {{run_3[product_data][0]}}
+        - Time_data (normalized, unitless): {{run_3[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_3[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_3[product_data]}}
 
         # Data Run 4
-        - Initial concentration of catalyst (normalized to [S]0): {run_4[initial_concentration_of_catalyst]}
-        - Initial concentration of substrate (normalized to [S]0): {run_4[substrate_data][0]}
+        - Initial concentration of catalyst (normalized to [S]0): {{run_4[initial_concentration_of_catalyst]}}
+        - Initial concentration of substrate (normalized to [S]0): {{run_4[substrate_data][0]}}
         - Initial concentration of ES: 0.0
-        - Initial concentration of product (normalized to [S]0): {run_4[product_data][0]}
-        - Time_data (normalized, unitless): {run_4[time_data]}
-        - Substrate_data (normalized to [S]0): {run_4[substrate_data]}
-        - Product_data (normalized to [S]0): {run_4[product_data]}
+        - Initial concentration of product (normalized to [S]0): {{run_4[product_data][0]}}
+        - Time_data (normalized, unitless): {{run_4[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_4[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_4[product_data]}}
         """
 
         train_dict = {
             "prompt_data": [
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=False)) 
-                for i in range(x_train.shape[0])
+                for i in range(self.x1_train.shape[0])
             ],
-            "solution": y_train.tolist()
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_train.tolist()]
         }
 
         test_dict = {
             "prompt_data": [
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=True)) 
-                for i in range(x_test.shape[0])
+                for i in range(self.x1_test.shape[0])
             ],
-            "solution": y_test.tolist()
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_test.tolist()]
         }
 
         self.dataset = DatasetDict({"train": Dataset.from_dict(train_dict), "test": Dataset.from_dict(test_dict)})
@@ -270,7 +276,7 @@ class KineticDataClassification(RLTask):
         final_answer, possible_mechanisms, rejected_mechanisms = self._parse_evaluation_result(extracted_result)
         return final_answer            
 
-    def _parse_evaluation_result(self, result: str) -> Tuple[str, List[str], List[str]]:
+    def _parse_evaluation_result(self, result: str):
         """
         Parse the evaluation result string into final answer, possible mechanisms, and rejected mechanisms.
         
@@ -278,7 +284,6 @@ class KineticDataClassification(RLTask):
             result: String in format 'Final: M1, Possible: M3 M4, Rejected: M2 M5'
             
         Returns:
-            Tuple containing:
             - final_answer (str): The final mechanism (e.g. 'M1')
             - possible_mechanisms (List[str]): List of possible mechanisms
             - rejected_mechanisms (List[str]): List of rejected mechanisms
@@ -307,3 +312,9 @@ class KineticDataClassification(RLTask):
 
     def dataset_preprocess(self, tokenizer):
         return self.dataset
+
+
+if __name__ == "__main__":
+    task = KineticDataClassification(dataset_id_or_path="/work/liac/kinetic")
+    task.load()
+    print(task.dataset)
