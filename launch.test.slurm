@@ -119,8 +119,10 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
 "
 export VLLM_RUN="conda deactivate;
 cd /Documents/sink;
-pip install hf_transfer gdown levenshtein wandb 'trl[vllm]';
-pip install -e . --no-deps;
+nvcc --version;
+pip show vllm;
+pip show trl;
+pip install -U git+https://github.com/schwallergroup/trl.git;
 CUDA_VISIBLE_DEVICES=3 trl vllm-serve \
     --model $MODEL \
     --max_model_len 2048 \
@@ -147,7 +149,8 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     "
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1 &
+clear;
+# srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1 &
 
 srun $SRUN_ARGS --jobid $SLURM_JOB_ID --nodes=1 --ntasks=1 --nodelist="$VLLM_NODE" bash -c "$VLLM_RUN" 2>&1 &
 
