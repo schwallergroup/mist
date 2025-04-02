@@ -7,12 +7,12 @@ format_reward, accuracy_reward
 import os
 import random
 import re
-from typing import Any, Optional
+from typing import Any, Optional, Dict
+from dataclasses import field
+from pydantic import BaseModel, Field
 
 from datasets import load_dataset
 from rdkit import RDLogger
-
-from pydantic import BaseModel, Field
 
 
 RDLogger.DisableLog("rdApp.*")
@@ -59,6 +59,9 @@ class RLTask(BaseModel):
     dataset_id_or_path: Optional[str] = None
     dataset_splits: Optional[str] = None
     dataset: Optional[Any] = None
+    task_mode: Optional[str] = "base"
+    task_kwargs: Dict[str, Any] = field(default_factory=dict)
+
     system_prompt: Optional[str] = Field(
         "A conversation between User and Assistant. The user asks a question, and the "
         "Assistant solves it. The assistant first thinks about the reasoning process "
@@ -166,5 +169,12 @@ class RLTask(BaseModel):
             for content in completion_contents
         ]
 
-        # Magic nubmer 3 to encourage 3 steps and more, otherwise partial reward
+        # Magic number 3 to encourage 3 steps and more, otherwise partial reward
         return [min(1.0, count / 3) for count in matches]
+
+    def get_metrics(self) -> dict:
+        """
+        Get task metrics to log in WANDB.
+        This function takes no arguments and returns a dictionary of metrics {key[str]: value[float]}.
+        """
+        return dict()

@@ -179,6 +179,9 @@ docs/build/
 # Others
 .idea
 
+# Others
+.idea
+
 # WANDB API KEY (PERSONAL & SECRET)
 wandb_api_key.txt
 
