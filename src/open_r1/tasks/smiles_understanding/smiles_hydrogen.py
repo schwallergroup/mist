@@ -6,6 +6,7 @@ from datasets import Dataset, DatasetDict
 from rdkit import RDLogger, Chem
 import pandas as pd
 import numpy as np
+import json
 from dataclasses import field
 RDLogger.DisableLog('rdApp.*')
 
@@ -19,47 +20,15 @@ class SmilesHydrogen(RLTask):
         super().__init__(**kwargs)
 
         # Define prompt guiding options
+        with open('task_examples.json', 'r') as f:
+            prompt_modes = json.load(f)
+
+
         pg_addH = ""
         pg_removeH = ""
-        if "PG1" in self.task_mode:
-            pg_addH = ("\nHere is an example of hydrogen addition for another molecule:\n"
-                       "- input: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n"
-                       "- expected output: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n")
-            pg_removeH = ("\nHere is an example of hydrogen removal for another molecule:\n"
-                          "- input: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n"
-                          "- expected output: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n")
-        elif "PG2" in self.task_mode:
-            pg_addH = ("\nHere is an example of hydrogen addition for another molecule:\n"
-                       "- input: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n"
-                       "- expected output: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n"
-                       "- method: to add implicit hydrogens in a SMILES, you need to understand the given SMILES and the 3D structure of the molecule. "
-                       "For each atom in the SMILES, you need to add the correct number of hydrogens to satisfy the valency of the atom (depending on the bonds). "
-                       "For example, a carbon atom with 3 bonds should have 1 hydrogen added to it. "
-                       "While adding atoms in the SMILES, ensure that the SMILES format is still correct and add parentheses/brackets accordingly to keep a correct format.\n")
-            pg_removeH = ("\nHere is an example of hydrogen removal for another molecule:\n"
-                          "- input: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n"
-                          "- expected output: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n"
-                          "- method: to remove implicit hydrogens in a SMILES, you need to understand the given SMILES and the 3D structure of the molecule. "
-                          "For each atom in the SMILES, you need to remove the implicit hydrogens without affecting the SMILES format. "
-                          "While removing atoms in the SMILES, ensure that the SMILES format is still correct and remove parentheses/brackets accordingly to keep a correct format.\n")
-        elif "PG3" in self.task_mode:
-            pg_addH = ("\nHere is an example of hydrogen addition for another molecule:\n"
-                       "- input: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n"
-                       "- expected output: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n"
-                       "- method: to add implicit hydrogens in a SMILES, you need to understand the given SMILES and the 3D structure of the molecule. "
-                       "For each atom in the SMILES, you need to add the correct number of hydrogens to satisfy the valency of the atom (depending on the bonds). "
-                       "For example, a carbon atom with 3 bonds should have 1 hydrogen added to it. "
-                       "While adding atoms in the SMILES, ensure that the SMILES format is still correct and add parentheses/brackets accordingly to keep a correct format.\n"
-                       "- additional help: most of the time, you only need to use 5 different characters for the hydrogen addition: H, (, ), [, ]. "
-                       "These 5 characters can be combined in [H] or ([H]) or [H])[H]) for example. Most of the time, multiple hydrogens need to be added. In some cases, you also need to add correct parentheses around groups of atoms.\n")
-            pg_removeH = ("\nHere is an example of hydrogen removal for another molecule:\n"
-                          "- input: c1([H])c([H])c([N+](=O)[O-])c([H])c([H])c1C(C(C(O[H])([H])[H])(N(C(=O)C(Cl)(Cl)[H])[H])[H])(O[H])[H]\n"
-                          "- expected output: c1cc([N+](=O)[O-])ccc1C(C(CO)NC(=O)C(Cl)Cl)O\n"
-                          "- method: to remove implicit hydrogens in a SMILES, you need to understand the given SMILES and the 3D structure of the molecule. "
-                          "For each atom in the SMILES, you need to remove the implicit hydrogens without affecting the SMILES format. "
-                          "While removing atoms in the SMILES, ensure that the SMILES format is still correct and remove parentheses/brackets accordingly to keep a correct format.\n"
-                          "- additional help: most of the time, you only need to remove 5 different characters for the hydrogen removal: H, (, ), [, ]. "
-                          "These 5 characters can be combined in [H] or ([H]) or [H])[H]) for example. In some cases, you also need to modify and correct the parentheses around groups of atoms.\n")
+        if self.task_mode in prompt_modes:
+            pg_addH = prompt_modes[self.task_mode]['addH']
+            pg_removeH = prompt_modes[self.task_mode]['removeH']
 
         self.question_template_addH = (
             "What is the SMILES for this molecule after adding all the implicit hydrogens? Here is a SMILES without hydrogens: {} "
