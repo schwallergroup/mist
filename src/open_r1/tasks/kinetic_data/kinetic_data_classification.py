@@ -95,13 +95,13 @@ class KineticDataClassification(RLTask):
         """
 
         # Assume the dataset is in the same directory as the script
-        x1_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x1_train_M1_M20_train_val_test_set_part_0.pkl")
-        x2_train_path = os.path.join(self.dataset_id_or_path, "x_train", "x2_train_M1_M20_train_val_test_set_part_0.pkl")
-        y_train_path = os.path.join(self.dataset_id_or_path, "y_train", "y_train_M1_M20_train_val_test_set.pkl")
+        x1_train_path = os.path.join(self.dataset_id_or_path, "x1_train_M1_M20_train_val_test_set_part_0.pkl")
+        x2_train_path = os.path.join(self.dataset_id_or_path, "x2_train_M1_M20_train_val_test_set_part_0.pkl")
+        y_train_path = os.path.join(self.dataset_id_or_path, "y_train_M1_M20_train_val_test_set_part_0.pkl")
 
-        x1_test_path = os.path.join(self.dataset_id_or_path, "x_val", "x1_val_M1_M20_train_val_test_set.pkl")
-        x2_test_path = os.path.join(self.dataset_id_or_path, "x_val", "x2_val_M1_M20_train_val_test_set.pkl")
-        y_test_path = os.path.join(self.dataset_id_or_path, "y_val", "y_val_M1_M20_train_val_test_set.pkl")
+        x1_test_path = os.path.join(self.dataset_id_or_path, "x1_val_M1_M20_train_val_test_set_part_0.pkl")
+        x2_test_path = os.path.join(self.dataset_id_or_path, "x2_val_M1_M20_train_val_test_set_part_0.pkl")
+        y_test_path = os.path.join(self.dataset_id_or_path, "y_val_M1_M20_train_val_test_set_part_0.pkl")
 
         # Implement dataset loading logic
         with open(x1_train_path, "rb") as f:
@@ -111,7 +111,12 @@ class KineticDataClassification(RLTask):
         with open(y_train_path, "rb") as f:
             self.y_train = pickle.load(f)
         
-        self.y_train = self.y_train.reshape(-1, 1)[:self.x1_train.shape[0]]
+        # Validate data shapes
+        if not (len(self.x1_train) == len(self.x2_train) == len(self.y_train)):
+            raise ValueError(
+                f"Data shapes mismatch: x1_train={len(self.x1_train)}, "
+                f"x2_train={len(self.x2_train)}, y_train={len(self.y_train)}"
+            )
 
         with open(x1_test_path, "rb") as f:
             self.x1_test = pickle.load(f)
@@ -119,6 +124,13 @@ class KineticDataClassification(RLTask):
             self.x2_test = pickle.load(f)
         with open(y_test_path, "rb") as f:
             self.y_test = pickle.load(f)
+
+        # Validate test data shapes
+        if not (len(self.x1_test) == len(self.x2_test) == len(self.y_test)):
+            raise ValueError(
+                f"Test data shapes mismatch: x1_test={len(self.x1_test)}, "
+                f"x2_test={len(self.x2_test)}, y_test={len(self.y_test)}"
+            )
 
         self.y_test = self.y_test.reshape(-1, 1)[:self.x1_test.shape[0]]
 
@@ -161,7 +173,7 @@ class KineticDataClassification(RLTask):
         """
 
         train_dict = {
-            "prompt_data": [
+            "problem": [
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=False)) 
                 for i in range(self.x1_train.shape[0])
             ],
@@ -169,7 +181,7 @@ class KineticDataClassification(RLTask):
         }
 
         test_dict = {
-            "prompt_data": [
+            "problem": [
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=True)) 
                 for i in range(self.x1_test.shape[0])
             ],
@@ -221,97 +233,27 @@ class KineticDataClassification(RLTask):
         }
 
     def accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function - check that the answer is same as ground truth
         """
-        Calculate rewards for model completions.
-        
-        Args:
-            completions (List[str]): Model generated responses
-            solution (List[str]): Ground truth solutions
-            
-        Returns:
-            List[float]: Rewards for each completion
-        """
+        answers = [self.preprocess_response(c) for c in completions]
         rewards = []
-        for completion, solution in zip(completions, solution):
-            final_answer = self.extract_final_answer(completion)
-            if completion == final_answer:
+
+        for answer, sol in zip(answers, solution):
+            if sol == answer:
                 rewards.append(1)
             else:
                 rewards.append(0)
         return rewards
 
-    def extract_final_answer(self, completion):
-        prompt = """Extract the final reaction class and categorize other considered mechanisms into 'possible' (plausible alternatives) and 'rejected' (explicitly discussed and rejected). 
-
-        Provide the answer in the format: 
-        'Final: M1, Possible: M3 M4, Rejected: M2 M5'
-
-        Rules:
-        1. The final answer should be a single mechanism (e.g., M1, M2, etc.)
-        2. 'Possible' mechanisms are those that were discussed as plausible alternatives but not chosen as final
-        3. 'Rejected' mechanisms are those that were explicitly discussed and ruled out
-        4. Format must be exactly: 'Final: Mx, Possible: My Mz, Rejected: Ma Mb'
-        5. If no other mechanisms were considered in either category, omit that category
-        e.g., 'Final: M1, Rejected: M2' (if no possible alternatives)
-        e.g., 'Final: M1, Possible: M2' (if no rejected mechanisms)
-        e.g., 'Final: M1' (if no other mechanisms were considered)
-
-        Example outputs:
-        - 'Final: M1, Possible: M3 M4, Rejected: M2 M5'
-        - 'Final: M2, Possible: M1, Rejected: M3'
-        - 'Final: M1, Rejected: M2 M3'
-        - 'Final: M3, Possible: M1 M2'
-        - 'Final: M1'
-        """
-
-        chat_completion = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0,  # 決定論的な出力を得るため
-                max_tokens=100  # 短い応答で十分
-        )
-        extracted_result = chat_completion.choices[0].message.content.strip()
-        final_answer, possible_mechanisms, rejected_mechanisms = self._parse_evaluation_result(extracted_result)
-        return final_answer            
-
-    def _parse_evaluation_result(self, result: str):
-        """
-        Parse the evaluation result string into final answer, possible mechanisms, and rejected mechanisms.
-        
-        Args:
-            result: String in format 'Final: M1, Possible: M3 M4, Rejected: M2 M5'
-            
-        Returns:
-            - final_answer (str): The final mechanism (e.g. 'M1')
-            - possible_mechanisms (List[str]): List of possible mechanisms
-            - rejected_mechanisms (List[str]): List of rejected mechanisms
-        """
-        final_answer = ""
-        possible_mechanisms = []
-        rejected_mechanisms = []
-        
-        # Extract final answer
-        if "Final:" in result:
-            final_part = result.split("Final:")[1].split(",")[0].strip()
-            final_answer = final_part
-            
-        # Extract possible mechanisms
-        if "Possible:" in result:
-            possible_part = result.split("Possible:")[1].split(",")[0].strip()
-            possible_mechanisms = possible_part.split()
-            
-        # Extract rejected mechanisms
-        if "Rejected:" in result:
-            rejected_part = result.split("Rejected:")[1].split(",")[0].strip()
-            rejected_mechanisms = rejected_part.split()
-        
-        return final_answer, possible_mechanisms, rejected_mechanisms
-
-
-    def dataset_preprocess(self, tokenizer):
-        return self.dataset
+    def preprocess_response(self, response):
+        """Preprocess the response before checking for accuracy."""
+        pattern = r"<answer>(.*)<\/answer>"
+        m = re.search(pattern, response, re.DOTALL)
+        if m:
+            ans = m.groups()[0]
+            return ans
+        else:
+            return "NONE"
 
 
 if __name__ == "__main__":
