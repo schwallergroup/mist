@@ -126,6 +126,22 @@ class ForwardReaction(RLTask):
         return rewards
 ```
 
+### Recipes
+
+To specify a recipe for your task, copy from template.yaml and modify the section # Chemical Task Arguments:
+```yaml
+# recipes/my_task.yaml
+chem_task: my_task
+dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/...  # can be a HF dataset
+rewards:
+- sequential
+task_mode: my_task_mode
+task_kwargs:
+  my_kwarg: my_value
+```
+
+Where `task_mode` is a special argument whose meaning can be specified arbitrarily for each task, and `task_kwargs` are any other list of arguments. 
+
 ### Task Requirements
 
 When creating a new task, ensure:
