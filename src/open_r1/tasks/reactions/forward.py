@@ -25,10 +25,10 @@ class ForwardReaction(SMILESBasedTask):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not os.path.exists(self.dataset_id_or_path):
-            os.makedirs(self.dataset_id_or_path)
-        if not os.listdir(self.dataset_id_or_path):
-            download_data(self.dataset_id_or_path)
+        # if not os.path.exists(self.dataset_id_or_path):
+        #     os.makedirs(self.dataset_id_or_path)
+        # if not os.listdir(self.dataset_id_or_path):
+        #     download_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
@@ -42,7 +42,7 @@ class ForwardReaction(SMILESBasedTask):
             "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
             "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
-            "Here are the reagents: {}. "
+            "Here are the reagents: [START_SMILES] {} [END_SMILES]. "
             "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
             "Your response: <think> "
         )
@@ -113,8 +113,9 @@ class ForwardReaction(SMILESBasedTask):
         '''To prevent the longest smiles in answer turns out to be the copy of the starting reagents'''
         answer_smiles = self.extract_smiles(answer)
         input_smiles = self.extract_smiles(prompt)
+        input_smiles_flatten = [s for smiles in input_smiles for s in smiles.split('.')]
         
-        answer_smiles = [s for s in answer_smiles if s not in input_smiles]
+        answer_smiles = [s for s in answer_smiles if s not in input_smiles and s not in input_smiles_flatten]
         answer_smiles = max(answer_smiles, key=len) if answer_smiles else None
         return answer_smiles
 

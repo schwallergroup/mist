@@ -55,6 +55,7 @@ export WANDB_PROJECT="r1-$TASK"
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
+export WANDB_HTTP_TIMEOUT=60
 export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
 export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
 export NCCL_ASYNC_ERROR_HANDLING=1
@@ -70,14 +71,15 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
+    --run_name grpo-kuma-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
 export LAUNCHER="cd /Documents/sink;
 pip install hf_transfer rdkit levenshtein wandb;
 pip install -e .;
-pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+pip install -U transformers==4.48.2 pandas==2.0.0;
+pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release; 
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
