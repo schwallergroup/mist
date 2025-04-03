@@ -6,14 +6,15 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: rxnpred_with_tags
-dataset_id_or_path: ${MIST_DATA_DIR}/rxnpred/USPTO_480k_clean
+chem_task: ForwardReactionWithTags
+dataset_id_or_path: /work/liac/sink/data/rxn_pred/USPTO_480k_clean/
 rewards:
 - format
 - accuracy
 # - reasoning_steps
 # - tanimoto_accuracy
 
+#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
 # Lora Arguments
 # No LoRA is used here
