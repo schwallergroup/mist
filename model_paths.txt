@@ -11,4 +11,4 @@ Qwen2.5-3B_pretrained-v1:               /iopsstor/store/cscs/swissai/a05/LIAC/LL
 Qwen2.5-3B_pretrained-v1_cot-v1:        /iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/Qwen2.5-3B_pretrained-v1_cot-v1
 QwenCOT:                /iopsstor/store/cscs/swissai/a05/chem/qwen-cot 
 Qwen-3B-SFT:                   /capstor/store/cscs/swissai/a05/qwen_3b_sft
-Qwen-SFT-full:   	/capstor/store/cscs/swissai/a05/qwen_sft_full
+Qwen-SFT-full:   	/LLM_models/qwen_sft_full
