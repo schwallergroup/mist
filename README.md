@@ -17,7 +17,7 @@ python3 kuma_setup.py
 
 A `launch.slurm` script will be generated based on the `launch.template.slurm` template file.
 
-After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
+After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`, and `[RESUME_JOB_ID]` is the job ID of a previous job you want to continue from, or 0 if run from scratch.
 
 ```bash
 sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID]
@@ -27,9 +27,13 @@ sbatch launch.slurm Qwen2.5-3B 123456
 
 # Or launch from scratch
 sbatch launch.slurm Qwen2.5-3B 0
-
 ```
+Alternatively, you can also submit a job using the `submit_job.sh`, which provides you the option to specify the paramters of `sbatch` without modifying the `launch.template.slurm` script. 
 
+```bash
+# After editing the `submit_job.sh` script, run:
+sh submit_job.sh
+```
 
 
 ## 📖 Documentation
