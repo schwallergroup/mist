@@ -8,15 +8,16 @@
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
 #SBATCH --partition=h100
+#SBATCH -A liac
 
-# Run like:
-# sbatch launch.slurm canonic
+export WANDB_API_KEY=
+export CACHE_DIR=
+export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
+export LLM_MODEL_DIR=/work/liac/LLM_models
 
-# RUN 240275
 set -x -e
 
 source ~/.bashrc
-# cd $(pwd)
 echo "START TIME: $(date)"
 
 NUM_NODES=$SLURM_NNODES
@@ -29,23 +30,6 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-# MODEL=/cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B/snapshots/8faed761d45a263340a0528343f099c05c9a4323
-# MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
-# MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1
-# MODEL=/cache/huggingface/models--meta-llama--Llama-3.1-8B/snapshots/d04e592bb4f6aa9cfee91e2e20afa771667e1d4b
-# MODEL=/cache/huggingface/models--Qwen--Qwen2.5-7B/snapshots/d149729398750b98c0af14eb82c78cfe92750796/
-# MODEL=/cache/models--Qwen--Qwen2.5-0.5B/snapshots/060db6499f32faf8b98477b0a26969ef7d8b9987
-# MODEL=/cache/huggingface/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b
-# MODEL=/iopsstor/scratch/cscs/nnguyenx/models/sink/194653/checkpoint-75/
-# MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen_3b_pretrained
-# MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot-207163-checkpoint-25/
-# MODEL=/iopsstor/store/cscs/swissai/a05/chem/qwen-cot/
-# MODEL=/capstor/store/cscs/swissai/a05/qwen_3b_sft/
-#TASK=canonic
-#TASK=canonmc
-#TASK=iupacsm
-# TASK=rxnpred
-# TASK=smi_permute
 
 MODEL_ID=$1
 TASK=$2
@@ -68,15 +52,13 @@ echo "TRAINING ON ${NUM_GPUS_FOR_TRAINING} GPU(S)"
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
-# export WANDB_API_KEY=a271772bd2d02dce487419cb4448c81195dda55c
-export WANDB_API_KEY=fc356832222355f46cd87bdebb5fe69b52412b78
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
 export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
 export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
 export NCCL_ASYNC_ERROR_HANDLING=1
-#export NCCL_DEBUG=INFO
+export NCCL_DEBUG=INFO
 export NCCL_IB_TIMEOUT=23
 export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
@@ -88,23 +70,15 @@ export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-${RESUME_JOB_ID}-${MODEL_ID} \
+    --run_name grpo-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
 export LAUNCHER="cd /Documents/sink;
-# source openr1/bin/activate;
-# pip install flash-attn --no-build-isolation;
-# pip install -U vllm==0.7.1;
-# pip install -e . --no-deps;
-# pip install -U vllm==0.7.2;
-# pip install -U trl==0.14.0;
-pip install setuptools && pip install flash-attn --no-build-isolation;
-pip install hf_transfer deepspeed rdkit levenshtein wandb;
-pip install -e . -U;
-pip install -U trl==0.14.0 transformers==4.48.2;
-pip install -U pandas==2.0.0;
-HF_HUB_ENABLE_HF_TRANSFER=1 NCCL_DEBUG=INFO ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
+pip install hf_transfer rdkit levenshtein wandb;
+pip install -e .;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
    --num_processes $NUM_GPUS_FOR_TRAINING \
@@ -133,10 +107,11 @@ clear;
 # srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 srun apptainer exec --nv \
 	--bind /scratch \
-	--mount type=bind,src=/scratch/nxnguyen/LIAC/LLM_models/,dst=/LLM_models \
-	--mount type=bind,src=$HOME/repo/,dst=/Documents \
-	--mount type=bind,src=/scratch/nxnguyen/.cache,dst=/cache \
-	$HOME/images/vllm-openai_v0.7.1.sif \
+    --bind /work \
+	--mount type=bind,src=${LLM_MODEL_DIR},dst=/LLM_models \
+	--mount type=bind,src="$(dirname "$(pwd)")",dst=/Documents \
+	--mount type=bind,src=${CACHE_DIR},dst=/cache \
+	${CONTAINER_PATH} \
 	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
