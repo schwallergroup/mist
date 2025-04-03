@@ -2,12 +2,12 @@
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=08:00:00
+#SBATCH --mem=0
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
-#SBATCH --environment=vllm071
-#SBATCH -A a-a05
+#SBATCH --partition=h100
 
 # Run like:
 # sbatch launch.slurm canonic
@@ -16,7 +16,7 @@
 set -x -e
 
 source ~/.bashrc
-cd /Documents/sink
+# cd $(pwd)
 echo "START TIME: $(date)"
 
 NUM_NODES=$SLURM_NNODES
@@ -64,7 +64,7 @@ CONFIG_FILE=recipes/$TASK.yaml
 echo "MODEL ID: ${MODEL_ID}"
 echo "MODEL PATH: ${MODEL}"
 echo "TASK: ${TASK}"
-echo "TASK_MODE: ${TASK_MODE}"
+echo "TRAINING ON ${NUM_GPUS_FOR_TRAINING} GPU(S)"
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-$TASK"
@@ -92,12 +92,19 @@ export CMD=" \
     --base_model_name=$MODEL_NAME \
     "
 
-export LAUNCHER="conda deactivate;
-cd /Documents/sink;
-pip install hf_transfer gdown levenshtein wandb;
-pip install -U git+https://github.com/schwallergroup/trl.git;
-pip install -e . --no-deps;
-HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
+export LAUNCHER="cd /Documents/sink;
+# source openr1/bin/activate;
+# pip install flash-attn --no-build-isolation;
+# pip install -U vllm==0.7.1;
+# pip install -e . --no-deps;
+# pip install -U vllm==0.7.2;
+# pip install -U trl==0.14.0;
+pip install setuptools && pip install flash-attn --no-build-isolation;
+pip install hf_transfer deepspeed rdkit levenshtein wandb;
+pip install -e . -U;
+pip install -U trl==0.14.0 transformers==4.48.2;
+pip install -U pandas==2.0.0;
+HF_HUB_ENABLE_HF_TRANSFER=1 NCCL_DEBUG=INFO ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
    --num_processes $NUM_GPUS_FOR_TRAINING \
@@ -122,6 +129,14 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     "
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear;
+# srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+srun apptainer exec --nv \
+	--bind /scratch \
+	--mount type=bind,src=/scratch/nxnguyen/LIAC/LLM_models/,dst=/LLM_models \
+	--mount type=bind,src=$HOME/repo/,dst=/Documents \
+	--mount type=bind,src=/scratch/nxnguyen/.cache,dst=/cache \
+	$HOME/images/vllm-openai_v0.7.1.sif \
+	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
