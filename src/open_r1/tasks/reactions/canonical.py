@@ -88,3 +88,6 @@ class CanonicalizeSmiles(RLTask):
             return smi
         else:
             return "NONE"
+    
+    def dataset_preprocess(self, tokenizer):
+        return self.dataset
