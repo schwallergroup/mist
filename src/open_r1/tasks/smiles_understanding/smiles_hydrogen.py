@@ -20,9 +20,8 @@ class SmilesHydrogen(RLTask):
         super().__init__(**kwargs)
 
         # Define prompt guiding options
-        with open('task_examples.json', 'r') as f:
+        with open('smiles_hydrogen_prompt_guiding.json.json', 'r') as f:
             prompt_modes = json.load(f)
-
 
         pg_addH = ""
         pg_removeH = ""
