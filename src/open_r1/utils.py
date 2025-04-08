@@ -7,7 +7,6 @@ from trl import GRPOConfig, GRPOTrainer
 import logging
 from transformers.trainer_utils import get_last_checkpoint
 
-
 MetricFunc = Callable[[], dict]
 
 class ExtendedGRPOTrainer(GRPOTrainer):

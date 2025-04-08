@@ -2,26 +2,70 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Accelerate GRPO Training",
+            "name": "SMILES permute",
             "type": "python",
             "request": "launch",
-            "python": "/home/andres/anaconda3/envs/r1/bin/python",
+            "python": "/home/vu/miniconda3/envs/openr1/bin/python",
             "module": "accelerate.commands.launch",
             "args": [
                 "--config_file", "configs/deepspeed_zero3.yaml",
                 "--main_process_port", "29501",
                 "--num_processes", "1",
                 "src/open_r1/run_r1_grpo.py",
-                "--config", "recipes/rxnpred.yaml",
+                "--config", "recipes/smi_permute.test.yaml",
                 "--model_name_or_path", "Qwen/Qwen2.5-0.5B",
                 "--output_dir", "output/grpo",
-                "--dataset_id_or_path", "/home/andres/Documents/open-r1/data/USPTO/",
+                // "--dataset_id_or_path", "/home/vu/Documents/open-r1/data/CRLLM-PubChem-compounds1M-very_very_simple.csv",
             ],
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
-        }
+        },
+        {
+            "name": "IUPAC to SMILES with tags",
+            "type": "python",
+            "request": "launch",
+            "python": "/home/vu/miniconda3/envs/openr1/bin/python",
+            "module": "accelerate.commands.launch",
+            "args": [
+                "--config_file", "configs/deepspeed_zero3.yaml",
+                "--main_process_port", "29501",
+                "--num_processes", "1",
+                "src/open_r1/run_r1_grpo.py",
+                "--config", "recipes/iupacsm_with_tags.test.yaml",
+                "--model_name_or_path", "Qwen/Qwen2.5-0.5B",
+                "--output_dir", "output/grpo",
+                // "--dataset_id_or_path", "/home/vu/Documents/open-r1/data/CRLLM-PubChem-compounds1M-very_very_simple.csv",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Forward prediction with tags",
+            "type": "python",
+            "request": "launch",
+            "python": "/home/vu/miniconda3/envs/openr1/bin/python",
+            "module": "accelerate.commands.launch",
+            "args": [
+                "--config_file", "configs/deepspeed_zero3.yaml",
+                "--main_process_port", "29501",
+                "--num_processes", "1",
+                "src/open_r1/run_r1_grpo.py",
+                "--config", "recipes/rxnpred_with_tags.test.yaml",
+                "--model_name_or_path", "Qwen/Qwen2.5-0.5B",
+                "--output_dir", "output/grpo",
+                // "--dataset_id_or_path", "/home/vu/Documents/open-r1/data/CRLLM-PubChem-compounds1M-very_very_simple.csv",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
     ]
 }

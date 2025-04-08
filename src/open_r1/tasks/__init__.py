@@ -1,7 +1,9 @@
-from .reactions.forward import ForwardReaction
+from .countdown.cd_task import CountdownTask
+from .reactions.forward import ForwardReaction, ForwardReactionWithTags
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
-from .reactions.iupac2smi import Iupac2Smiles
+from .reactions.iupac2smi import Iupac2Smiles, Iupac2SmilesWithTags
+from .reactions.smi_permute import PermuteSmiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 
 
@@ -12,4 +14,12 @@ CHEMTASKS = {
     "canonmc": CanonicalizeSmilesMCQA,
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
+    "CountdownTask": CountdownTask,
+    "ForwardReaction": ForwardReaction,
+    "ForwardReactionWithTags": ForwardReactionWithTags,
+    "CanonicalizeSmiles": CanonicalizeSmiles,
+    "Iupac2Smiles": Iupac2Smiles,
+    "Iupac2SmilesWithTags": Iupac2SmilesWithTags,
+    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA,
+    "PermuteSmiles": PermuteSmiles
 }

@@ -1,3 +1,8 @@
+
+from ..base import SMILESBasedTask
+from .utils import tanimoto_sim
+from typing import Any, Dict
+import re
 import os
 import re
 from random import random
@@ -11,20 +16,47 @@ from rdkit.Chem import AllChem
 from ..base import RLTask
 
 
-class Iupac2Smiles(RLTask):
+class Iupac2Smiles(SMILESBasedTask):
     question_template: str = ""
+    
+    custom_metrics: Dict[str, Any] = {}
+    random_log: Dict[str, Any] = {}
+    printed_sample_prompt: bool = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
-            "What is the SMILES for this molecule? {}. "
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
+            "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
+            # "What is the SMILES for this molecule? {}. "
+            "Here is the IUPAC name: {}.\n"
+            # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "Your response: <think> "
         )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
-
+        self.custom_metrics = {
+            'n_samples': 0,
+            'n_waits': [],
+            'reasoning_score': [],
+            'answer_scores': [],
+        }
+        
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        prompt = {
+            'prompt': self.question_template.format(problem),
+            'problem': problem
+        }
+        
+        if not self.printed_sample_prompt: # print sample prompt once
+            print(f"***SAMPLE PROMPT:\n{prompt['prompt']}")
+            self.printed_sample_prompt = True
+        
+        return prompt
+        
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
+        df = df.drop_duplicates(subset=['SMILES'])
         train_dict = {
             "problem": df["IUPAC"].tolist(),
             "solution": df["SMILES"].tolist(),
@@ -39,33 +71,69 @@ class Iupac2Smiles(RLTask):
             {"train": train_dataset, "test": test_dataset}
         )
         return self.dataset
+    
+    
 
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
+        # def tanimoto_sim(mol1, mol2):
+        #     mol1 = Chem.MolFromSmiles(mol1)
+        #     mol2 = Chem.MolFromSmiles(mol2)
+            
+        #     fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, radius=2, useChirality=True)
+        #     fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, radius=2, useChirality=True)
+                        
+        #     return DataStructs.TanimotoSimilarity(fp1, fp2)
+        
+        
+        def _calc_score(mol1: str, mol2: str, beta=10):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
+                return 0.0
+            sim = tanimoto_sim(mol1, mol2)
+            return sim ** beta
+        
         rewards = []
 
-        # Here task is simple: check that the smiles is the same as the target smiles
-        for content, sol in zip(completions, solution):
-            ans = self.preprocess_response(content)
-            if ans == "NONE":
-                rewards.append(-1)
-                continue
-            if ans == sol:
-                rewards.append(1)
-                self.log_correct(content)
-            else:
-                # It gets a point if when we canonicalize it, it's the same
-                try:
-                    completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(ans))
-                    if completion_mol == sol:
-                        rewards.append(
-                            0.2
-                        )  # as it didnt directly predict the correct canonical smiles
-                    else:
-                        rewards.append(-0.5)  # at least its a valid smiles
-                except:
-                    # invalid generated smiles
-                    rewards.append(-1)
+        for completion, ref, prompt in zip(completions, solution, prompts):
+            reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
+            reasoning_smiles = self.extract_smiles(reasoning)
+            scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
+            max_score = max(scores) if scores else -0.5
+            best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else 'None'
+            reasoning_score = max_score
+            if reasoning_score == 1.0:
+                reasoning_score += 1.0 # massive bonus for truly correct reasoning
+            
+            answer = self.preprocess_response(completion)
+            answer_smiles = self.extract_smiles_from_answer(answer)
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
+            if answer_score == 1.0:
+                answer_score += 1.0 # massive bonus for truly correct answer
+            
+            reward = reasoning_score + answer_score
+            
+            answer_smiles = answer_smiles if answer_smiles else 'None'
+            self.random_log = {
+                'prompt': prompt,
+                'reference': ref,
+                'answer': answer_smiles,
+                'best_smiles_in_reasoning': best_smiles_reasoning,
+                'reasoning_score [0, 2]': reasoning_score,
+                'answer_score [0, 2]': answer_score, 
+                'accuracy_reward [0, 4]': reward, 
+                'full_completion': completion}
+            
+            self.random_print(self.random_log)
+            if reward > 0.3:
+                self.good_print(self.random_log)
+                
+            rewards.append(reward)
+            
+            self.custom_metrics['n_samples'] += 1
+            self.custom_metrics['n_waits'].append(self.count_waits(completion))
+            self.custom_metrics['reasoning_score'].append(reasoning_score)
+            self.custom_metrics['answer_scores'].append(answer_score)
+            
         return rewards
 
     def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
@@ -120,17 +188,31 @@ class Iupac2Smiles(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>(.*)<\/answer>"
+        if not response.startswith("<think>"):
+            response = "<think>" + response
+        pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         m = re.search(pattern, response, re.DOTALL)
-        if m:
-            smi = m.groups()[0]
-
-            # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
-            if "[BEGIN_SMILES]" in smi:
-                smi = smi.replace("[BEGIN_SMILES]", "")
-            if "[END_SMILES]" in smi:
-                smi = smi.replace("[END_SMILES]", "")
-
-            return smi
+        if m and len(m.groups()) == 2:
+            return m.groups()[1]
         else:
             return "NONE"
+        
+    def get_metrics(self):
+        return super().get_metrics()
+    
+class Iupac2SmilesWithTags(Iupac2Smiles):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.question_template = (
+            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
+            "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
+            # "What is the SMILES for this molecule? {}. "
+            "Here is the IUPAC name: [START_MOL] {} [END_MOL].\n"
+            # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "Your response: <think> "
+        )
+        
+    def extract_smiles(self, completion: str):
+        smiles = re.findall(r'\[START_SMILES\](.*?)\[END_SMILES\]', completion)
+        smiles = [s.replace(' ', '') for s in smiles]
+        return smiles

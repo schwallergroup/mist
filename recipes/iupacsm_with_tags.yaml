@@ -6,22 +6,20 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: rxnpred
-dataset_id_or_path: /cache/data/
+chem_task: Iupac2SmilesWithTags
+dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/CRLLM-PubChem-compounds1M-simple.csv # max 20 atoms
 rewards:
 - format
 - accuracy
-- tanimoto_accuracy
-#- reasoning_steps
-special_smiles_tags: true
-
-#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
+# - reasoning_steps
+# - tanimoto_accuracy
+#dataset_id_or_path: /cache/data/
 
 # Lora Arguments
 # No LoRA is used here
 
 # Training arguments
-max_steps: 1000
+max_steps: 1450
 per_device_train_batch_size: 1
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
@@ -47,7 +45,7 @@ report_to:
 - wandb
 
 save_strategy: "steps"
-save_steps: 50
+save_steps: 25
 seed: 42
 
 # Hugging Face Hub 

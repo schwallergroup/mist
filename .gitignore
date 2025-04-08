@@ -135,6 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+openr1/
 
 # Spyder project settings
 .spyderproject
@@ -179,10 +180,12 @@ docs/build/
 # Others
 .idea
 
-# Others
-.idea
-
 # WANDB API KEY (PERSONAL & SECRET)
 wandb_api_key.txt
 
 completion_samples/
+output/
+core*
+*.ipynb
+
+launch.slurm

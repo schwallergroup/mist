@@ -1,8 +1,9 @@
-import os
-import re
+from ..base import SMILESBasedTask
+from .utils import tanimoto_sim
 from random import random
-from typing import Dict, Optional
-
+from typing import Any, Dict, Optional
+import re
+import os
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
@@ -12,13 +13,17 @@ from open_r1.download_data import download_data
 from ..base import RLTask
 
 
-class ForwardReaction(RLTask):
+class ForwardReaction(SMILESBasedTask):
     src_train_file: str = ""
     tgt_train_file: str = ""
     src_test_file: str = ""
     tgt_test_file: str = ""
     question_template: str = ""
-
+    
+    custom_metrics: Dict[str, Any] = {}
+    random_log: Dict[str, Any] = {}
+    printed_sample_prompt: bool = False
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if not os.path.exists(self.dataset_id_or_path):
@@ -42,14 +47,38 @@ class ForwardReaction(RLTask):
             else None
         )
         self.question_template = (
-            f"What is the product of the following reaction? Here are the reactants in SMILES notation: {self.begin_smiles_tag} {{}} {self.end_smiles_tag} "
-            "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
+            "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
+            "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
+            "Here are the reagents: {}. "
+            "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
+            "Your response: <think> "
         )
+        
+        self.custom_metrics = {
+            'n_samples': 0,
+            'n_waits': [],
+            'reasoning_score': [],
+            'answer_scores': [],
+        }
+        
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        prompt = {
+            'prompt': self.question_template.format(problem),
+            'problem': problem
+        }
+        
+        if not self.printed_sample_prompt: # print sample prompt once
+            print(f"***SAMPLE PROMPT:\n{prompt['prompt']}")
+            self.printed_sample_prompt = True
+        
+        return prompt
 
     def process_line(self, line: str) -> str:
         """Process a line from the source file."""
-        rm_space = re.sub(" +", "", line)
-        return rm_space
+        line = re.sub(r" +", "", line)
+        line = line.strip()
+        return line
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
@@ -89,97 +118,82 @@ class ForwardReaction(RLTask):
         )
 
         return self.dataset
+    
+    def extract_smiles_from_answer(self, answer, prompt):
+        '''To prevent the longest smiles in answer turns out to be the copy of the starting reagents'''
+        answer_smiles = self.extract_smiles(answer)
+        input_smiles = self.extract_smiles(prompt)
+        
+        answer_smiles = [s for s in answer_smiles if s not in input_smiles]
+        answer_smiles = max(answer_smiles, key=len) if answer_smiles else None
+        return answer_smiles
 
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
-
+        def _calc_score(mol1: str, mol2: str, beta=20):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
+                return 0.0
+            sim = tanimoto_sim(mol1, mol2)
+            return sim ** beta
+        
         rewards = []
-        for content, sol in zip(completions, solution):
-            ans = self.preprocess_response(content)
-            if ans == "NONE":
-                rewards.append(-1)
-                continue
-            try:
-                gold_mol = Chem.MolToSmiles(Chem.MolFromSmiles(sol))
-            except:
-                # invalid target smiles
-                rewards.append(-1)
-                continue
-            try:
-                completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(ans))
-            except:
-                # invalid generated smiles
-                rewards.append(-1)  # penalize if invalid smiles
-                continue
-            if gold_mol == completion_mol:
-                rewards.append(1)  # reward if correct
-                self.log_correct(content)
+        
+        for completion, ref, prompt in zip(completions, solution, prompts):
+            reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
+            reasoning_smiles = self.extract_smiles(reasoning)
+            scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
+            max_score = max(scores) if scores else -0.5
+            best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else 'None'
+            reasoning_score = max_score
+            if reasoning_score == 1.0:
+                reasoning_score += 1.0 # massive bonus for truly correct reasoning
+            
+            answer = self.preprocess_response(completion)
+            answer_smiles = self.extract_smiles_from_answer(answer, prompt)
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
+            if answer_score == 1.0:
+                answer_score += 1.0 # massive bonus for truly correct answer
+            
+            reward = reasoning_score + answer_score
+            
+            answer_smiles = answer_smiles if answer_smiles else 'None'
+            self.random_log = {
+                'prompt': prompt,
+                'reference': ref,
+                'answer': answer_smiles,
+                'best_smiles_in_reasoning': best_smiles_reasoning,
+                'reasoning_score [0, 2]': reasoning_score,
+                'answer_score [0, 2]': answer_score, 
+                'accuracy_reward [0, 4]': reward, 
+                'full_completion': completion}
+            
+            if reward > 0.3:
+                self.good_print(self.random_log)
             else:
-                rewards.append(-0.5)  # no reward if incorrect
+                self.random_print(self.random_log)
+                  
+            rewards.append(reward)
+            
+            self.custom_metrics['n_samples'] += 1
+            self.custom_metrics['n_waits'].append(self.count_waits(completion))
+            self.custom_metrics['reasoning_score'].append(reasoning_score)
+            self.custom_metrics['answer_scores'].append(answer_score)
+            
         return rewards
 
-    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
-        """Reward function using Tanimoto similarity between prediction and ground truth."""
-        answers = [self.preprocess_response(c) for c in completions]
-
-        rewards = []
-        for content, sol in zip(answers, solution):
-            if content == "NONE":
-                rewards.append(-1)
-                continue
-
-            try:
-                # Convert ground truth SMILES to molecule and fingerprint
-                gold_mol = Chem.MolFromSmiles(sol)
-                if gold_mol is None:
-                    rewards.append(-1)
-                    continue
-                gold_fp = AllChem.GetMorganFingerprintAsBitVect(gold_mol, 2)
-
-                # Convert prediction SMILES to molecule and fingerprint
-                pred_mol = Chem.MolFromSmiles(content)
-                if pred_mol is None:
-                    rewards.append(-1)
-                    continue
-                pred_fp = AllChem.GetMorganFingerprintAsBitVect(pred_mol, 2)
-
-                # Calculate Tanimoto similarity
-                tanimoto = DataStructs.TanimotoSimilarity(gold_fp, pred_fp)
-
-                # Scale the reward:
-                # 1.0 for perfect match
-                # Proportional to similarity for partial matches
-                # Still penalize very poor predictions
-                if tanimoto == 1.0:
-                    reward = 1.0
-                    self.log_correct(content)
-                elif tanimoto < 0.3:  # You can adjust this threshold
-                    reward = -0.5
-                else:
-                    reward = (
-                        tanimoto - 0.3
-                    )  # Shifts the reward to be negative for very low similarities
-
-                rewards.append(reward)
-
-            except Exception as e:
-                rewards.append(-1)
-                continue
-
-        return rewards
-
-    def preprocess_response(self, response):
-        """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>(.*)<\/answer>"
-        m = re.search(pattern, response, re.DOTALL)
-        if m:
-            smi = m.groups()[0]
-
-            # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
-            if "[BEGIN_SMILES]" in smi:
-                smi = smi.replace("[BEGIN_SMILES]", "")
-            if "[END_SMILES]" in smi:
-                smi = smi.replace("[END_SMILES]", "")
-            return smi
-        else:
-            return "NONE"
+class ForwardReactionWithTags(ForwardReaction):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.question_template = (
+            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
+            "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
+            "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
+            "Here are the reactants: [START_SMILES] {} [END_SMILES]. "
+            "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
+            "Your response: <think> "
+        )
+    
+    def extract_smiles(self, completion: str):
+        smiles = re.findall(r'\[START_SMILES\](.*?)\[END_SMILES\]', completion)
+        smiles = [s.replace(' ', '') for s in smiles]
+        return smiles

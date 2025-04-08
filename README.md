@@ -10,31 +10,43 @@ This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1),
 > [!IMPORTANT]  
 > Clone this repo into `$HOME/`. This partition has no cleaning policy and your code should be stored there. You can clone it into `$HOME/`, `$HOME/Documents/` or into any other folder of your choice.
 
-Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS cluster.
+Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS or Kuma cluster.
 ```bash
 python3 CSCS_setup.py
+# or
+python3 kuma_setup.py
 ```
 
-After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
+A `launch.slurm` script will be generated based on the `launch.template.slurm` template file.
+
+After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`, and `[RESUME_JOB_ID]` is the job ID of a previous job you want to continue from, or 0 if run from scratch.
 
 ```bash
-sbatch launch.slurm [MODEL] [TASK]
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
 
-# Launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
-sbatch launch.slurm Qwen2.5-3B rxnpred
+# Launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, continuing from job ID 123456
+sbatch launch.slurm Qwen2.5-3B rxnpred 123456
+
+# Or launch from scratch
+sbatch launch.slurm Qwen2.5-3B rxnpred 0
 ```
 
-A third optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
+A final optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
 - If you would like to process the dataset in a different manner.
 - If you would like to apply different chat templates / prompt templates.
 - If you would like to compute the rewards in a different manner.
 - Etc... (You can do whatever you want)
 
-If you use it, the parameter `[TASK_MODE]` will be given to the task in `self.task_mode`. If is useful if you would like to run the same recipe files with multiple task modes without rewriting dozens of individual recipes and task classes.
-```bash
-sbatch launch.slurm [MODEL] [TASK] [TASK_MODE]
-```
+If you use it, the parameter `[TASK_MODE]` will be given to the task in `self.task_mode`. It is useful if you would like to run the same recipe files with multiple task modes without rewriting dozens of individual recipes and task classes.
+
 Note: you can completely omit this third parameter and it won't affect anything if you don't use it. The default `[TASK_MODE]` is `"base"`. Additionnally, the `task_mode` parameter should never be specified in a recipe file.
+
+Alternatively, you can also submit a job using the `submit_job.sh`, which provides you the option to specify the paramters of `sbatch` without modifying the `launch.template.slurm` script. 
+
+```bash
+# After editing the `submit_job.sh` script, run:
+sh submit_job.sh
+```
 
 ## 📖 Documentation
 
