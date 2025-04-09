@@ -1,4 +1,5 @@
 import os
+import re
 import pickle
 from typing import List
 
@@ -244,6 +245,41 @@ class KineticDataClassification(RLTask):
             else:
                 rewards.append(0)
         return rewards
+    
+    def generate_prompt(self, problem, tokenizer):
+        """Generate prompt for the MCQA task."""
+        r1_prefix = [
+            {"role": "system", "content": self.system_prompt},
+            {
+                "role": "user",
+                "content": self.question_template.format(problem),
+            },
+        ]
+        return {
+            "prompt": tokenizer.apply_chat_template(
+                r1_prefix, tokenize=False, continue_final_message=True
+            ),
+            "problem": problem
+        }
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = (
+            self.dataset["train"]
+            .shuffle(seed=42)
+            .select(range(min(50000, len(self.dataset["train"]))))
+        )
+        self.dataset["test"] = (
+            self.dataset["test"]
+            .shuffle(seed=42)
+            .select(range(min(10000, len(self.dataset["test"]))))
+        )
+
+        self.dataset = self.dataset.map(
+            lambda x: self.generate_prompt(
+                x["problem"], tokenizer, options=x["options"]
+            )
+        )
+        return self.dataset
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""

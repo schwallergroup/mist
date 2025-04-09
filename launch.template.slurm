@@ -10,8 +10,8 @@
 #SBATCH --partition=h100
 #SBATCH -A liac
 
-export WANDB_API_KEY=cf870797fb856fe5fd2bbfb69114d65c364c59d9
-export CACHE_DIR=./logs
+export WANDB_API_KEY=
+export CACHE_DIR=
 export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
 export LLM_MODEL_DIR=/work/liac/LLM_models
 
@@ -75,9 +75,9 @@ export CMD=" \
     "
 
 export LAUNCHER="cd /Documents/sink;
-pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
-pip install --no-cache-dir -e .;
-pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 pandas==2.0.0 gdown==4.7.1;
+pip install hf_transfer rdkit levenshtein wandb;
+pip install -e .;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \

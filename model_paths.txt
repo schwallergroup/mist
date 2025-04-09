@@ -5,7 +5,7 @@ Qwen2.5-3B-Instruct:			/LLM_models/models--Qwen--Qwen2.5-3B-Instruct/snapshots/a
 Llama-3.1-8B:				/LLM_models/models--meta-llama--Llama-3.1-8B/snapshots/d04e592bb4f6aa9cfee91e2e20afa771667e1d4b
 Llama-3-8B:				/LLM_models/models--meta-llama--Meta-Llama-3-8B/snapshots/8cde5ca8380496c9a6cc7ef3a8b46a0372a1d920
 DeepSeek-R1-Distill-Qwen-1.5B:		/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa
+DeepSeek-R1-Distill-Qwen-14B:       /kinetic/deepseek-r1-distill-qwen-14b
 DeepSeek-R1-Distill-Llama-70B:		/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Llama-70B/snapshots/0d6d11a6ea1187363aa7b78543f824fc02e06b14
 Qwen2.5-3B_pretrained-v1:		/LLM_models/Qwen2.5-3B_pretrained-v1
 Qwen2.5-3B_pretrained-v1_cot-v1:	/LLM_models/Qwen2.5-3B_pretrained-v1_cot-v1
-Qwen2.5-3B_pretrained-v2:		/LLM_models/Qwen2.5-3B_pretrained-v2
