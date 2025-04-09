@@ -9,6 +9,8 @@ from .kinetic_data.kinetic_data_classification import KineticDataClassification
 # Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
     "ForwardReactionWithTags": ForwardReactionWithTags,
+    "Iupac2SmilesWithTags": Iupac2SmilesWithTags,
+    "PermuteSmiles": PermuteSmiles,
     "rxnpred": ForwardReaction,
     "canonic": CanonicalizeSmiles,
     "canonmc": CanonicalizeSmilesMCQA,
