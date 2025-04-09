@@ -86,7 +86,7 @@ class RLTask(BaseModel):
             )
             return self.dataset
 
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, **kwargs):
         """Define accuracy reward"""
         raise NotImplementedError
 
@@ -140,7 +140,7 @@ class RLTask(BaseModel):
 
         for completion in completions:
             try:
-                if random.random() < 0.00:  # 1% chance to print a completion
+                if random.random() < 0.00:  # 0% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
                 if not completion.startswith("<think>"):
                     completion = "<think>" + completion
