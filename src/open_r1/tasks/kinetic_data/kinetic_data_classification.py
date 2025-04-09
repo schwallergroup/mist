@@ -178,7 +178,8 @@ class KineticDataClassification(RLTask):
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=False)) 
                 for i in range(self.x1_train.shape[0])
             ],
-            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_train.tolist()]
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_train.tolist()],
+            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_train.shape[0])],
         }
 
         test_dict = {
@@ -186,7 +187,8 @@ class KineticDataClassification(RLTask):
                 prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=True)) 
                 for i in range(self.x1_test.shape[0])
             ],
-            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_test.tolist()]
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_test.tolist()],
+            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_test.shape[0])],
         }
 
         self.dataset = DatasetDict({"train": Dataset.from_dict(train_dict), "test": Dataset.from_dict(test_dict)})
