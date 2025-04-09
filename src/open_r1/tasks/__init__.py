@@ -13,6 +13,6 @@ CHEMTASKS = {
     "canonmc": CanonicalizeSmilesMCQA,
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
-    "ForwardReactionWithTags": ForwardReactionWithTags,
     "kinetic": KineticDataClassification,
+    "ForwardReactionWithTags": ForwardReactionWithTags,
 }
