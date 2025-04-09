@@ -13,11 +13,7 @@ CHEMTASKS = {
     "canonmc": CanonicalizeSmilesMCQA,
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
-    "ForwardReaction": ForwardReaction,
     "ForwardReactionWithTags": ForwardReactionWithTags,
-    "CanonicalizeSmiles": CanonicalizeSmiles,
-    "Iupac2Smiles": Iupac2Smiles,
     "Iupac2SmilesWithTags": Iupac2SmilesWithTags,
-    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA,
     "PermuteSmiles": PermuteSmiles
 }
