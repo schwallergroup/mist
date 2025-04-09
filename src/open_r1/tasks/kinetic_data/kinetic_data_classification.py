@@ -21,7 +21,7 @@ class KineticDataClassification(RLTask):
         Reason and estimate the reaction class for the following reaction.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
-        and finally put your final answer within \\boxed{{}}.
+        then end with </think>, and finally put your final answer within <answer> </answer> tags.
 
         # Possible reaction classes
         // M1 Mechanism
@@ -85,6 +85,8 @@ class KineticDataClassification(RLTask):
         S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
         
         {}
+
+        <think>
         """)
         
     def load(self) -> DatasetDict:
