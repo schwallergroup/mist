@@ -187,5 +187,3 @@ completion_samples/
 output/
 core*
 *.ipynb
-
-launch.slurm
