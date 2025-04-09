@@ -1,4 +1,3 @@
-from .countdown.cd_task import CountdownTask
 from .reactions.forward import ForwardReaction, ForwardReactionWithTags
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
@@ -14,7 +13,6 @@ CHEMTASKS = {
     "canonmc": CanonicalizeSmilesMCQA,
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
-    "CountdownTask": CountdownTask,
     "ForwardReaction": ForwardReaction,
     "ForwardReactionWithTags": ForwardReactionWithTags,
     "CanonicalizeSmiles": CanonicalizeSmiles,
