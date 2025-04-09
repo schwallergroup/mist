@@ -14,7 +14,5 @@ CHEMTASKS = {
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
     "ForwardReactionWithTags": ForwardReactionWithTags,
-    "Iupac2SmilesWithTags": Iupac2SmilesWithTags,
-    "PermuteSmiles": PermuteSmiles,
     "kinetic": KineticDataClassification,
 }
