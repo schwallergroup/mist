@@ -246,7 +246,7 @@ class KineticDataClassification(RLTask):
                 rewards.append(0)
         return rewards
     
-    def generate_prompt(self, problem, tokenizer):
+    def generate_prompt(self, problem, tokenizer, **kwargs):
         """Generate prompt for the MCQA task."""
         r1_prefix = [
             {"role": "system", "content": self.system_prompt},
@@ -276,7 +276,7 @@ class KineticDataClassification(RLTask):
 
         self.dataset = self.dataset.map(
             lambda x: self.generate_prompt(
-                x["problem"], tokenizer, options=x["options"]
+                x["problem"], tokenizer
             )
         )
         return self.dataset
