@@ -17,6 +17,10 @@ python3 CSCS_setup.py
 python3 kuma_setup.py
 ```
 
+**Cluster-specific launch files (used in the example below):**
+- **If you are using CSCS cluster, you need to use `launch_CSCS.slurm` instead of `launch.slurm`.**
+- **If you are using kuma cluster, you need to use `launch_kuma.slurm` instead of `launch.slurm`.**
+
 After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/` (without the suffix `.yaml`).
 ```bash
 sbatch launch.slurm [MODEL] [TASK]
