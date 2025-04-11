@@ -1,19 +1,9 @@
-#!/bin/bash
-#SBATCH --job-name=grpo-chem
-#SBATCH --ntasks-per-node=1
-#SBATCH --time=08:00:00
-#SBATCH --mem=0
-#SBATCH --nodes=4
-#SBATCH --gres=gpu:4
-#SBATCH --output=./logs/%x-%j.out
-#SBATCH --err=./logs/%x-%j.err
-#SBATCH --partition=h100
-#SBATCH -A liac
-
-export WANDB_API_KEY=
-export CACHE_DIR=
+export WANDB_API_KEY=cf870797fb856fe5fd2bbfb69114d65c364c59d9
+export CACHE_DIR=./logs
 export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
 export LLM_MODEL_DIR=/work/liac/LLM_models
+# コンテナ内にCA証明書がないため、ホストのCA証明書をマウント
+export PROXY_CA=/etc/pki/tls/certs/ca-bundle.crt
 
 set -x -e
 
@@ -67,17 +57,20 @@ export CUDA_LAUNCH_BLOCKING=1
 
 
 export CMD=" \
-    src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
+    src/open_r1/run_r1_grpo.py --config ${CONFIG_FILE} \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
     --run_name grpo-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
-    --base_model_name=$MODEL_NAME \
+    --base_model_name=${MODEL_NAME} \
     "
 
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb;
-pip install -e .;
-pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+apt-get update && apt-get install -y ca-certificates;
+update-ca-certificates;
+export REQUESTS_CA_BUNDLE=/certs/proxy_ca.pem;
+pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
+pip install --no-cache-dir -e .;
+pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 pandas==2.0.0 gdown==4.7.1;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -91,27 +84,11 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+echo "-----------CMD-----------"
+echo $CMD
+echo "-----------END-----------"
 
-export NCCL_ASYNC_ERROR_HANDLING=1
-
-# srun error handling:
-# --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
-# --kill-on-bad-exit=1: terminate a step if any task exits with a non-zero exit code
-SRUN_ARGS=" \
-    --wait=60 \
-    --kill-on-bad-exit=1 \
-    "
-
-clear;
-# srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
-srun apptainer exec --nv \
-	--bind /scratch \
-    --bind /work \
-	--mount type=bind,src=${LLM_MODEL_DIR},dst=/LLM_models \
-	--mount type=bind,src="$(dirname "$(pwd)")",dst=/Documents \
-	--mount type=bind,src=${CACHE_DIR},dst=/cache \
-	${CONTAINER_PATH} \
-	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
-
-echo "END TIME: $(date)"
+# echo "-----------LAUNCHER-----------"
+# echo $LAUNCHER
+# echo "-----------END-----------"
+# bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
