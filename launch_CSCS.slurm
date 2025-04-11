@@ -14,8 +14,9 @@
 # Example 2: sbatch launch.slurm Qwen2.5-0.5B canonmc base
 # Argument 1: model id (from model_paths.txt)
 # Argument 2: task name (in folder recipes)
-# Argument 3: job_id to continue training from. If none, pass 0
+# Argument 3 (optional): job_id to continue training from (if none, the default is 0)
 # Argument 4 (optional): task mode
+# Note: if you would like to use "task mode" without using "job_id", you still need to pass the job_id parameter with the value 0
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
@@ -36,12 +37,15 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
-if [[ "$TASK" == *_* ]]; then
-    TASK_SUFFIX="_${TASK#*_}"
+if [[ "$TASK" == *.* ]]; then
+    TASK_SUFFIX="_${TASK#*.}"
 else
     TASK_SUFFIX=""
 fi
-RESUME_JOB_ID=$3
+RESUME_JOB_ID="${3:-0}"
+if [ $RESUME_JOB_ID = 0 ]; then
+    RESUME_JOB_ID=$SLURM_JOB_ID
+fi
 TASK_MODE="${4:-base}"
 if [ "$TASK_MODE" != "base" ]; then
     TASK_MODE_SUFFIX="_$TASK_MODE"
@@ -50,13 +54,8 @@ else
 fi
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
+echo "RESUME_JOB_ID: ${RESUME_JOB_ID}"
 echo "TASK_MODE: ${TASK_MODE}"
-
-if [[ $RESUME_JOB_ID = 0 ]]
-then
-	RESUME_JOB_ID=$SLURM_JOB_ID
-fi
-
 
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
@@ -83,16 +82,16 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
+    --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --task_mode=$TASK_MODE \
     "
 
-export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb;
-pip install -e .;
-pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+export LAUNCHER="conda deactivate;
+cd /Documents/sink;
+pip install hf_transfer gdown;
+pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -118,15 +117,6 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     "
 
-clear;
-# srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
-srun apptainer exec --nv \
-	--bind /scratch \
-    --bind /work \
-	--mount type=bind,src=${LLM_MODEL_DIR},dst=/LLM_models \
-	--mount type=bind,src="$(dirname "$(pwd)")",dst=/Documents \
-	--mount type=bind,src=${CACHE_DIR},dst=/cache \
-	${CONTAINER_PATH} \
-	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
