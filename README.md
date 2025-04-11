@@ -17,21 +17,26 @@ python3 CSCS_setup.py
 python3 kuma_setup.py
 ```
 
-A `launch.slurm` script will be generated based on the `launch.template.slurm` template file.
-
-After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`, and `[RESUME_JOB_ID]` is the job ID of a previous job you want to continue from, or 0 if run from scratch.
-
+After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/` (without the suffix `.yaml`).
 ```bash
-sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
+sbatch launch.slurm [MODEL] [TASK]
 
-# Launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, continuing from job ID 123456
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
+sbatch launch.slurm Qwen2.5-3B rxnpred
+```
+
+A third optional parameter is `[RESUME_JOB_ID]`. It is used if you would like to continue the training of a previous job. `[RESUME_JOB_ID]` should contain the job ID of the previous job you want to continue from. If you want to start a run from scratch (without using a previous run checkpoint), then you can set this parameter to 0 (however it is not necessary since the default value is 0 if the parameter is omitted).
+```bash
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID]
+
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, continuing from job ID 123456
 sbatch launch.slurm Qwen2.5-3B rxnpred 123456
 
-# Or launch from scratch
+# Example: launch from scratch
 sbatch launch.slurm Qwen2.5-3B rxnpred 0
 ```
 
-A final optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
+A final fourth optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
 - If you would like to process the dataset in a different manner.
 - If you would like to apply different chat templates / prompt templates.
 - If you would like to compute the rewards in a different manner.
@@ -39,13 +44,26 @@ A final optional parameter is `[TASK_MODE]`, it can be used if you would like to
 
 If you use it, the parameter `[TASK_MODE]` will be given to the task in `self.task_mode`. It is useful if you would like to run the same recipe files with multiple task modes without rewriting dozens of individual recipes and task classes.
 
-Note: you can completely omit this third parameter and it won't affect anything if you don't use it. The default `[TASK_MODE]` is `"base"`. Additionnally, the `task_mode` parameter should never be specified in a recipe file.
-
-Alternatively, you can also submit a job using the `submit_job.sh`, which provides you the option to specify the paramters of `sbatch` without modifying the `launch.template.slurm` script. 
-
+Notes:
+- If you would like to use the parameter `[TASK_MODE]`, you need to pass it as the fourth parameter. Therefore, you need to specify the third parameter `[RESUME_JOB_ID]` as well (even if you don't use it). If you do not want to use `[RESUME_JOB_ID]`, you can set it to 0.
+- You can completely omit this fourth parameter, and it won't affect anything if you don't use it. The default value for `[TASK_MODE]` is `"base"`.
+- The `task_mode` parameter should never be specified in a recipe file.
 ```bash
-# After editing the `submit_job.sh` script, run:
-sh submit_job.sh
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
+
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, running from scratch with task mode "base"
+sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
+```
+
+Since the default values are:
+- `[RESUME_JOB_ID]` = 0 (start from scratch)
+- `[TASK_MODE]` = "base" (base task mode)
+
+The 3 following commands are equivalent:
+```bash
+sbatch launch.slurm Qwen2.5-3B rxnpred
+sbatch launch.slurm Qwen2.5-3B rxnpred 0
+sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
 ```
 
 ## 📖 Documentation
