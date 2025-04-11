@@ -21,8 +21,12 @@
 
 set -x -e
 
+# Load kuma environment variables
+source kuma.env
+CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
+
 source ~/.bashrc
-cd /Documents/sink
+cd ${KUMA_FOLDER_DOCUMENTS}/sink
 echo "START TIME: $(date)"
 
 NUM_NODES=$SLURM_NNODES
@@ -89,7 +93,7 @@ export CMD=" \
     "
 
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb;
+pip install hf_transfer rdkit levenshtein wandb gdown;
 pip install -e .;
 pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
@@ -108,10 +112,6 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
 export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
-
-# Load kuma environment variables
-source kuma.env
-CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
 
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
