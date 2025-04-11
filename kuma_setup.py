@@ -27,8 +27,8 @@ if __name__ == "__main__":
     with open(kuma_env_filepath, "w") as f:
         f.write(
             f'KUMA_FOLDER_LLM_MODELS=/work/liac/LLM_models\n'
-            f'KUMA_FOLDER_CACHE=/scratch/{username}/.cache\n'
             f'KUMA_FOLDER_DOCUMENTS={path_Documents}\n'
+            f'KUMA_FOLDER_CACHE=/scratch/{username}/.cache\n'
         )
 
     # WANDB setup

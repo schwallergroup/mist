@@ -115,8 +115,9 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 SRUN_ARGS=" \
     --wait=60 \
     --kill-on-bad-exit=1 \
-    "
+    --jobid $SLURM_JOB_ID \
+"
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"

@@ -6,8 +6,8 @@
 #SBATCH --gres=gpu:4
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
-#SBATCH --environment=vllm071
-#SBATCH -A a-a05
+#SBATCH --partition=h100
+#SBATCH -A liac
 
 # Run like:
 # Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
@@ -88,10 +88,10 @@ export CMD=" \
     --task_mode=$TASK_MODE \
     "
 
-export LAUNCHER="conda deactivate;
-cd /Documents/sink;
-pip install hf_transfer gdown;
-pip install -e . --no-deps;
+export LAUNCHER="cd /Documents/sink;
+pip install hf_transfer rdkit levenshtein wandb;
+pip install -e .;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -109,14 +109,27 @@ export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | 
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
+# Load kuma environment variables
+source kuma.env
+CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
+
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
 # --kill-on-bad-exit=1: terminate a step if any task exits with a non-zero exit code
 SRUN_ARGS=" \
     --wait=60 \
     --kill-on-bad-exit=1 \
-    "
+    --jobid $SLURM_JOB_ID \
+    apptainer exec --nv \
+    --bind /scratch \
+    --bind /home \
+    --bind /work \
+    --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
+    --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
+    --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
+    ${CONTAINER_PATH} \
+"
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
