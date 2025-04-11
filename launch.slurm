@@ -17,6 +17,7 @@ export LLM_MODEL_DIR=/work/liac/LLM_models
 # コンテナ内にCA証明書がないため、ホストのCA証明書をマウント
 # export PROXY_CA=/etc/pki/tls/certs/ca-bundle.crt
 export PROXY_CA=/home/kuroki/sink/cacert.pem
+export PIP_CACHE_DIR=${CACHE_DIR}
 
 set -x -e
 
@@ -83,9 +84,14 @@ export SSL_CERT_FILE=/certs/cacert.pem
 export LAUNCHER="cd /Documents/sink;
 apt-get update && apt-get install -y ca-certificates;
 update-ca-certificates;
+
+python3 -m venv /cache/venv;
+source /cache/venv/bin/activate;
+
 pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
 pip install --no-cache-dir -e .;
-pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 pandas==2.0.0 gdown==4.7.1;
+pip install --no-cache-dir numpy==1.24.4 pandas==2.0.3;
+pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 gdown==4.7.1;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
