@@ -4,7 +4,250 @@ import argparse
 import pandas as pd
 import random
 from verl.utils.hdfs_io import copy, makedirs
-from AIRS_preporcess._tokenizer import CIFTokenizer
+
+# This file contains code adapted from the AIRS project:
+# https://github.com/divelab/AIRS/blob/main/OpenMat/Mat2Seq/mat2seq/_tokenizer.py
+# 
+# Copyright (c) 2023 Luis M. Antunes
+# Licensed under the MIT License.
+#
+# The CIFTokenizer class and related utilities are reused and modified here
+# for downstream crystallographic tasks.
+# 
+# Modifications by Ruizhi Xu, 2025
+
+import re
+from torch.utils.data import Dataset
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+with open(os.path.join(THIS_DIR, "spacegroups.txt"), "rt") as f:
+    SPACE_GROUPS = [sg.strip() for sg in f.readlines()]
+
+
+ATOMS = ["Si", "C", "Pb", "I", "Br", "Cl", "Eu", "O", "Fe", "Sb", "In", "S", "N", "U", "Mn", "Lu", "Se", "Tl", "Hf",
+         "Ir", "Ca", "Ta", "Cr", "K", "Pm", "Mg", "Zn", "Cu", "Sn", "Ti", "B", "W", "P", "H", "Pd", "As", "Co", "Np",
+         "Tc", "Hg", "Pu", "Al", "Tm", "Tb", "Ho", "Nb", "Ge", "Zr", "Cd", "V", "Sr", "Ni", "Rh", "Th", "Na", "Ru",
+         "La", "Re", "Y", "Er", "Ce", "Pt", "Ga", "Li", "Cs", "F", "Ba", "Te", "Mo", "Gd", "Pr", "Bi", "Sc", "Ag", "Rb",
+         "Dy", "Yb", "Nd", "Au", "Os", "Pa", "Sm", "Be", "Ac", "Xe", "Kr", "He", "Ne", "Ar"]
+
+DIGITS = [str(d) for d in list(range(10))]
+
+INTS = [str(d) for d in list(range(300))]
+
+KEYWORDS = [
+    "space_group_symbol",
+    "formula",
+    "atoms",
+    "lattice_parameters",
+    "a",
+    "b",
+    "c",
+    "alpha",
+    "beta",
+    "gamma"
+]
+
+UNK_TOKEN = "<unk>"
+
+def get_spacegroup_number(sg_symbol):
+    try:
+        from pymatgen.symmetry.groups import SpaceGroup
+        sg = SpaceGroup(sg_symbol)
+        return sg
+    except Exception as e:
+        print("Err:", e)
+        return None
+
+def parse_formula(formula):
+    formula = formula.replace("'", "").replace('"', '').strip()
+    pattern = r"([A-Z][a-z]*)(\d*)"
+    counts = {}
+    for element, count in re.findall(pattern, formula):
+        counts[element] = counts.get(element, 0) + (int(count) if count else 1)
+    return counts
+
+def compute_cell_formula_units_Z(formula_sum, formula_structural):
+    counts_sum = parse_formula(formula_sum)
+    counts_struct = parse_formula(formula_structural)
+
+    ratios = []
+    for element, count_struct in counts_struct.items():
+        if element not in counts_sum:
+            raise ValueError(f"{element}")
+        ratio = counts_sum[element] / count_struct
+        if ratio != int(ratio):
+            raise ValueError(f"{element}, {ratio} not int")
+        ratios.append(int(ratio))
+
+    if len(set(ratios)) != 1:
+        raise ValueError(f"{ratios} != 1")
+    return ratios[0]
+
+class CIFTokenizer:
+    def __init__(self):
+        self._tokens = ["<pad>"]
+        self._tokens.extend(self.atoms())
+        self._tokens.extend(self.digits())
+        self._tokens.extend(self.keywords())
+        self._tokens.extend(self.symbols())
+
+        space_groups = list(self.space_groups())
+        # Replace 'Pm' space group with 'Pm_sg' to disambiguate from atom 'Pm',
+        #  or 'P1' with 'P1_sg' to disambiguate from atom 'P' and number '1'
+        space_groups_sg = [sg+"_sg" for sg in space_groups]
+        self._tokens.extend(space_groups_sg)
+
+        digits_int = [v+"_int" for v in INTS]
+        self._tokens.extend(digits_int)
+
+        self._escaped_tokens = [re.escape(token) for token in self._tokens]
+        self._escaped_tokens.sort(key=len, reverse=True)
+
+        # a mapping from characters to integers
+        self._token_to_id = {ch: i for i, ch in enumerate(self._tokens)}
+        self._id_to_token = {i: ch for i, ch in enumerate(self._tokens)}
+        # map the id of 'Pm_sg' back to 'Pm', or 'P1_sg' to 'P1',
+        #  for decoding convenience
+        for sg in space_groups_sg:
+            self._id_to_token[self.token_to_id[sg]] = sg.replace("_sg", "")
+        
+        for v_int in digits_int:
+            self._id_to_token[self.token_to_id[v_int]] = v_int.replace("_int", "")
+
+    @staticmethod
+    def atoms():
+        return ATOMS
+
+    @staticmethod
+    def digits():
+        return DIGITS
+
+    @staticmethod
+    def keywords():
+        kws = list(KEYWORDS)
+        return kws
+
+    @staticmethod
+    def symbols():
+        # return ["x", "y", "z", ".", "(", ")", "+", "-", "/", "'", ",", " ", "\n"]
+        return [",", " ", ":", ".", "\n"]
+
+    @staticmethod
+    def space_groups():
+        return SPACE_GROUPS
+
+    @property
+    def token_to_id(self):
+        return dict(self._token_to_id)
+
+    @property
+    def id_to_token(self):
+        return dict(self._id_to_token)
+
+    def encode(self, tokens):
+        # encoder: take a list of tokens, output a list of integers
+        return [self._token_to_id[t] for t in tokens]
+
+    def decode(self, ids):
+        # decoder: take a list of integers (i.e. encoded tokens), output a string
+        return ''.join([self._id_to_token[i] for i in ids])
+    
+    def serialize(self, cif_string):
+        spacegroups = "|".join(SPACE_GROUPS)
+        cif_string = re.sub(fr'(_symmetry_space_group_name_H-M *\b({spacegroups}))\n', r'\1_sg\n', cif_string)
+        extracted_data = self.tokenize_cif_preprocess(cif_string)
+
+        seq_res = ''
+        # formula
+        seq_res += "formula "
+        formula = extracted_data["formula"]
+        elements_counts = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
+        for element, count in elements_counts:
+            if not element: break
+            if not count: count ="1"
+            seq_res += element + " " + count + "_int "
+        seq_res += "\n"
+        # space group name
+        seq_res += "space_group_symbol " + extracted_data["space_group_symbol"] + "\n"
+        # lattice
+        seq_res += "lattice_parameters " + "a " + extracted_data["lattice_parameters"]["a"] + " "
+        seq_res += "b " + extracted_data["lattice_parameters"]["b"] + " "
+        seq_res += "c " + extracted_data["lattice_parameters"]["c"] + " "
+        seq_res += "alpha " + extracted_data["lattice_parameters"]["alpha"] + " "
+        seq_res += "beta " + extracted_data["lattice_parameters"]["beta"] + " "
+        seq_res += "gamma " + extracted_data["lattice_parameters"]["gamma"] + " "
+        seq_res += "\n"
+        # atoms
+        for idx in range(len(extracted_data["atoms"])):
+            tmp = extracted_data["atoms"][idx]
+            seq_res += tmp["type"] + " " + tmp["num"] + "_int " + tmp["coordinates"][0] + " " + tmp["coordinates"][1] + " " + tmp["coordinates"][2] + "\n"
+        seq_res += "\n"
+        # Create a regex pattern by joining the escaped tokens with '|'
+        token_pattern = '|'.join(self._escaped_tokens)
+        # Add a regex pattern to match any sequence of characters separated by whitespace or punctuation
+        full_pattern = f'({token_pattern}|\\w+|[\\.,;!?])'
+        # Tokenize the input string using the regex pattern
+        seq_res = re.sub(r'[ \t]+', ' ', seq_res)
+        return seq_res
+
+    def tokenize_cif_preprocess(self, cif_string):
+        # Re-initialize the dictionary to hold the extracted data
+        extracted_data = {
+            "space_group_symbol": "",
+            "formula": "",
+            "atoms": [],
+            "lattice_parameters": {}
+        }
+
+        # Split the text into lines for processing
+        lines = cif_string.split('\n')
+
+        # Iterate through each line to extract the required information
+        atom_line_idx = -1
+        for line_idx in range(len(lines)):
+            line = lines[line_idx]
+            # Extract space group symbol
+            if "_symmetry_space_group_name_H-M" in line:
+                spacegroup_match = re.search(r'_symmetry_space_group_name_H-M\s+([^\n]+)', line)
+                spacegroup = spacegroup_match.group(1).strip()
+                extracted_data["space_group_symbol"] = spacegroup
+            # Extract formula
+            elif line.startswith("data_"):
+                extracted_data["formula"] = line.split("_")[1]
+            # Extract lattice parameters
+            elif line.startswith("_cell_length_a"):
+                extracted_data["lattice_parameters"]["a"] = line.split()[-1]
+            elif line.startswith("_cell_length_b"):
+                extracted_data["lattice_parameters"]["b"] = line.split()[-1]
+            elif line.startswith("_cell_length_c"):
+                extracted_data["lattice_parameters"]["c"] = line.split()[-1]
+            elif line.startswith("_cell_angle_alpha"):
+                extracted_data["lattice_parameters"]["alpha"] = line.split()[-1]
+            elif line.startswith("_cell_angle_beta"):
+                extracted_data["lattice_parameters"]["beta"] = line.split()[-1]
+            elif line.startswith("_cell_angle_gamma"):
+                extracted_data["lattice_parameters"]["gamma"] = line.split()[-1]
+            elif "_atom_site_occupancy" in line:
+                atom_line_idx = line_idx + 1
+                break
+
+        for line_idx in range(atom_line_idx, len(lines)):
+            line = lines[line_idx]
+            if len(line) < 2:
+                continue
+            atom_info = line.split()
+            atom_type = atom_info[0]
+            num_atoms = atom_info[2]
+            x, y, z = atom_info[3], atom_info[4], atom_info[5]
+            extracted_data["atoms"].append({
+                "type": atom_type,
+                "num": num_atoms,
+                "coordinates": (x, y, z)
+            })
+
+        return extracted_data
 
 # Initialize the tokenizer
 cif_tokenizer = CIFTokenizer()
