@@ -275,17 +275,22 @@ class KineticDataClassification(RLTask):
             
             # sometimes the answer is None
             if answer != "NONE":
-                # accuracy reward (category)
-                if category_dict[sol] == category_dict[answer]:
-                    category_reward = 1
+                if answer in category_dict.keys():
+                    # accuracy reward (category)
+                    if category_dict[sol] == category_dict[answer]:
+                        category_reward = 1
+                    else:
+                        category_reward = 0
+                    
+                    # class coverage reward
+                    class_coverage_reward = self.class_coverage_reward(answer)
+
+                    # data coverage reward
+                    data_coverage_reward = self.data_coverage_reward(answer)
                 else:
                     category_reward = 0
-                
-                # class coverage reward
-                class_coverage_reward = self.class_coverage_reward(answer)
-
-                # data coverage reward
-                data_coverage_reward = self.data_coverage_reward(answer)
+                    class_coverage_reward = 0
+                    data_coverage_reward = 0
             else:
                 category_reward = 0
                 class_coverage_reward = 0
