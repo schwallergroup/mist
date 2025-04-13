@@ -8,6 +8,7 @@ from datasets import Dataset, DatasetDict
 from rdkit import Chem
 from ..base import RLTask
 import requests
+from dataclasses import field
 
 
 class BinaryCompoundRelaxing(RLTask):
@@ -16,6 +17,8 @@ class BinaryCompoundRelaxing(RLTask):
     src_test_file: str = ""
     tgt_test_file: str = ""
     question_template: str = ""
+    log_custom_metrics: bool = True
+    custom_metrics: dict = field(default_factory=dict)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
