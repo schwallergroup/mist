@@ -2,6 +2,7 @@ import os
 import re
 import pickle
 from typing import List
+import random
 
 from open_r1.tasks.base import RLTask
 from datasets import DatasetDict, Dataset
@@ -21,7 +22,7 @@ class KineticDataClassification(RLTask):
         Reason and estimate the reaction class for the following reaction.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
-        then end with </think>, and finally put your final answer within <answer> </answer> tags, for example <answer>M1</answer>.
+        then end with </think>, and finally put your final answer within \\boxed{{}} tags, for example \\boxed{{M1}}.
 
         # Possible reaction classes
         // M1 Mechanism
@@ -301,9 +302,7 @@ class KineticDataClassification(RLTask):
         return rewards
     
     def generate_prompt(self, problem, tokenizer, **kwargs):
-        """Generate prompt for the MCQA task."""
         r1_prefix = [
-            {"role": "system", "content": self.system_prompt},
             {
                 "role": "user",
                 "content": self.question_template.format(problem),
@@ -337,10 +336,10 @@ class KineticDataClassification(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>(.*)<\/answer>"
+        pattern = r"\\boxed{(.*?)}"
         m = re.search(pattern, response, re.DOTALL)
         if m:
-            ans = m.groups()[0]
+            ans = m.groups()[-1]
             return ans
         else:
             return "NONE"
@@ -357,60 +356,30 @@ class KineticDataClassification(RLTask):
         score_data_coverage = len(data_mentioned) / 4
         return score_data_coverage
 
-
-
-if __name__ == "__main__":
-    task = KineticDataClassification(dataset_id_or_path="/work/liac/kinetic")
-    # task.load()
-    # print(task.dataset)
-    output = """
-    <think> Hi, I need to figure out the reaction class for these reaction data. Okay, let's see. The user provided four data runs with different initial conditions and time data, and their corresponding substrate and product concentrations. I remember that reaction classes like M1 to M20 are used to classify reactions based on their rate laws and intermediates.
-        2658
-        2025-04-10 23:07:24
-
-        2659
-        2025-04-10 23:07:24
-        First, I should look for the rate law patterns. Maybe they're both first-order with respect to the substrate ([S]₀) and the catalyst [S], so maybe second-order overall, which is M2 or M20.
-        2660
-        2025-04-10 23:07:24
-
-        2661
-        2025-04-10 23:07:24
-        But then I notice that some runs haven't reached 95% conversion yet, which might indicate the reaction is reversible. Hmm, for reversible reactions, M20 is used, which considers the equilibrium constant.
-        2662
-        2025-04-10 23:07:24
-
-        2663
-        2025-04-10 23:07:24
-        Looking at the data runs, in each one the product is initially present and then react, but doesn't always reach near 95% conversion. Still, the rate constants in run 4 are higher for the forward than reverse reactions, which suggests a tendency toward product formation, but without equilibration, the conversion isn't as high.
-        2664
-        2025-04-10 23:07:24
-
-        2665
-        2025-04-10 23:07:24
-        The product concentration increases over time, which supports the presence of a forward reaction, possibly consistent with M2, but without reaching 95% yet. Maybe M20 is the correct class because it involves both forward and reverse reactions.
-        2666
-        2025-04-10 23:07:24
-
-        2667
-        2025-04-10 23:07:24
-        I'm a bit confused because with forward and reverse reactions, the overall reaction is reversible, which is more accurately represented by M20. However, the product is accumulating but doesn't seem to peak as drastically as M20 would predict without equilibration.
-        2668
-        2025-04-10 23:07:24
-
-        2669
-        2025-04-10 23:07:24
-        I think M20 is the most appropriate class for these data points. It accounts for the competing rates and doesn't require equilibration, giving a clearer picture of the reaction kinetics.
-        2670
-        2025-04-10 23:07:24
-        </think>
-        2671
-        2025-04-10 23:07:24
-
-        2672
-        2025-04-10 23:07:24
-        Based on the reaction data provided, the reaction class is M20, which accounts for the competing rates of forward and reverse reactions, as well as the presence of a product with initial activation, avoiding equilibration to 95%.
-        <answer>M20</answer>
+    def format_reward(self, completions, **kwargs):
         """
-    rewards = task.accuracy_reward([output], ["M1"])
-    print(rewards)
+        Format: <think>...</think>\boxed{}
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+
+        Returns:
+            list[float]: Reward scores
+        """
+        rewards = []
+
+        for completion in completions:
+            try:
+                if random.random() < 0.01:  # 1% chance to print a completion
+                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+
+                regex = r"<think>(.*?)</think>.*?\\boxed{(.*?)}"
+                match = re.search(regex, completion, re.DOTALL)
+                # if the format is not correct, reward is 0
+                if match is None or len(match.groups()) != 2:
+                    rewards.append(0.0)
+                else:
+                    rewards.append(1.0)
+            except Exception:
+                rewards.append(0.0)
+        return rewards
