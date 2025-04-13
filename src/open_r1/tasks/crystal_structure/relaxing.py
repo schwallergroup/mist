@@ -11,6 +11,10 @@ import requests
 
 
 class BinaryCompoundRelaxing(RLTask):
+    src_train_file: str = ""
+    tgt_train_file: str = ""
+    src_test_file: str = ""
+    tgt_test_file: str = ""
     question_template: str = ""
 
     def __init__(self, **kwargs):
