@@ -65,14 +65,30 @@ class BinaryCompoundRelaxing(RLTask):
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
-        with open(src_file, "r", encoding="utf-8") as f:
-            problems = [
-                self.question_template.format(self.process_line(line))
-                for line in f.readlines()
-            ]
+        def read_records(file_path: str) -> list:
+            """Helper function to read multi-line records separated by blank lines."""
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            records = []
+            current_record = []
+            for line in lines:
+                if line.strip() == "":  # Blank line indicates end of a record
+                    if current_record:
+                        records.append("\n".join(current_record))
+                        current_record = []
+                else:
+                    current_record.append(line.strip())
+            if current_record:  # Append the last record if file doesn't end with blank line
+                records.append("\n".join(current_record))
+            return records
+        # Read records from source and target files
+        src_records = read_records(src_file)
+        tgt_records = read_records(tgt_file)
 
-        with open(tgt_file, "r", encoding="utf-8") as f:
-            solutions = [self.process_line(line) for line in f.readlines()]
+        # Generate problems using the question template
+        problems = [self.question_template.format(record) for record in src_records]
+        # Solutions are the raw target records (assuming no further processing needed)
+        solutions = tgt_records
 
         return {
             "problem": problems,
