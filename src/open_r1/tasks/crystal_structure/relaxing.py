@@ -49,6 +49,10 @@ class BinaryCompoundRelaxing(RLTask):
             "As 8_int 0.06170692 0.25000000 0.62500000\n"
             "<|im_end|>\n"
         )
+        self.log_custom_metrics = True
+        self.custom_metrics = {
+            'val/rewards': [],
+        }
 
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
@@ -122,6 +126,8 @@ class BinaryCompoundRelaxing(RLTask):
                 rewards.append(reward)
             except Exception as e:
                 rewards.append(-10)
+        if self.log_custom_metrics:
+            self.custom_metrics['val/rewards'].extend(rewards)
         return rewards
 
     def preprocess_response(self, response):
@@ -132,3 +138,19 @@ class BinaryCompoundRelaxing(RLTask):
             return m[-1].strip()
         else:
             return "NONE"
+
+    def get_metrics(self) -> Dict:
+        """
+        Get task metrics to log in WANDB.
+        This function takes no arguments and returns a dictionary of metrics {key[str]: value[float]}.
+        """
+        metrics = dict()
+        if self.log_custom_metrics:
+            rewards = self.custom_metrics['val/rewards']
+            if rewards:
+                correct_count = sum(1 for r in rewards if r == 1)
+                total_count = len(rewards)
+                accuracy = correct_count / total_count if total_count > 0 else 0.0
+                metrics['val/accuracy'] = accuracy
+                self.custom_metrics['val/rewards'] = []
+        return metrics
