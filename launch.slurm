@@ -31,7 +31,7 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 
 
 # so processes know who to talk to
-MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
+MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)fz
 MASTER_PORT=6000
 
 
@@ -88,7 +88,7 @@ update-ca-certificates;
 export PIP_CACHE_DIR=/tmp/pip-cache
 
 pip install --no-cache-dir numpy==1.24.4 pandas==2.0.0;
-pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
+pip install --no-cache-dir hf_transfer rdkit levenshtein wandb scipy;
 pip install --no-cache-dir -e .;
 pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 gdown==4.7.1;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
