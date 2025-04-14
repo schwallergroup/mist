@@ -369,6 +369,7 @@ class KineticDataClassification(RLTask):
         rewards = []
 
         for completion in completions:
+            completion = "<think>" + completion
             try:
                 if random.random() < 0.01:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
