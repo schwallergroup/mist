@@ -13,4 +13,5 @@ CHEMTASKS = {
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
     "kinetic": KineticDataClassification,
+    "kinetic_metrics": KineticDataClassificationWithMetrics,
 }
