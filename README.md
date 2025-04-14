@@ -159,7 +159,7 @@ Here is a list of the methods that you can implement in your task class:
             - `completions`: list of strings containing the generated text completions (without the prompts). The completions usually contains the thinking and the answer if you follow the standard format.
             - `**kwargs`: any additional column found in `self.dataset` will be passed as keyword arguments (in a list in the same way as `completions`). For example, if you have a column named `"prompt"`, the parameter `prompt=...` will be taken as input. It is useful if you would like to compute rewards and checking if the solutions/expected answer is found in the completions.
     - Output: rewards (list of reward float values with the same length as completions)
-4. **`accuarcy_reward()`** (mandatory): This reward function is used to evaluate the accuracy of the reward (if the answer equals the expected solution).
+4. **`accuracy_reward()`** (mandatory): This reward function is used to evaluate the accuracy of the reward (if the answer equals the expected solution).
 5. **`format_reward()`** (optional): Predefined reward used to reward the correct formatting of the completions (<think> and <answer> tags correctly formatted in the completions).
 6. **`reasoning_steps_reward()`** (optional): Predefined reward used to reward a step-by-step thinking in the completions.
 7. **`get_metrics()`** (optional): Optional function that can be used to log additional metrics in the wandb run. This function is called automatically during the GRPO training.

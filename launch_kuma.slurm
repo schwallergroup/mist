@@ -4,6 +4,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
+#SBATCH --cpus-per-task=64
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --partition=h100

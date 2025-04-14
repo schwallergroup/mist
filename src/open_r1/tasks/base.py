@@ -205,17 +205,7 @@ class RLTask(BaseModel):
     def count_waits(self, completion: str):
         return completion.lower().count("wait")
     
-    def get_metrics(self):
-        metrics = {}
-        if self.custom_metrics['n_samples'] > 0:
-            metrics['n_samples'] = self.custom_metrics['n_samples']
-            for k, v in self.custom_metrics.items():
-                if k != 'n_samples':
-                    metrics[k] = sum(v) / len(v)
-                    self.custom_metrics[k] = []
-        
-        return metrics
-    
+
 class SMILESBasedTask(RLTask):
     def _post_process_smiles(self, smiles):
         smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
