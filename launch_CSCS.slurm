@@ -63,7 +63,7 @@ MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' 
 CONFIG_FILE=recipes/$TASK.yaml
 
 export HF_HOME=/cache/huggingface
-export WANDB_PROJECT="r1-${TASK%%_*}"
+export WANDB_PROJECT="r1-${TASK%%.*}"
 export WANDB_API_KEY=$(cat wandb_api_key.txt)
 
 export NCCL_TIMEOUT=3600

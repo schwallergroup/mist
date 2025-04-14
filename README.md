@@ -94,7 +94,7 @@ Then open `http://localhost:8000` in your browser.
 3. Add class to `CHEMTASKS` in `src/open_r1/tasks/__init__.py`, e.g. `'sampletask': SampleTask`
 4. Write a recipe with the same name as the task `recipes/sampletask.yaml`
     - The run will be logged on wandb under the project named r1-`[TASK]` (e.g. r1-sampletask). Therefore, runs using different recipe files will be logged under different wandb projects.
-    - If you add an underscore in your recipe filename (e.g. `sampletask_variant1.yaml`), the run will also be logged under r1-sampletask (everything after the underscore will be ignored). This is useful if you want to run multiple experiments with different recipe files but keep them under the same wandb project for analysis.
+    - If you add a dot in your recipe filename (e.g. `sampletask.variant1.yaml`), the run will also be logged under r1-sampletask (everything after the dot will be ignored). This is useful if you want to run multiple experiments with different recipe files but keep them under the same wandb project for analysis.
 5. Add documentation:
     - Create an entry under `docs/source/tasks/sampletask.rst` (use the template.rst)
     - Add it to the modules index: `docs/source/modules.rst` as `tasks/sampletask.rst`
