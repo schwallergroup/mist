@@ -6,7 +6,7 @@ from datasets import Dataset, DatasetDict
 from rdkit import RDLogger, Chem
 import pandas as pd
 import numpy as np
-import json
+import json, os
 from dataclasses import field
 RDLogger.DisableLog('rdApp.*')
 
@@ -20,7 +20,8 @@ class SmilesHydrogen(RLTask):
         super().__init__(**kwargs)
 
         # Define prompt guiding options
-        with open('smiles_hydrogen_prompt_guiding.json', 'r') as f:
+        smiles_hydrogen_prompt_guiding_path = os.path.join(os.path.dirname(__file__), "smiles_hydrogen_prompt_guiding.json")
+        with open(smiles_hydrogen_prompt_guiding_path, 'r') as f:
             prompt_modes = json.load(f)
 
         pg_addH = ""
