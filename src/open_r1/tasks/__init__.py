@@ -4,6 +4,7 @@ from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.iupac2smi import Iupac2Smiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
+from .kinetic_data.kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics
 
 # Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
