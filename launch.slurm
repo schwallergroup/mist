@@ -5,6 +5,7 @@
 #SBATCH --mem=0
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
+#SBATCH --cpus-per-task=64
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
 #SBATCH --partition=h100
