@@ -57,6 +57,7 @@ The task expects data files in the following format:
 
 Reward Functions
 --------------
+The accuracy reward is calculated by the weighted sum of the following rewards.
 
 1. **Exact Match (accuracy_reward)**
    
@@ -64,9 +65,38 @@ Reward Functions
    - Correct mechanism classification: 1.0
    - Incorrect mechanism classification: 0.0
 
-If only exact match does not work, we could add the following reward function:
-- if the model predicts the reaction class that belongs to the similar reaction class, such as the class that involves core mechanism(M1), bicatalytic steps(M2-M5), activation steps(M6-M8) and deactivation steps(M9-M20), we could add a small reward.
-- if the model predicts the correct reaction class as the possible reaction class, we could add a small reward(But there is a risk of reward hacking by answering all as possible reaction class).
+2. **Class Coverage Reward (accuracy_reward)**
+
+   Calculates the reward based on the percentage of the 20 reaction classes that the model considered during the reasoning.
+   - If the model considered all 20 reaction classes, the reward is 1.0.
+
+3. **Data Coverage Reward (accuracy_reward)**
+
+   Calculates the reward based on the percentage of the 4 data runs that the model considered during the reasoning.
+   - If the model considered all 4 data runs, the reward is 1.0.
+
+4. **Category Match (accuracy_reward)**
+
+   Calculates the reward based on the answer that the model gave is in the same category as the ground truth.
+   - If the model gave the answer that is in the same category as the ground truth, the reward is 1.0.
+   - For example, if the ground truth is M3, and the model gave M2, the reward is 1.0.
+   - Category is defined as follows:
+      - M1: Core mechanism
+      - M2-M5: Bicatalytic steps
+      - M6-M8: Activation steps
+      - M9-M20: Deactivation steps
+
+The format reward is calculated by the following reward.
+5. **Format Reward (format_reward)**
+
+   Calculates the reward based on the format of the answer.
+   - If the answer includes ``<think>`` and ``\\boxed{}``, the reward is 1.0.
+   - Otherwise, the reward is 0.0.
+
+   **Note:**
+   - This format is intended to train DeepSeek R1 Distill Qwen.
+   - There is the suggestion to use the format in the prompt in their transformer website. I once tried to use ``<think>`` and ``<answer>``, but the format reward did not start to increase in the first 50 global steps.
+
 
 Task Example
 -----------
