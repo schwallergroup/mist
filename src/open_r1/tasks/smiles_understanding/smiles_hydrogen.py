@@ -113,6 +113,7 @@ class SmilesHydrogen(RLTask):
         self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(20_000, len(self.dataset["test"]))))
         self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], x["question_category"], tokenizer))
         return self.dataset
+
     def preprocess_answer(self, response):
         """ Preprocess the answer before checking for accuracy. """
         pattern = r"<answer>(.*)<\/answer>"

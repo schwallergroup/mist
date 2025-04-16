@@ -31,7 +31,6 @@ class Iupac2Smiles(SMILESBasedTask):
             # "What is the SMILES for this molecule? {}. "
             "Here is the IUPAC name: {}.\n"
             # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
-            "Your response: <think> "
         )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
         self.custom_metrics = {

@@ -42,7 +42,6 @@ class PermuteSmiles(RLTask):
             # "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             # "Do not write anything else outside of the tags.\n"
             "Here is the SMILES that you need to work on: [START_SMILES] {} [END_SMILES]. "
-            "Your response: <think> "
         )
         self.question_template = self.question_template.replace("[START_SMILES] ", "")
         self.question_template = self.question_template.replace(" [END_SMILES]", "")
