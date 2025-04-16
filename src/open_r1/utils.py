@@ -1,21 +1,23 @@
 import logging
 import os
-from typing import List, Optional, Union, Callable, Any, Dict
-from pydantic import Field
 from dataclasses import dataclass, field
-from trl import GRPOConfig, GRPOTrainer
-import logging
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from transformers.trainer_utils import get_last_checkpoint
+
+from pydantic import Field
+from trl import GRPOConfig, GRPOTrainer
 
 
 MetricFunc = Callable[[], dict]
+
 
 class ExtendedGRPOTrainer(GRPOTrainer):
     def __init__(
         self,
         metric_funcs: Optional[Union[MetricFunc, list[MetricFunc]]] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args, **kwargs)
@@ -35,7 +37,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             for metric_name, metric_value in metrics.items():
                 if mode in self._metrics.keys():
                     # Compatible with the current version 'main' of trl repository
-                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                    self._metrics[mode][f"custom/{metric_name}"].append(
+                        metric_value
+                    )
                 else:
                     # Compatible with the "older versions" of trl repository (0.14.0 included)
                     self._metrics[f"custom/{metric_name}"].append(metric_value)
@@ -50,6 +54,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.add_custom_metrics()
 
         return output
+
 
 @dataclass
 class ExtendedGRPOConfig(GRPOConfig):
