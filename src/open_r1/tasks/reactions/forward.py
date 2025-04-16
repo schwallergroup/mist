@@ -47,12 +47,11 @@ class ForwardReaction(SMILESBasedTask):
             else None
         )
         self.question_template = (
-            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
+            "You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
             "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
             "Here are the reagents: {}. "
             "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
-            "Your response: <think> "
         )
         
         self.custom_metrics = {
