@@ -6,20 +6,21 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: canonmc
-dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
+chem_task: iupacsm_with_tags
+dataset_id_or_path: /home/vu/Documents/open-r1/data/CRLLM-PubChem-compounds1M-simple.csv # max 20 atoms
 rewards:
 - format
 - accuracy
-task_kwargs:
-  task_variant: options_sameformula_canon
+# - reasoning_steps
+# - tanimoto_accuracy
+#dataset_id_or_path: /cache/data/
 
 # Lora Arguments
 # No LoRA is used here
 
 # Training arguments
-max_steps: 900
-per_device_train_batch_size: 1
+max_steps: 1450
+per_device_train_batch_size: 8
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
@@ -30,11 +31,12 @@ warmup_ratio: 0.03
 # GRPO specific parameters
 beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
 max_prompt_length: 256
-max_completion_length: 1024
+max_completion_length: 2048
 num_generations: 8
-use_vllm: true
+use_vllm: false
 vllm_device: "cuda:3"
-vllm_gpu_memory_utilization: 0.7
+vllm_gpu_memory_utilization: 0.8
+vllm_max_model_len: 2048
 
 # Logging arguments
 logging_strategy: steps

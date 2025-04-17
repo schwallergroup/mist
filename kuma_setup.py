@@ -14,39 +14,22 @@ if __name__ == "__main__":
     username = os.getlogin()
 
     # Create .cache directory in scratch
-    path_scratch = f"/iopsstor/scratch/cscs/{username}"
+    path_scratch = f"/scratch/{username}"
     assert os.path.isdir(
         path_scratch
     ), f"The user's scratch directory does not exist: {path_scratch}"
     if os.path.isdir(f"{path_scratch}/.cache") is False:
         os.mkdir(f"{path_scratch}/.cache")
 
-    # Create environment in .edf folder
-    path_home = f"/users/{username}"
-    assert os.path.isdir(
-        path_home
-    ), f"The user's home directory does not exist: {path_home}"
-    if os.path.isdir(f"{path_home}/.edf") is False:
-        os.mkdir(f"{path_home}/.edf")
-    path_environment = f"{path_home}/.edf/vllm071.toml"
-    if os.path.isfile(path_environment) is False:
-        with open(path_environment, "w") as f:
-            path_Documents = "/".join(path_script.split("/")[:-2])
-            content = (
-                f'image = "/iopsstor/store/cscs/swissai/a05/containers/vllm_trl_sink.sqsh"\n'
-                f"mounts = [\n"
-                f'  "/capstor",\n'
-                f'  "/iopsstor",\n'
-                f'  "/users",\n'
-                f'  "/iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/:/LLM_models",\n'
-                f'  "{path_Documents}/:/Documents",\n'
-                f'  "/iopsstor/scratch/cscs/{username}/.cache/:/cache",\n'
-                f"]\n"
-                f"[annotations]\n"
-                f'com.hooks.aws_ofi_nccl.enabled = "true"\n'
-                f'com.hooks.aws_ofi_nccl.variant = "cuda12"'
-            )
-            f.write(content)
+    # Create kuma environment variables
+    kuma_env_filepath = "kuma.env"
+    path_Documents = "/".join(path_script.split("/")[:-2])
+    with open(kuma_env_filepath, "w") as f:
+        f.write(
+            f"KUMA_FOLDER_LLM_MODELS=/work/liac/LLM_models\n"
+            f"KUMA_FOLDER_DOCUMENTS={path_Documents}\n"
+            f"KUMA_FOLDER_CACHE=/scratch/{username}/.cache\n"
+        )
 
     # WANDB setup
     wandb_api_key_needed = True

@@ -2,10 +2,11 @@
 Task utilitary functions
 """
 
-
-from rdkit import RDLogger, Chem, DataStructs
+from rdkit import Chem, DataStructs, RDLogger
 from rdkit.Chem import AllChem
-RDLogger.DisableLog('rdApp.*')
+
+
+RDLogger.DisableLog("rdApp.*")
 
 
 def compute_lcs_length(s1, s2):
@@ -34,6 +35,8 @@ def compute_lcs_length(s1, s2):
             else:
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
     return dp[m][n]
+
+
 def compute_levenshtein_distance(s1, s2):
     """
     Compute the levenshtein distance between two strings
@@ -55,13 +58,17 @@ def compute_levenshtein_distance(s1, s2):
     for i, c1 in enumerate(s1):
         current_row = [i + 1]
         for j, c2 in enumerate(s2):
-            insertions = previous_row[j + 1] + 1  # j+1 instead of j since previous_row and current_row are one character longer
+            insertions = (
+                previous_row[j + 1] + 1
+            )  # j+1 instead of j since previous_row and current_row are one character longer
             deletions = current_row[j] + 1  # than s2
             substitutions = previous_row[j] + (c1 != c2)
             current_row.append(min(insertions, deletions, substitutions))
         previous_row = current_row
 
     return previous_row[-1]
+
+
 def compute_tanimoto_similarity(smiles1, smiles2):
     """
     Compute the Tanimoto similarity between two SMILES strings
@@ -72,13 +79,12 @@ def compute_tanimoto_similarity(smiles1, smiles2):
     """
     mol1 = Chem.MolFromSmiles(smiles1)
     if mol1 is None:
-        return None # invalid smiles1
+        return None  # invalid smiles1
     mol1_fp = AllChem.GetMorganFingerprintAsBitVect(mol1, 2)
     mol2 = Chem.MolFromSmiles(smiles2)
     if mol2 is None:
-        return None # invalid smiles2
+        return None  # invalid smiles2
     mol2_fp = AllChem.GetMorganFingerprintAsBitVect(mol2, 2)
     # Calculate Tanimoto similarity
     tanimoto_similarity = DataStructs.TanimotoSimilarity(mol1_fp, mol2_fp)
     return tanimoto_similarity
-

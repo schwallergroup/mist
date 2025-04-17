@@ -14,7 +14,9 @@
 # Example 2: sbatch launch.slurm Qwen2.5-0.5B canonmc base
 # Argument 1: model id (from model_paths.txt)
 # Argument 2: task name (in folder recipes)
-# Argument 3 (optional): task mode
+# Argument 3 (optional): job_id to continue training from (if none, the default is 0)
+# Argument 4 (optional): task mode
+# Note: if you would like to use "task mode" without using "job_id", you still need to pass the job_id parameter with the value 0
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
@@ -22,7 +24,6 @@ set -x -e
 source ~/.bashrc
 cd /Documents/sink
 echo "START TIME: $(date)"
-
 
 NUM_NODES=$SLURM_NNODES
 GPUS_PER_NODE=4
@@ -36,12 +37,16 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
-if [[ "$TASK" == *_* ]]; then
-    TASK_SUFFIX="_${TASK#*_}"
+if [[ "$TASK" == *.* ]]; then
+    TASK_SUFFIX="_${TASK#*.}"
 else
     TASK_SUFFIX=""
 fi
-TASK_MODE="${3:-base}"
+RESUME_JOB_ID="${3:-0}"
+if [ $RESUME_JOB_ID = 0 ]; then
+    RESUME_JOB_ID=$SLURM_JOB_ID
+fi
+TASK_MODE="${4:-base}"
 if [ "$TASK_MODE" != "base" ]; then
     TASK_MODE_SUFFIX="_$TASK_MODE"
 else
@@ -49,9 +54,8 @@ else
 fi
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
+echo "RESUME_JOB_ID: ${RESUME_JOB_ID}"
 echo "TASK_MODE: ${TASK_MODE}"
-
-
 
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
@@ -59,7 +63,7 @@ MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' 
 CONFIG_FILE=recipes/$TASK.yaml
 
 export HF_HOME=/cache/huggingface
-export WANDB_PROJECT="r1-${TASK%%_*}"
+export WANDB_PROJECT="r1-${TASK%%.*}"
 export WANDB_API_KEY=$(cat wandb_api_key.txt)
 
 export NCCL_TIMEOUT=3600
@@ -67,7 +71,7 @@ export TORCH_DISTRIBUTED_TIMEOUT=3600
 export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
 export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
 export NCCL_ASYNC_ERROR_HANDLING=1
-#export NCCL_DEBUG=INFO
+export NCCL_DEBUG=INFO
 export NCCL_IB_TIMEOUT=23
 export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
@@ -78,15 +82,15 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/${MODEL_ID}/${SLURM_JOB_ID} \
-    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID} \
+    --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --task_mode=$TASK_MODE \
     "
 
 export LAUNCHER="conda deactivate;
 cd /Documents/sink;
-pip install hf_transfer gdown;
+pip install hf_transfer gdown levenshtein;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
@@ -111,8 +115,9 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 SRUN_ARGS=" \
     --wait=60 \
     --kill-on-bad-exit=1 \
-    "
+    --jobid $SLURM_JOB_ID \
+"
 
-clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
