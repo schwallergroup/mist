@@ -20,7 +20,7 @@ CHEMTASKS = {
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
     "kinetic": KineticDataClassification,
-    "MCQAInversion": SmilesInversion,  
-    "RnxReplacement": SmilesReplacement,
-    "Rxn2Nname": Smiles2Name
+    "rxn_inversion": SmilesInversion,  
+    "rxn_replacement": SmilesReplacement,
+    "rxn_naming": Smiles2Name
 }
