@@ -24,7 +24,7 @@ CHEMTASKS = {
     "kinetic": KineticDataClassification,
     "kinetic_metrics": KineticDataClassificationWithMetrics,
     "kinetic_metrics_category": KineticDataCategoryClassificationWithMetrics,
-    "MCQAInversion": SmilesInversion,
-    "RnxReplacement": SmilesReplacement,
-    "Rxn2Nname": Smiles2Name,
+    "rxn_inversion": SmilesInversion,
+    "rxn_replacement": SmilesReplacement,
+    "rxn_naming": Smiles2Name,
 }
