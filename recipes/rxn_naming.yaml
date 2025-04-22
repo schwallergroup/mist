@@ -6,7 +6,7 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: Rxn2Nname
+chem_task: rxn_naming
 dataset_id_or_path: /work/liac/dsegura/datasets/reaction_annotated_dataset.csv
 rewards:
 - format
