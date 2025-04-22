@@ -55,7 +55,7 @@ async def main():
 
     tasks = []
     for question in question_buffer:
-        match = re.search(r"Answer:\s*(.*)", text)
+        match = re.search(r"Answer:\s*(.*)", question)
         ans = match.group(1)
         entity = asyncio.create_task(call_deepseek(question+"\nGive the final reasoning and the final answer in terms of explanations in SMILES by parsing it and explaining it in the final answer correctly.", ans))
         tasks.append(entity)
