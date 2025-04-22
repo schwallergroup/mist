@@ -3,10 +3,10 @@ Correct Inversion Reaction MCQA
 
 .. currentmodule:: open_r1.tasks.reactions
 
-SmilesInversion
+SmilesReplacement
 -------------
 
-.. autoclass:: SmilesInversion
+.. autoclass:: SmilesReplacement
    :members:
    :show-inheritance:
 
@@ -27,10 +27,10 @@ Usage Example
 
 .. code-block:: python
 
-    from open_r1.tasks.reactions.mcqa_inversion import SmilesInversion
+    from open_r1.tasks.reactions.mcqa_inversion import SmilesReplacement
 
     # Initialize the task
-    task = SmilesInversion(
+    task = SmilesReplacement(
         dataset_id_or_path="path/to/reaction_mcqa_inversion_data",
     )
 
@@ -45,7 +45,7 @@ Data Format
 
 The task expects data files in the following format:
 
-- `prompt_true`: In the following reaction, the reagents are: [BEGIN_SMILES] CCCCOc1nc(N)c2nc(OC)n(CCCC3CCCCN3C(=O)OCc3ccccc3)c2n1 [END_SMILES], [BEGIN_SMILES] CCC[C@H](C)Oc1nc(N)c2nc(OC)[nH]c2n1 [END_SMILES], [BEGIN_SMILES] O=C(O)C(F)(F)F [END_SMILES], [BEGIN_SMILES] O=C(OCc1ccccc1)N1CCCC(CCCBr)C1 [END_SMILES] and the product is: [BEGIN_SMILES] CCC[C@H](C)Oc1nc(N)c2nc(OC)n(CCCC3CCCN(C(=O)OCc4ccccc4)C3)c2n1 [END_SMILES].
+- `prompt_true`: "In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES]."	"In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES]".
 - `fake1`: This column contains a similar prompt as the "prompt_true", but contains a first example of a fake reaction.
 - `fake2`: This column contains a similar prompt as the "prompt_true", but contains a second example of a fake reaction.
 - `fake3`: This column contains a similar prompt as the "prompt_true", but contains a third example of a fake reaction.
@@ -54,11 +54,13 @@ The task expects data files in the following format:
 Reward Functions
 --------------
 
-1. **Partial String Matching (accuracy_reward)**
+1. **Option Matching (accuracy_reward)**
    
 completions = ["<answer>A</answer>"]
-solution = ["prompt_true"]
-rewards = task.accuracy_reward(completions, solution, options=[["prompt_true", "fake1", "fake2", "fake3"]])
+solution    = ["prompt_true"]
+options     = [["prompt_true","fake1","fake2","fake3"]]
+
+rewards = task.accuracy_reward(completions, solution, options=options)
 
 Task Example
 -----------
@@ -68,13 +70,16 @@ Task Example
    Datta Example: 
    prompt_true, fake1, fake2, fake3
 
-   "In the following reaction, the reagents are: [BEGIN_SMILES] CCCCOc1nc(N)c2nc(OC)n(CCCC3CCCCN3C(=O)OCc3ccccc3)c2n1 [END_SMILES], [BEGIN_SMILES] CCC[C@H](C)Oc1nc(N)c2nc(OC)[nH]c2n1 [END_SMILES], [BEGIN_SMILES] O=C(O)C(F)(F)F [END_SMILES], [BEGIN_SMILES] O=C(OCc1ccccc1)N1CCCC(CCCBr)C1 [END_SMILES] and the product is: [BEGIN_SMILES] CCC[C@H](C)Oc1nc(N)c2nc(OC)n(CCCC3CCCN(C(=O)OCc4ccccc4)C3)c2n1 [END_SMILES]."	
+   "In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES]."	"In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES].",	
    
-   "In the following reaction, the reagents are: [BEGIN_SMILES] CCOCC [END_SMILES], [BEGIN_SMILES] Cl [END_SMILES], [BEGIN_SMILES] FB(F)F [END_SMILES], [BEGIN_SMILES] Fc1ccccc1F [END_SMILES], [BEGIN_SMILES] [Li]CCCC [END_SMILES], [BEGIN_SMILES] CCCCCCC(O)Cc1cccc(F)c1F [END_SMILES], the condition is: [BEGIN_SMILES] C1COCC1 [END_SMILES], and the product is: [BEGIN_SMILES] CCCCCCC1CO1 [END_SMILES]."	
+   "In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCC(=O)N1CCC(NS(=O)(=O)c2cn(C)c(C)n2)C1 [END_SMILES].",
    
-   "In the following reaction, the reagents are: [BEGIN_SMILES] O=Cc1ccc2[nH]ncc2c1 [END_SMILES], [BEGIN_SMILES] O=Cc1ccc2c(cnn2Cc2ccc(Cl)cc2C(F)(F)F)c1 [END_SMILES] and the product is: [BEGIN_SMILES] FC(F)(F)c1cc(Cl)ccc1CBr [END_SMILES]."
+   "In the following reaction, the reagents are: [BEGIN_SMILES] O=C1CC(C(=O)N2C[C@@H](F)C[C@H]2CO)CN1Cc1ccccc1 [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES].",
    
-   "In the following reaction, the reagents are: [BEGIN_SMILES] CCN(C(C)C)C(C)C [END_SMILES], [BEGIN_SMILES] CCN=C=NCCCN(C)C [END_SMILES], [BEGIN_SMILES] Cl [END_SMILES], [BEGIN_SMILES] NC1CCCC(CNC(=O)OCc2ccccc2)C1 [END_SMILES], [BEGIN_SMILES] On1nnc2cccnc21 [END_SMILES], [BEGIN_SMILES] Cc1onc(-c2ncc(Cl)cc2Cl)c1C(=O)NC1CCCC(CNC(=O)OCc2ccccc2)C1 [END_SMILES], the condition is: [BEGIN_SMILES] CN(C)C=O [END_SMILES], and the product is: [BEGIN_SMILES] Cc1onc(-c2ncc(Cl)cc2Cl)c1C(=O)O [END_SMILES]."
+   "In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCOc1ccccc1-c1csc(NC(=O)c2cc(OC)c(OC)cc2C)n1 [END_SMILES].",
+
+   "Output: In the following reaction, the reagents are: [BEGIN_SMILES] CCS(=O)(=O)Cl [END_SMILES], [BEGIN_SMILES] OCCBr [END_SMILES], the conditions are: [BEGIN_SMILES] CCN(CC)CC [END_SMILES], [BEGIN_SMILES] CCOCC [END_SMILES], and the product is: [BEGIN_SMILES] CCS(=O)(=O)OCCBr [END_SMILES]."
+
 
    Reasoning: <think>
    The first reaction contains ...

@@ -6,12 +6,13 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: RnxReplacement
-dataset_id_or_path: /work/liac/dsegura/datasets/mcqa_modified_reactions_1M.csv
+chem_task: rxn_replacement
+dataset_id_or_path: /work/liac/dsegura/datasets/mcqa_modified_reactions_1M_prompts.csv
 rewards:
 - format
 - accuracy
 - reasoning_steps
+- thinking_length
 
 # Training arguments
 max_steps: 900
