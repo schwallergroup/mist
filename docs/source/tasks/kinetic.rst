@@ -96,7 +96,9 @@ The accuracy reward is calculated by the weighted sum of the following rewards. 
   
       - M9-M20: Deactivation steps
 
+
 The format reward is calculated by the following reward.
+
 1. **Format Reward (format_reward)**
 
    Calculates the reward based on the format of the answer.
@@ -300,7 +302,8 @@ I included each reaction mechanisms explanation and four data runs in the prompt
 
 
 Result
-```````
+------
+
 Transition of Rewards
 ^^^^^^^^^^^^
 - The format reward increases from around 0.3 at the beggining to 0.9 at 200 global steps.
