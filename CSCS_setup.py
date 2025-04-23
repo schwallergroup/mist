@@ -70,7 +70,10 @@ if __name__ == "__main__":
         "Well done! The setup is complete.\n"
         "You can now run experiments in the sink directory such as the next example:\n"
         "\tsbatch launch.slurm Qwen2.5-0.5B rxnpred\n\n"
-        "The general SLURM command is: sbatch launch.slurm <model_id> <task>\n"
-        "\t- model_id: The model id to use (can be found in the file model_paths.txt)\n"
-        "\t- task: The task to run (can be found in the folder recipes; for example for rxnpred.yaml, the task is rxnpred)"
+        "The general SLURM command is: sbatch launch.slurm <model_id> <task> <resume_job_id> <task_mode>\n"
+        "\t- <model_id>: The model id to use (can be found in the file model_paths.txt)\n"
+        "\t- <task>: The task to run (can be found in the folder recipes; for example for rxnpred.yaml, the task is rxnpred)"
+        "\t- <resume_job_id>: Used when you want to resume a job from a checkpoint (if run from scratch, set it to 0)"
+        "\t- <task_mode>: The task mode you would like to use"
+        "You can find more information in the README file."
     )

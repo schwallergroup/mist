@@ -7,12 +7,13 @@ format_reward, accuracy_reward
 import os
 import random
 import re
-from typing import Any, Optional, Dict
 from dataclasses import field
-from pydantic import BaseModel, Field
+from typing import Any, Dict, Optional
 
 from datasets import load_dataset
-from rdkit import RDLogger
+from rdkit import Chem, RDLogger
+
+from pydantic import BaseModel, Field
 
 
 RDLogger.DisableLog("rdApp.*")
@@ -84,7 +85,7 @@ class RLTask(BaseModel):
             )
             return self.dataset
 
-    def accuracy_reward(self, completions, target, **kwargs):
+    def accuracy_reward(self, completions, **kwargs):
         """Define accuracy reward"""
         raise NotImplementedError
 
@@ -137,18 +138,20 @@ class RLTask(BaseModel):
         rewards = []
 
         for completion in completions:
-            completion = "<think>" + completion
             try:
-                if random.random() < 0.01:  # 1% chance to print a completion
+                if random.random() < 0.00:  # 0% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
-
-                regex = r"<think>(.*)<\/think>\n?<answer>(.*)<\/answer>"
+                if not completion.startswith("<think>"):
+                    completion = "<think>" + completion
+                regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
                 match = re.search(regex, completion, re.DOTALL)
                 # if the format is not correct, reward is 0
                 if match is None or len(match.groups()) != 2:
                     rewards.append(0.0)
                 else:
-                    rewards.append(1.0)
+                    # The model tends to generate gibberish outside of the tags
+                    reward = len(match.group()) / len(completion)
+                    rewards.append(reward)
             except Exception:
                 rewards.append(0.0)
         return rewards
@@ -162,7 +165,7 @@ class RLTask(BaseModel):
             \n\* - matches bullet points with asterisks
             First,|Second,|Next,|Finally, - matches transition words
         """
-        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,)"
+        pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,|Wait|But|but|However)"
         completion_contents = [completion for completion in completions]
         matches = [
             len(re.findall(pattern, content))
@@ -178,3 +181,64 @@ class RLTask(BaseModel):
         This function takes no arguments and returns a dictionary of metrics {key[str]: value[float]}.
         """
         return dict()
+
+    def random_print(self, print_data: dict, out_rate=0.01):
+        if random.random() < out_rate:  # 1% chance to print a completion
+            out = "\n\n=======<RANDOM_RESPONSE>=======\n"
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
+            print(out)
+
+    def good_print(self, print_data: dict, out_rate=0.1):
+        if random.random() < out_rate:  # 10% chance to print a completion
+            # print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+            out = "\n\n=======<GOOD_RESPONSE>=======\n"
+            for k, v in print_data.items():
+                out += f"*** {k.upper()}: {v}\n"
+
+            print(out)
+
+    def count_waits(self, completion: str):
+        return completion.lower().count("wait")
+
+
+class SMILESBasedTask(RLTask):
+    def _post_process_smiles(self, smiles):
+        smiles = re.sub(r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles)
+        smiles = re.sub(r"\[CH\d?\]", "C", smiles)
+        smiles = re.sub(
+            r"\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]",
+            lambda m: m.group(0).strip("[]"),
+            smiles,
+        )
+        return smiles
+
+    def extract_smiles(self, completion: str, **kwargs):
+
+        excluded_smiles = set(("I"))
+        words = completion.split()
+        words = [w.strip(" !\"#$%&'*+,-./:;<=>?@\\^_`{|}~") for w in words]
+        # words_tkns = [smiles_tokenizer(w) for w in words]
+        # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
+        smiles = words
+        smiles = [s for s in smiles if s and s not in excluded_smiles]
+        smiles = [self._post_process_smiles(s) for s in smiles]
+        smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
+        return smiles
+
+    def extract_smiles_from_answer(self, answer: str, **kwargs):
+        """Extract the longest SMILES from the answer"""
+        smiles = self.extract_smiles(answer)
+        smiles = max(smiles, key=len) if smiles else None
+        return smiles
+
+    def preprocess_response(self, response):
+        """Preprocess the response before checking for accuracy."""
+        if not response.startswith("<think>"):
+            response = "<think>" + response
+        pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+        m = re.search(pattern, response, re.DOTALL)
+        if m and len(m.groups()) == 2:
+            return m.groups()[1]
+        else:
+            return "NONE"
