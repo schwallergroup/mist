@@ -65,8 +65,13 @@ class ExtendedGRPOConfig(GRPOConfig):
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
     base_model_name: str = "None"
+    base_model_id: str = "None"
     rewards: List[str] = Field(default_factory=["accuracy", "format"])
     special_smiles_tags: bool = False
+    task_recipe: str = "None"
+    task_recipe_suffix: str = "None"
+    slurm_job_id: str = "None"
+    slurm_resume_job_id: str = "None"
 
 
 def setup_logger(name="logger"):
