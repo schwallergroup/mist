@@ -40,7 +40,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 "max_tokens": self.max_completion_length,  # default from TRL 0.14.0
             }
             sampling_params_dict.update(args.sampling_params_config)  # added from the sampling_params config -> overwrite default values
-            self.sampling_params = SamplingParams(sampling_params_dict)
+            self.sampling_params = SamplingParams(**sampling_params_dict)
         print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
 
     def add_custom_metrics(self):
