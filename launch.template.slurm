@@ -1,11 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-<<<<<<< HEAD
-#SBATCH --time=72:00:00
-=======
 #SBATCH --time=08:00:00
->>>>>>> 796e7588de6a0a92d1c01e810ab00efe6835c1ec
 #SBATCH --mem=0
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
@@ -14,20 +10,10 @@
 #SBATCH --partition=h100
 #SBATCH -A liac
 
-export WANDB_API_KEY=cf870797fb856fe5fd2bbfb69114d65c364c59d9
-<<<<<<< HEAD
-export CACHE_DIR=/scratch/kuroki/logs
+export WANDB_API_KEY=
+export CACHE_DIR=
 export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
 export LLM_MODEL_DIR=/work/liac/LLM_models
-# コンテナ内にCA証明書がないため、ホストのCA証明書をマウント
-# export PROXY_CA=/etc/pki/tls/certs/ca-bundle.crt
-export PROXY_CA=/home/kuroki/sink/cacert.pem
-export PIP_CACHE_DIR=/tmp/pip-cache
-=======
-export CACHE_DIR=./logs
-export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
-export LLM_MODEL_DIR=/work/liac/LLM_models
->>>>>>> 796e7588de6a0a92d1c01e810ab00efe6835c1ec
 
 set -x -e
 
@@ -88,26 +74,10 @@ export CMD=" \
     --base_model_name=$MODEL_NAME \
     "
 
-<<<<<<< HEAD
-export REQUESTS_CA_BUNDLE=/certs/cacert.pem
-export SSL_CERT_FILE=/certs/cacert.pem
-
 export LAUNCHER="cd /Documents/sink;
-apt-get update && apt-get install -y ca-certificates;
-update-ca-certificates;
-
-export PIP_CACHE_DIR=/tmp/pip-cache
-
-pip install --no-cache-dir numpy==1.24.4 pandas==2.0.0;
-pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
-pip install --no-cache-dir -e .;
-pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 gdown==4.7.1;
-=======
-export LAUNCHER="cd /Documents/sink;
-pip install --no-cache-dir hf_transfer rdkit levenshtein wandb;
-pip install --no-cache-dir -e .;
-pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 pandas==2.0.0 gdown==4.7.1;
->>>>>>> 796e7588de6a0a92d1c01e810ab00efe6835c1ec
+pip install hf_transfer rdkit levenshtein wandb;
+pip install -e .;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -121,11 +91,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-<<<<<<< HEAD
-export WANDBLOG="SSL_CERT_FILE=/certs/cacert.pem wandb sync \$(cat logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
-=======
 export WANDBLOG="wandb sync \$(cat logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
->>>>>>> 796e7588de6a0a92d1c01e810ab00efe6835c1ec
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
@@ -145,15 +111,7 @@ srun apptainer exec --nv \
 	--mount type=bind,src=${LLM_MODEL_DIR},dst=/LLM_models \
 	--mount type=bind,src="$(dirname "$(pwd)")",dst=/Documents \
 	--mount type=bind,src=${CACHE_DIR},dst=/cache \
-<<<<<<< HEAD
-    --mount type=bind,src=${PROXY_CA},dst=/certs/cacert.pem \
 	${CONTAINER_PATH} \
 	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
-=======
-	${CONTAINER_PATH} \
-	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
-
-echo "END TIME: $(date)"
->>>>>>> 796e7588de6a0a92d1c01e810ab00efe6835c1ec
