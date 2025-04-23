@@ -90,7 +90,7 @@ class KineticDataClassification(RLTask):
         {}
 
         <think>
-        """)
+        """
         
     def load(self) -> DatasetDict:
         """
