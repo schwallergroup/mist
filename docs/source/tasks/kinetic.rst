@@ -161,6 +161,7 @@ Prompt
 I included each reaction mechanisms explanation and four data runs in the prompt as follows.
 
 .. code-block:: text
+      
    Reason and estimate the reaction class for the following reaction.
    The possible reaction classes are M1 to M20 indicated as follows.
    Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
@@ -265,6 +266,8 @@ I included each reaction mechanisms explanation and four data runs in the prompt
 
    <think>
 
+
+
 Result
 ```````
 Transition of Rewards
@@ -284,7 +287,9 @@ The following is the final response on the log. Several observations can be made
 - Hallucinations are also observed.
   - It mentioned "Drosophila formation" in the reasoning traces, which is not a recognized term in chemistry.
 
+
 .. code-block:: text
+
    <think> Okay, so I'm trying to determine the reaction class of the given reaction mechanism, M1 to M20. I have data runs 1, 2, and 3, along with the data for each. I need to analyze the behavior of these data runs against each mechanism.
 
    Looking at Data Run 1 first: The initial concentration of the catalyst is [S]0.8 in normalized units. The substrate levels are decreasing, and the product also decreases. The product's peak is around t=2.4426, which isn't too high, so maybe it's the beginning phase of a reaction. The product levels are increasing initially and then perhaps stabilizing.
