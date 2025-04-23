@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
-#SBATCH --output=./logs/%x-%j.out
-#SBATCH --err=./logs/%x-%j.err
+#SBATCH --output=../sink_logs/%x-%j.out
+#SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --partition=h100
 #SBATCH -A liac
 
@@ -82,23 +82,35 @@ export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
 export NCCL_TREE_THRESHOLD=0
 export CUDA_LAUNCH_BLOCKING=1
-export SSL_CERT_FILE="cacert.pem"
 
 
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
     --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
-    --run_name grpo-kuma-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --task_mode=$TASK_MODE \
     "
 
+export REQUESTS_CA_BUNDLE=/certs/cacert.pem
+export SSL_CERT_FILE=/certs/cacert.pem
+
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb gdown exmol;
+apt-get update && apt-get install -y ca-certificates;
+update-ca-certificates;
+pip install --upgrade pip
+pip install hf_transfer rdkit levenshtein wandb gdown;
 pip install -e .;
-pip install -U transformers==4.48.2 pandas==2.0.0;
-pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+
+export PYTHONPATH=\$HOME/.local/lib/python3.12/site-packages:\$PYTHONPATH
+export HF_HUB_ENABLE_HF_TRANSFER=1
+export ACCELERATE_LOG_LEVEL=debug
+export TRANSFORMERS_VERBOSITY=debug
+export TRANSFORMERS_LOG_LEVEL=debug
+export PYTHONFAULTHANDLER=1
+
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -112,7 +124,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat ./logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="SSL_CERT_FILE=/certs/cacert.pem wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
@@ -124,13 +136,15 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     --jobid $SLURM_JOB_ID \
     apptainer exec --nv \
-    --bind /scratch \
-    --bind /home \
-    --bind /work \
-    --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
-    --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
-    --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
-    ${CONTAINER_PATH} \
+        --bind /scratch \
+        --bind /home \
+        --bind /work \
+        --bind ${KUMA_FOLDER_LLM_MODELS}:/LLM_models \
+        --bind ${KUMA_FOLDER_DOCUMENTS}:/Documents \
+        --bind ${KUMA_FOLDER_CACHE}:/cache \
+        --bind /etc/ssl/certs:/etc/ssl/certs \
+        --bind /etc/pki:/etc/pki \
+        $CONTAINER_PATH \
 "
 
 clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
