@@ -221,8 +221,6 @@ task_kwargs:
     - This argument is optional and can be omitted in the recipe file if you don't need it.
 5. There are many other training parameters in the recipe file, you can keep the default values (as in `recipes/template.yaml`) but feel free to modify them if you need it (however it could lead to unexpected results or crashes). If you just built your task, it's recommended to keep the default parameters, ensure that your task is working and then modify these parameters to your needs.
 
-```yaml
-
 ### Task Requirements
 
 When creating a new task, ensure:
@@ -252,3 +250,19 @@ When creating a new task, ensure:
 
 For detailed examples and API reference, please check the [documentation](link-to-docs).
 
+### Models
+The list of models can be found in the file `model_paths.txt`.
+- The models are stored in the folder `LLM_models/`.
+- If you want to add a new model, you can add it in the file `model_paths.txt` (in a new line with the format `[model_id]: [path]`) and add the model in the appropriate folder (`LLM_models`).
+
+Multiple custom models were pretrained:
+- Qwen2.5-3B_pretrained-v1
+  - Original name: qwen_3b_pretrained
+- Qwen2.5-3B_pretrained-v1_cot-v1
+  - Original name: qwen-cot
+- Qwen2.5-3B_pretrained-v2
+  - Original name: qwen_3b_sft
+- Qwen2.5-3B_pretrained-v3
+  - Original name: qwen_sft_full
+- Qwen2.5-3B_pretrained-v4-cot
+  - Original name: qwen_cot_v3
