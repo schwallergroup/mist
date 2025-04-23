@@ -160,111 +160,110 @@ Prompt
 ^^^^^^^
 I included each reaction mechanisms explanation and four data runs in the prompt as follows.
 
-```python
-Reason and estimate the reaction class for the following reaction.
-The possible reaction classes are M1 to M20 indicated as follows.
-Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
-then end with </think>, and finally put your final answer within \\boxed{{}} tags, for example \\boxed{{M1}}.
+.. code-block:: text
+   Reason and estimate the reaction class for the following reaction.
+   The possible reaction classes are M1 to M20 indicated as follows.
+   Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
+   then end with </think>, and finally put your final answer within \\boxed{{}} tags, for example \\boxed{{M1}}.
 
-# Possible reaction classes
-// M1 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2
+   # Possible reaction classes
+   // M1 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2
 
-// M2 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>cat2;k3,k-3
+   // M2 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>cat2;k3,k-3
 
-// M3 Mechanism
-S+cat2<=>((cat)2S);k1,k-1|((cat)2S)<=>P+cat2;k2,k-2|2cat<=>cat2;k3,k-3
+   // M3 Mechanism
+   S+cat2<=>((cat)2S);k1,k-1|((cat)2S)<=>P+cat2;k2,k-2|2cat<=>cat2;k3,k-3
 
-// M4 Mechanism
-X+catS<=>S+cat;k1,k-1|X+catS<=>P+cat;k2,k-2
+   // M4 Mechanism
+   X+catS<=>S+cat;k1,k-1|X+catS<=>P+cat;k2,k-2
 
-// M5 Mechanism
-S+cat<=>catS;k1,k-1|catS+cat<=>catP;k2,k-2|catP<=>P+cat;k3,k-3
+   // M5 Mechanism
+   S+cat<=>catS;k1,k-1|catS+cat<=>catP;k2,k-2|catP<=>P+cat;k3,k-3
 
-// M6 Mechanism
-cat<=>cat*;k1,0|S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2
+   // M6 Mechanism
+   cat<=>cat*;k1,0|S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2
 
-// M7 Mechanism
-S+cat<=>catS;k1,k-1|S+catS<=>catS2;k3,k-3|catS<=>P+cat;k2,k-2
+   // M7 Mechanism
+   S+cat<=>catS;k1,k-1|S+catS<=>catS2;k3,k-3|catS<=>P+cat;k2,k-2
 
-// M8 Mechanism
-S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2|cat+L<=>cat*;k3,k-3
+   // M8 Mechanism
+   S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2|cat+L<=>cat*;k3,k-3
 
-// M9 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0
+   // M9 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0
 
-// M10 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+cat<=>inactive catI;k3,0
+   // M10 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+cat<=>inactive catI;k3,0
 
-// M11 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+cat<=>inactive catS;k-3,0
+   // M11 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+cat<=>inactive catS;k-3,0
 
-// M12 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+cat<=>inactive catP;k-3,0
+   // M12 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+cat<=>inactive catP;k-3,0
 
-// M13 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>inactive cat2;k-3,0
+   // M13 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>inactive cat2;k-3,0
 
-// M14 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|catS<=>inactive catS;k-3,0
+   // M14 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|catS<=>inactive catS;k-3,0
 
-// M15 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+catS<=>inactive catSI;k-3,0
+   // M15 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+catS<=>inactive catSI;k-3,0
 
-// M16 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+catS<=>inactive catS2;k-3,0
+   // M16 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+catS<=>inactive catS2;k-3,0
 
-// M17 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+catS<=>inactive catSP;k-3,0
+   // M17 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+catS<=>inactive catSP;k-3,0
 
-// M18 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2catS<=>inactive cat2S2;k-3,0
+   // M18 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2catS<=>inactive cat2S2;k-3,0
 
-// M19 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat+catS<=>inactive cat2S;k3,0
+   // M19 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat+catS<=>inactive cat2S;k3,0
 
-// M20 Mechanism
-S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
+   // M20 Mechanism
+   S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
 
-# Data Run 1
-- Initial concentration of catalyst (normalized to [S]0): {{run_1[initial_concentration_of_catalyst]}}
-- Initial concentration of substrate (normalized to [S]0): {{run_1[substrate_data][0]}}
-- Initial concentration of ES: 0.0
-- Initial concentration of product (normalized to [S]0): {{run_1[product_data][0]}}
-- Time_data (normalized, unitless): {{run_1[time_data]}}
-- Substrate_data (normalized to [S]0): {{run_1[substrate_data]}}
-- Product_data (normalized to [S]0): {{run_1[product_data]}}
+   # Data Run 1
+   - Initial concentration of catalyst (normalized to [S]0): {{run_1[initial_concentration_of_catalyst]}}
+   - Initial concentration of substrate (normalized to [S]0): {{run_1[substrate_data][0]}}
+   - Initial concentration of ES: 0.0
+   - Initial concentration of product (normalized to [S]0): {{run_1[product_data][0]}}
+   - Time_data (normalized, unitless): {{run_1[time_data]}}
+   - Substrate_data (normalized to [S]0): {{run_1[substrate_data]}}
+   - Product_data (normalized to [S]0): {{run_1[product_data]}}
 
-# Data Run 2
-- Initial concentration of catalyst (normalized to [S]0): {{run_2[initial_concentration_of_catalyst]}}
-- Initial concentration of substrate (normalized to [S]0): {{run_2[substrate_data][0]}}
-- Initial concentration of ES: 0.0
-- Initial concentration of product (normalized to [S]0): {{run_2[product_data][0]}}
-- Time_data (normalized, unitless): {{run_2[time_data]}}
-- Substrate_data (normalized to [S]0): {{run_2[substrate_data]}}
-- Product_data (normalized to [S]0): {{run_2[product_data]}}
+   # Data Run 2
+   - Initial concentration of catalyst (normalized to [S]0): {{run_2[initial_concentration_of_catalyst]}}
+   - Initial concentration of substrate (normalized to [S]0): {{run_2[substrate_data][0]}}
+   - Initial concentration of ES: 0.0
+   - Initial concentration of product (normalized to [S]0): {{run_2[product_data][0]}}
+   - Time_data (normalized, unitless): {{run_2[time_data]}}
+   - Substrate_data (normalized to [S]0): {{run_2[substrate_data]}}
+   - Product_data (normalized to [S]0): {{run_2[product_data]}}
 
-# Data Run 3
-- Initial concentration of catalyst (normalized to [S]0): {{run_3[initial_concentration_of_catalyst]}}
-- Initial concentration of substrate (normalized to [S]0): {{run_3[substrate_data][0]}}
-- Initial concentration of ES: 0.0
-- Initial concentration of product (normalized to [S]0): {{run_3[product_data][0]}}
-- Time_data (normalized, unitless): {{run_3[time_data]}}
-- Substrate_data (normalized to [S]0): {{run_3[substrate_data]}}
-- Product_data (normalized to [S]0): {{run_3[product_data]}}
+   # Data Run 3
+   - Initial concentration of catalyst (normalized to [S]0): {{run_3[initial_concentration_of_catalyst]}}
+   - Initial concentration of substrate (normalized to [S]0): {{run_3[substrate_data][0]}}
+   - Initial concentration of ES: 0.0
+   - Initial concentration of product (normalized to [S]0): {{run_3[product_data][0]}}
+   - Time_data (normalized, unitless): {{run_3[time_data]}}
+   - Substrate_data (normalized to [S]0): {{run_3[substrate_data]}}
+   - Product_data (normalized to [S]0): {{run_3[product_data]}}
 
-# Data Run 4
-- Initial concentration of catalyst (normalized to [S]0): {{run_4[initial_concentration_of_catalyst]}}
-- Initial concentration of substrate (normalized to [S]0): {{run_4[substrate_data][0]}}
-- Initial concentration of ES: 0.0
-- Initial concentration of product (normalized to [S]0): {{run_4[product_data][0]}}
-- Time_data (normalized, unitless): {{run_4[time_data]}}
-- Substrate_data (normalized to [S]0): {{run_4[substrate_data]}}
-- Product_data (normalized to [S]0): {{run_4[product_data]}}
+   # Data Run 4
+   - Initial concentration of catalyst (normalized to [S]0): {{run_4[initial_concentration_of_catalyst]}}
+   - Initial concentration of substrate (normalized to [S]0): {{run_4[substrate_data][0]}}
+   - Initial concentration of ES: 0.0
+   - Initial concentration of product (normalized to [S]0): {{run_4[product_data][0]}}
+   - Time_data (normalized, unitless): {{run_4[time_data]}}
+   - Substrate_data (normalized to [S]0): {{run_4[substrate_data]}}
+   - Product_data (normalized to [S]0): {{run_4[product_data]}}
 
-<think>
-```
+   <think>
 
 Result
 ```````
@@ -285,32 +284,32 @@ The following is the final response on the log. Several observations can be made
 - Hallucinations are also observed.
   - It mentioned "Drosophila formation" in the reasoning traces, which is not a recognized term in chemistry.
 
-```python
-<think> Okay, so I'm trying to determine the reaction class of the given reaction mechanism, M1 to M20. I have data runs 1, 2, and 3, along with the data for each. I need to analyze the behavior of these data runs against each mechanism.
+.. code-block:: text
+   <think> Okay, so I'm trying to determine the reaction class of the given reaction mechanism, M1 to M20. I have data runs 1, 2, and 3, along with the data for each. I need to analyze the behavior of these data runs against each mechanism.
 
-Looking at Data Run 1 first: The initial concentration of the catalyst is [S]0.8 in normalized units. The substrate levels are decreasing, and the product also decreases. The product's peak is around t=2.4426, which isn't too high, so maybe it's the beginning phase of a reaction. The product levels are increasing initially and then perhaps stabilizing.
+   Looking at Data Run 1 first: The initial concentration of the catalyst is [S]0.8 in normalized units. The substrate levels are decreasing, and the product also decreases. The product's peak is around t=2.4426, which isn't too high, so maybe it's the beginning phase of a reaction. The product levels are increasing initially and then perhaps stabilizing.
 
-In Data Run 2, the initial catalyst is [S]0.0382. There's a significant boost in product levels almost immediately, then the substrate decreases. The product seems to peak higher and then stabilize, which might indicate a bimolecular reaction or a step where some conversion occurs early.
+   In Data Run 2, the initial catalyst is [S]0.0382. There's a significant boost in product levels almost immediately, then the substrate decreases. The product seems to peak higher and then stabilize, which might indicate a bimolecular reaction or a step where some conversion occurs early.
 
-Data Run 3 has a lower initial catalyst concentration. Products start at even lower levels, but they rise higher. The product's peak is around t=2.6641, longer than Data Run 1 but similar to 2.
+   Data Run 3 has a lower initial catalyst concentration. Products start at even lower levels, but they rise higher. The product's peak is around t=2.6641, longer than Data Run 1 but similar to 2.
 
-Data Run 4 has a high initial catalyst concentration (0.382) and a lot of product quickly. The catalyst is used up, and product increases significantly at first, then decreases. This is similar to a boptimized reaction mechanism where enzymes might be overused, leading to some product formation and then inhibition.
+   Data Run 4 has a high initial catalyst concentration (0.382) and a lot of product quickly. The catalyst is used up, and product increases significantly at first, then decreases. This is similar to a boptimized reaction mechanism where enzymes might be overused, leading to some product formation and then inhibition.
 
-Looking at all the data points, it seems like these reaction mechanisms are related to a bimolecular reaction, maybe without complex steps like Drosophila formation or cooperativity. Each run starts with a catalyst in high concentrations, leading to early product formation and substrate depletion.
+   Looking at all the data points, it seems like these reaction mechanisms are related to a bimolecular reaction, maybe without complex steps like Drosophila formation or cooperativity. Each run starts with a catalyst in high concentrations, leading to early product formation and substrate depletion.
 
-Also, in Data Run 4, the product increases significantly before t=5, then decreases again. This could be indicative of a stepwise pathway where some conversion happens first before the rate decreases, which could be a three-component system or an S₄ step.
+   Also, in Data Run 4, the product increases significantly before t=5, then decreases again. This could be indicative of a stepwise pathway where some conversion happens first before the rate decreases, which could be a three-component system or an S₄ step.
 
-Comparing all to M1 to M20, mechanisms that would show such early product peaks and substrate depletion are likely to be those that process the substrate and catalyst early on, without waiting for both to reach their full capacity.
+   Comparing all to M1 to M20, mechanisms that would show such early product peaks and substrate depletion are likely to be those that process the substrate and catalyst early on, without waiting for both to reach their full capacity.
 
-M1 might involve a catalyst first forming ES, which then deactivates the catalyst and becomes E, leading to product formation. M2 and M5 involve catalyst activation followed by E activation, again showing early peaks. M3 might involve higher certainty or steps without full catalyst activation.
+   M1 might involve a catalyst first forming ES, which then deactivates the catalyst and becomes E, leading to product formation. M2 and M5 involve catalyst activation followed by E activation, again showing early peaks. M3 might involve higher certainty or steps without full catalyst activation.
 
-M4 seems to involve more complex steps, possibly allowing catalyst deactivation in the presence of product, leading to product accumulation quickly.
+   M4 seems to involve more complex steps, possibly allowing catalyst deactivation in the presence of product, leading to product accumulation quickly.
 
-Based on the initial data, M2, M3, M4 could fit, but without seeing the entire data set, it's hard to be certain. However, considering the presence of higher substrate levels early in Data Run 4, M20 (M4) isn't the best fit. M4 has product peaks and a complex catalyst turnover path.
+   Based on the initial data, M2, M3, M4 could fit, but without seeing the entire data set, it's hard to be certain. However, considering the presence of higher substrate levels early in Data Run 4, M20 (M4) isn't the best fit. M4 has product peaks and a complex catalyst turnover path.
 
-Another consideration is the presence of multiple steps. M1 might involve multiple transformations, but Data Run 4 seems to have a different pattern than other runs.
+   Another consideration is the presence of multiple steps. M1 might involve multiple transformations, but Data Run 4 seems to have a different pattern than other runs.
 
-After evaluating all, it seems M20 is the most likely candidate, as it involves a complex catalytic cycle with product formation early.
-</think>
-```
+   After evaluating all, it seems M20 is the most likely candidate, as it involves a complex catalytic cycle with product formation early.
+   </think>
+
 
