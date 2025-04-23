@@ -273,18 +273,26 @@ Result
 Transition of Rewards
 ^^^^^^^^^^^^
 - The format reward increases from around 0.3 at the beggining to 0.9 at 200 global steps.
+
 - The accuracy reward (which includes exact match reward, category reward, class coverage reward and data run coverage reward as explained above) is around 0.02 at the beggining, and reaches approximetly 0.06 at 200 global steps. 
   This seems to correspond to the improvement in the format reward, both reward increase rouphly threehold, suggesting that the accuracy reward of the responses with correct format remains almost unchanged from the begginning.
 
 Sample Responses
 ^^^^^^^^^^^^^^^^
 The following is the final response on the log. Several observations can be made:
+
 - The overall structure of the response is good. It starts by observing the data and links the observed features to potential reaction mechanisms.
+
 - However, some weakness in the model's reasoning ability are noticible.
+  
   - For example, it initially claims that M20 isn't the best fit, but it concludes that M20 is the most likely candidate without clear explantion for this change in opinion.
+  
   - It confuses M20 and M4, which are distinct mechanisms.
+  
   - It infers that from the observed data suggest a bimolecular reaction, despite the fact that M1-M20 are not bimolecular reactions.
+
 - Hallucinations are also observed.
+  
   - It mentioned "Drosophila formation" in the reasoning traces, which is not a recognized term in chemistry.
 
 
