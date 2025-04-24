@@ -176,6 +176,7 @@ data/
 wandb/
 logs/
 completion_samples/
+misc/
 output/
 core*
 *.ipynb
