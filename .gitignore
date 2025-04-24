@@ -188,6 +188,7 @@ cluster/*.local.env
 cluster/*.local.env.sh
 
 completion_samples/
+misc/
 output/
 core*
 *.ipynb

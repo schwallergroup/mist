@@ -46,7 +46,7 @@ report_to:
 - wandb
 
 save_strategy: "steps"
-save_steps: 25
+save_steps: 8
 seed: 42
 
 # Hugging Face Hub 
