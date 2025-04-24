@@ -1,0 +1,10 @@
++ source /users/ruizhi_xu/.bashrc
+++ test -s /users/ruizhi_xu/.alias
+++ true
++ cd /Documents/sink/src/open_r1/tasks/crystal_structure/reward_server
+++ srun --ntasks=1 hostname -I
+++ awk '{print \$1}'
+awk: 1: unexpected character '\'
+slurmstepd: error: couldn't chdir to `/Documents/sink/src/open_r1/tasks/crystal_structure/reward_server': No such file or directory: going to /tmp instead
+slurmstepd: error: couldn't chdir to `/Documents/sink/src/open_r1/tasks/crystal_structure/reward_server': No such file or directory: going to /tmp instead
++ FLASK_IP=
