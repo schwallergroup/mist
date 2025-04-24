@@ -6,8 +6,13 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
+<<<<<<< HEAD
 chem_task: ForwardReactionWithTags
 dataset_id_or_path: /work/liac/sink/data/rxn_pred/USPTO_480k_clean/
+=======
+chem_task: rxnpred_with_tags
+dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/rxnpred/USPTO_480k_clean
+>>>>>>> kuma_Vu
 rewards:
 - format
 - accuracy

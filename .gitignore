@@ -175,11 +175,17 @@ cython_debug/
 data/
 wandb/
 logs/
+docs/build/
+
+# Others
+.idea
+
+# WANDB API KEY (PERSONAL & SECRET) and setup
+wandb_api_key.txt
+kuma.env
+
 completion_samples/
 misc/
 output/
 core*
 *.ipynb
-
-
-launch.slurm

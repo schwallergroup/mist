@@ -1,22 +1,22 @@
-import random
-from ..base import RLTask
-from typing import Dict, Optional
-import re
 import os
-from datasets import Dataset, DatasetDict
-from rdkit import Chem
-import pandas as pd
-from Levenshtein import ratio as levenshtein_ratio
+import random
+import re
+from typing import Dict, Optional
 
+import pandas as pd
+from datasets import Dataset, DatasetDict
+from Levenshtein import ratio as levenshtein_ratio
+from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
-from rdkit import Chem
-from rdkit import DataStructs
+
+from ..base import RLTask
+
 
 class PermuteSmiles(RLTask):
     question_template: str = ""
     system_prompt: str = ""
     custom_metrics: dict = {}
-    
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.question_template = (
@@ -34,7 +34,7 @@ class PermuteSmiles(RLTask):
             # "<answer> [START_SMILES] CC1CC1C(C)CCC [END_SMILES] </answer>.\n"
             # "For example, [START_SMILES] CC(=O)O [END_SMILES] can be permuted into [START_SMILES] O=C(O)C [END_SMILES]. "
             # "Show your reasoning in <think> </think> tags. And return the final answer in <answer> </answer> tags as a single SMILES sequence, for example <answer> [START_SMILES] O=C(O)C [END_SMILES] </answer>. "
-	        # "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
+            # "A reasoning pattern that you could follow is to visualize the molecule in your mind, describe it in details, and then find another starting atom for the SMILES sequence. "
             # "Don't hesitate to start over again if you get stuck or get the molecule wrong. "
             "Remember that your answer SMILES must satisfy two criteria: 1) it must be different from the input SMILES, and 2) it must represent the same molecule. "
             # "You can revise your reasoning as many times as you want. "
@@ -42,46 +42,46 @@ class PermuteSmiles(RLTask):
             # "Your reponse must strictly follow the format: <think> [REASONING] </think> <answer> [START_SMILES] [SMILES] [END_SMILES] </answer>.\n"
             # "Do not write anything else outside of the tags.\n"
             "Here is the SMILES that you need to work on: [START_SMILES] {} [END_SMILES]. "
-            "Your response: <think> "
         )
-        self.question_template = self.question_template.replace("[START_SMILES] ", "")
-        self.question_template = self.question_template.replace(" [END_SMILES]", "")
-        
+        self.question_template = self.question_template.replace(
+            "[START_SMILES] ", ""
+        )
+        self.question_template = self.question_template.replace(
+            " [END_SMILES]", ""
+        )
+
         self.custom_metrics = {
-            'n_samples': 0,
-            'n_waits': [],
-            'reasoning_score': [],
-            'answer_scores': [],
+            "n_samples": 0,
+            "n_waits": [],
+            "reasoning_score": [],
+            "answer_scores": [],
         }
-        
+
     def generate_prompt(self, problem, tokenizer, **kwargs):
         return {
-            'prompt': self.question_template.format(problem),
-            'problem': problem
+            "prompt": self.question_template.format(problem),
+            "problem": problem,
         }
-    
+
     def load(self):
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
-        df = df.drop_duplicates(subset=['SMILES'])
+        df = df.drop_duplicates(subset=["SMILES"])
         train_dict = {
-            'problem': df['SMILES'].tolist(),
-            'solution': df['SMILES'].tolist()
+            "problem": df["SMILES"].tolist(),
+            "solution": df["SMILES"].tolist(),
         }
         train_dataset = Dataset.from_dict(train_dict)
         train_test_split = train_dataset.train_test_split(test_size=0.1)
-        train_dataset = train_test_split['train']
-        test_dataset = train_test_split['test']
-        
+        train_dataset = train_test_split["train"]
+        test_dataset = train_test_split["test"]
+
         # Combine into DatasetDict
-        self.dataset = DatasetDict({
-            'train': train_dataset,
-            'test': test_dataset
-        })
+        self.dataset = DatasetDict(
+            {"train": train_dataset, "test": test_dataset}
+        )
         return self.dataset
-    
-    
-    
+
     def accuracy_reward(self, completions: list[str], solution, **kwargs):
         """
         Reward function - check that completed SMILES refers to the same molecule as the original SMILES.
@@ -90,58 +90,75 @@ class PermuteSmiles(RLTask):
 
         # answers = [self.preprocess_response(c) for c in completions]
         # self.random_print(completions, solution, answers)
-        
+
         def _tanimoto_sim(mol1, mol2):
             mol1 = Chem.MolFromSmiles(mol1)
             mol2 = Chem.MolFromSmiles(mol2)
-            
+
             fpgen = AllChem.GetRDKitFPGenerator(fpSize=1024)
             fp1 = fpgen.GetFingerprint(mol1)
             fp2 = fpgen.GetFingerprint(mol2)
-            
+
             charge1 = Chem.GetFormalCharge(mol1)
             charge2 = Chem.GetFormalCharge(mol2)
-            
+
             charge_penalty = 0.85 if charge1 != charge2 else 1.0
-            
+
             return DataStructs.FingerprintSimilarity(fp1, fp2) * charge_penalty
-        
+
         def _edit_distance_preprocess(smiles: str):
             # Remove stereo symbols
-            smiles = re.sub(r'\/|\\|@', '', smiles)
-            smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-            smiles = re.sub(r'\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?(?:\:\d)?\]', lambda m: m.group(1), smiles)
+            smiles = re.sub(r"\/|\\|@", "", smiles)
+            smiles = re.sub(r"\[CH\d?\]", "C", smiles)
+            smiles = re.sub(
+                r"\[(Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)(?:H\d?)?(?:\:\d)?\]",
+                lambda m: m.group(1),
+                smiles,
+            )
             # Remove ring numbers
-            smiles = re.sub(r'\d', '', smiles)
+            smiles = re.sub(r"\d", "", smiles)
             # Remove redundant symbols
-            smiles = re.sub(r'-', '', smiles)
-            
+            smiles = re.sub(r"-", "", smiles)
+
             return smiles
-        
+
         def _edit_distance(mol1, mol2):
             mol1 = _edit_distance_preprocess(mol1)
             mol2 = _edit_distance_preprocess(mol2)
             if mol1 in mol2 or mol2 in mol1:
                 return 0.0
-            return 1-levenshtein_ratio(mol1, mol2)
+            return 1 - levenshtein_ratio(mol1, mol2)
 
         def _calc_score(mol1: str, mol2: str, beta=30):
-            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
+            if (
+                Chem.MolFromSmiles(mol1) is None
+                or Chem.MolFromSmiles(mol2) is None
+            ):
                 return 0.0
             edit_distance = _edit_distance(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
-            return edit_distance**(1+(1-_tanimoto_sim(mol1, mol2))*beta) / 0.3
-        
+            return (
+                edit_distance ** (1 + (1 - _tanimoto_sim(mol1, mol2)) * beta)
+                / 0.3
+            )
+
         def _extract_smiles(completion: str):
             def _post_process_smiles(smiles):
-                smiles = re.sub(r'(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)', '', smiles)
-                smiles = re.sub(r'\[CH\d?\]', 'C', smiles)
-                smiles = re.sub(r'\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]', lambda m: m.group(0).strip("[]"), smiles)
-                smiles = smiles.split('.')[0]
+                smiles = re.sub(
+                    r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles
+                )
+                smiles = re.sub(r"\[CH\d?\]", "C", smiles)
+                smiles = re.sub(
+                    r"\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]",
+                    lambda m: m.group(0).strip("[]"),
+                    smiles,
+                )
+                smiles = smiles.split(".")[0]
                 return smiles
-            excluded_smiles = set(('I'))
+
+            excluded_smiles = set(("I"))
             words = completion.split()
-            words = [w.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~') for w in words]
+            words = [w.strip(" !\"#$%&'*+,-./:;<=>?@\\^_`{|}~") for w in words]
             # words_tkns = [smiles_tokenizer(w) for w in words]
             # smiles = [w for w, w_tokens in zip(words, words_tkns) if w_tokens.replace(' ', '') == w]
             smiles = words
@@ -149,53 +166,61 @@ class PermuteSmiles(RLTask):
             smiles = [_post_process_smiles(s) for s in smiles]
             smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
             return smiles
-        
+
         def _extract_smiles_from_answer(answer: str, input_smi: str):
-            '''Extract the longest SMILES from the answer that is different from the input SMILES'''
+            """Extract the longest SMILES from the answer that is different from the input SMILES"""
             smiles = _extract_smiles(answer)
             smiles = [s for s in smiles if s != input_smi]
             smiles = max(smiles, key=len) if smiles else None
             return smiles
-        
+
         def count_waits(completion: str):
             return completion.lower().count("wait")
 
         rewards = []
 
         for completion, ref in zip(completions, solution):
-            reasoning = completion.rsplit('<answer>', maxsplit=1)[0]
+            reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
             smiles = _extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in smiles]
             max_score = max(scores) if scores else -0.5
             reasoning_score = max_score
-            best_smiles_reasoning = smiles[scores.index(max_score)] if max_score in scores else 'None'
-            
+            best_smiles_reasoning = (
+                smiles[scores.index(max_score)]
+                if max_score in scores
+                else "None"
+            )
+
             answer = self.preprocess_response(completion)
             answer_smiles = _extract_smiles_from_answer(answer, ref)
-            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
-            
+            answer_score = (
+                _calc_score(answer_smiles, ref) if answer_smiles else 0
+            )
+
             reward = reasoning_score + answer_score
-            
-            answer_smiles = answer_smiles if answer_smiles else 'None'
-            report = {'reference': ref,
-                      'answer': answer_smiles,
-                      'best_smiles_in_reasoning': best_smiles_reasoning,
-                      'reasoning_score [0, 1]': reasoning_score,
-                      'answer_score [0, 1]': answer_score, 
-                      'accuracy_reward [0, 2]': reward, 
-                      'full_completion': completion}
-            
+
+            answer_smiles = answer_smiles if answer_smiles else "None"
+            report = {
+                "reference": ref,
+                "answer": answer_smiles,
+                "best_smiles_in_reasoning": best_smiles_reasoning,
+                "reasoning_score [0, 1]": reasoning_score,
+                "answer_score [0, 1]": answer_score,
+                "accuracy_reward [0, 2]": reward,
+                "full_completion": completion,
+            }
+
             self.random_print(report)
             if reward > 0.3:
                 self.good_print(report)
-            
+
             rewards.append(reward)
-            
-            self.custom_metrics['n_samples'] += 1
-            self.custom_metrics['n_waits'].append(count_waits(completion))
-            self.custom_metrics['reasoning_score'].append(reasoning_score)
-            self.custom_metrics['answer_scores'].append(answer_score)
-        
+
+            self.custom_metrics["n_samples"] += 1
+            self.custom_metrics["n_waits"].append(count_waits(completion))
+            self.custom_metrics["reasoning_score"].append(reasoning_score)
+            self.custom_metrics["answer_scores"].append(answer_score)
+
         return rewards
 
     def reasoning_length_reward(self, completions, **kwargs):
@@ -204,7 +229,9 @@ class PermuteSmiles(RLTask):
         for completion in completions:
             if not completion.startswith("<think>"):
                 completion = "<think>" + completion
-            reasoning = re.search(r"<think>(.*?)<\/think>", completion, re.DOTALL)
+            reasoning = re.search(
+                r"<think>(.*?)<\/think>", completion, re.DOTALL
+            )
             if reasoning is None:
                 rewards.append(0.0)
                 continue
@@ -213,7 +240,7 @@ class PermuteSmiles(RLTask):
             reasoning_reward = min(1, reasoning_length / max_length)
             rewards.append(reasoning_reward)
         return rewards
-    
+
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         if not response.startswith("<think>"):
@@ -224,13 +251,12 @@ class PermuteSmiles(RLTask):
             # smi = m.groups()[1]
 
             # smi = self._post_process_smiles(smi)
-            
+
             # return smi
             return m.groups()[1]
         else:
             return "NONE"
 
-    
     # def _post_process_smiles(self, smiles):
     #     # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
     #     smiles = smiles.replace("[BEGIN_SMILES]", "")
@@ -239,14 +265,14 @@ class PermuteSmiles(RLTask):
     #     smiles = smiles.replace(' ', '')
     #     smiles = smiles.strip(' !"#$%&\'*+,-./:;<=>?@\\^_`{|}~')
     #     return smiles
-        
+
     def format_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
         Args:
             completions (list[str]): Generated outputs
             target (list[str]): Expected answers
-        
+
         Returns:
             list[float]: Reward scores
         """
@@ -257,7 +283,7 @@ class PermuteSmiles(RLTask):
                 if not completion.startswith("<think>"):
                     completion = "<think>" + completion
                 regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
-                match = re.search(regex, completion, re.DOTALL) 
+                match = re.search(regex, completion, re.DOTALL)
                 # if the format is not correct, reward is 0
                 if match is None or len(match.groups()) != 2:
                     rewards.append(0.0)
@@ -272,6 +298,6 @@ class PermuteSmiles(RLTask):
             except Exception:
                 rewards.append(0.0)
         return rewards
-    
+
     def get_metrics(self):
         return super().get_metrics()

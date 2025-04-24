@@ -1,19 +1,21 @@
-
-from .countdown.cd_task import CountdownTask
-from .reactions.forward import ForwardReaction, ForwardReactionWithTags
-from .reactions.canonical import CanonicalizeSmiles
+from .kinetic_data.kinetic_data_classification import KineticDataClassification
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
+from .reactions.canonical import CanonicalizeSmiles
+from .reactions.forward import ForwardReaction, ForwardReactionWithTags
 from .reactions.iupac2smi import Iupac2Smiles, Iupac2SmilesWithTags
 from .reactions.smi_permute import PermuteSmiles
+from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 
 
+# Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
-    "CountdownTask": CountdownTask,
-    "ForwardReaction": ForwardReaction,
-    "ForwardReactionWithTags": ForwardReactionWithTags,
-    "CanonicalizeSmiles": CanonicalizeSmiles,
-    "Iupac2Smiles": Iupac2Smiles,
-    "Iupac2SmilesWithTags": Iupac2SmilesWithTags,
-    "CanonicalizeSmilesMCQA": CanonicalizeSmilesMCQA,
-    "PermuteSmiles": PermuteSmiles
+    "rxnpred_with_tags": ForwardReactionWithTags,
+    "iupacsm_with_tags": Iupac2SmilesWithTags,
+    "smi_permute": PermuteSmiles,
+    "rxnpred": ForwardReaction,
+    "canonic": CanonicalizeSmiles,
+    "canonmc": CanonicalizeSmilesMCQA,
+    "iupacsm": Iupac2Smiles,
+    "smhydrogen": SmilesHydrogen,
+    "kinetic": KineticDataClassification,
 }

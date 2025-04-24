@@ -6,7 +6,7 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: ForwardReactionWithTags
+chem_task: rxnpred_with_tags
 dataset_id_or_path: /data/vu/sink/rxnpred/USPTO_480k_clean
 rewards:
 - format

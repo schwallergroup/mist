@@ -1,20 +1,23 @@
-
-import os
-from typing import Callable, List, Optional, Union
-from pydantic import Field
-from dataclasses import dataclass
-from trl import GRPOConfig, GRPOTrainer
 import logging
+import os
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from transformers.trainer_utils import get_last_checkpoint
 
+from pydantic import Field
+from trl import GRPOConfig, GRPOTrainer
+
+
 MetricFunc = Callable[[], dict]
+
 
 class ExtendedGRPOTrainer(GRPOTrainer):
     def __init__(
         self,
         metric_funcs: Optional[Union[MetricFunc, list[MetricFunc]]] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args, **kwargs)
@@ -34,7 +37,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             for metric_name, metric_value in metrics.items():
                 if mode in self._metrics.keys():
                     # Compatible with the current version 'main' of trl repository
-                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                    self._metrics[mode][f"custom/{metric_name}"].append(
+                        metric_value
+                    )
                 else:
                     # Compatible with the "older versions" of trl repository (0.14.0 included)
                     self._metrics[f"custom/{metric_name}"].append(metric_value)
@@ -50,15 +55,19 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         return output
 
+
 @dataclass
 class ExtendedGRPOConfig(GRPOConfig):
     dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
+    task_mode: str = "base"
+    task_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_name_or_path: str = None
     dataset_splits: str = "train"
     base_model_name: str = "None"
     rewards: List[str] = Field(default_factory=["accuracy", "format"])
     special_smiles_tags: bool = False
+
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
@@ -76,14 +85,16 @@ def setup_logger(name="logger"):
 
     return logger
 
+
 def get_checkpoint(training_args: GRPOConfig):
     last_checkpoint = None
     if os.path.isdir(training_args.output_dir):
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
     return last_checkpoint
 
+
 def get_reward_list(task, rewards):
     rwds = []
     for r in rewards:
-        rwds.append(getattr(task, r+"_reward"))
+        rwds.append(getattr(task, r + "_reward"))
     return rwds

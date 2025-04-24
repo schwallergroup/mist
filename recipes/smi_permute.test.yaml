@@ -6,7 +6,7 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: PermuteSmiles
+chem_task: smi_permute
 dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M-very_very_simple.csv # max 10 atoms with augmentation
 rewards:
 - format
