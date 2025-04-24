@@ -52,19 +52,39 @@ The task reads paired text files with multi-line CIF records separated by blank 
 - `src-train.txt / src-test.txt`: Each record is a serialized CIF string of a perturbed binary structure.
 - `tgt-train.txt / tgt-test.txt`: Each record is the ground‑truth CIF string after DFT relaxation.
 
+Task
+----------------
+Generate a structure with lower internal energy.
+
+Base model
+----------------
+`Qwen/Qwen2.5-3B-Instruct`, fine-tuned on the MPtraj dataset via supervised fine-tuning (SFT).
+
 Reward Functions
 ----------------
 
 1. **Accuracy Reward (accuracy_reward)**
-   - Sends each predicted structure (extracted via <answer> tags) together with the ground truth to a scoring server at /compute_score.
-   - Receives an energy‑based reward (e.g., +1 for lower energy, –4 for higher energy, –10 for invalid).
+   - Reward is assigned based on the validity of the generated CIF structure and its internal energy relative to the input:
+     - **–10**: if the generated structure (`S_gen`) is **not a valid CIF format**.
+     - **–4**: if `S_gen` is a **valid CIF format** but has **higher or equal internal energy** than the input.
+     - **+1**: if `S_gen` is **valid** and has **lower internal energy** than the input.
 
 Task Example
 ------------
-
-This example illustrates how the given non-canonical SMILES is converted to its canonical form:
 
 .. code-block:: text
 
    Input:  unstable Crystal structure [M2S format]
    Output: relaxed Crystal structure [M2S format]
+
+.. image:: _static/structure_relaxing_result.png
+   :width: 400
+   :align: center
+   :alt: accuracy and response length matrices
+
+Around step 50, the model experiences a pivotal shift (the “aha moment”) where it transitions from moderate performance gains to a pronounced acceleration in accuracy. By the final stages of training, the model achieves a 91% success rate in generating lower-energy structures, underscoring the effectiveness of the learning process after redesigning the experiments.
+We selected the checkpoint at step 130 for evaluation on a larger, external test set. Among 471 binary crystal structures, the model achieved a success rate of 81% in generating structures with lower internal energy.
+.. image:: _static/structure_relaxing_success_rate.png
+   :width: 400
+   :align: center
+   :alt: success rate of the model in generating structures with lower internal energy
