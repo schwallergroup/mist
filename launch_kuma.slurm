@@ -5,8 +5,8 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
-#SBATCH --output=../sink_logs/%x-%j.out
-#SBATCH --err=../sink_logs/%x-%j.err
+#SBATCH --output=./logs/%x-%j.out
+#SBATCH --err=./logs/%x-%j.err
 #SBATCH --partition=h100
 #SBATCH -A liac
 
@@ -82,6 +82,7 @@ export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
 export NCCL_TREE_THRESHOLD=0
 export CUDA_LAUNCH_BLOCKING=1
+export SSL_CERT_FILE="cacert.pem"
 
 
 export CMD=" \
@@ -96,7 +97,8 @@ export CMD=" \
 export LAUNCHER="cd /Documents/sink;
 pip install hf_transfer rdkit levenshtein wandb gdown;
 pip install -e .;
-pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+pip install -U transformers==4.48.2 pandas==2.0.0;
+pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -110,7 +112,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="wandb sync \$(cat ./logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 

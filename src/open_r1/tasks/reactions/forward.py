@@ -76,7 +76,8 @@ class ForwardReaction(SMILESBasedTask):
         """Read source and target files and create dataset dictionary."""
         with open(src_file, "r", encoding="utf-8") as f:
             problems = [
-                self.question_template.format(self.process_line(line))
+                # self.question_template.format(self.process_line(line))
+                self.process_line(line)
                 for line in f.readlines()
             ]
 
@@ -191,14 +192,15 @@ class ForwardReaction(SMILESBasedTask):
 class ForwardReactionWithTags(ForwardReaction):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = (
-            "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
-            "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
-            "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
-            "Here are the reactants: [START_SMILES] {} [END_SMILES]. "
-            "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
-            "Your response: <think> "
-        )
+        # self.question_template = (
+        #     "<|im_start|>You are an organic chemistry expert, and I have a task for you. "
+        #     "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
+        #     "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
+        #     "Here are the reactants: [START_SMILES] {} [END_SMILES]. "
+        #     "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
+        #     "Your response: <think> "
+        # )
+        self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
 
     def extract_smiles(self, completion: str):
         smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
