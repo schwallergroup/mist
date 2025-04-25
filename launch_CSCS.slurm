@@ -93,6 +93,7 @@ export LAUNCHER="conda deactivate;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein;
 pip install -e . --no-deps;
+pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
