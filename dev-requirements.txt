@@ -4,3 +4,4 @@ pydantic
 typing
 datasets
 gdown
+levenshtein

@@ -10,4 +10,6 @@ Modules Reference
    tasks/canonic
    tasks/canonmc
    tasks/iupacsm
+   tasks/smhydrogen
+   tasks/kinetic
    tasks/template

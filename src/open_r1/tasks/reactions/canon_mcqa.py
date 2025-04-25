@@ -1,6 +1,6 @@
-import re
-import random
 import collections
+import random
+import re
 
 import numpy as np
 import pandas as pd
@@ -25,28 +25,66 @@ class CanonicalizeSmilesMCQA(RLTask):
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
 
-        if self.task_kwargs.get('task_variant', 'base') == 'base':
-            shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_variant2', 'SMILES_variant3', 'SMILES_variant4', "SMILES"]].values]
-        elif self.task_kwargs.get('task_variant', 'base') == 'options_sameformula_canon':
+        if self.task_kwargs.get("task_variant", "base") == "base":
+            shuffled = [
+                np.random.permutation(row).tolist()
+                for row in df[
+                    [
+                        "SMILES_variant2",
+                        "SMILES_variant3",
+                        "SMILES_variant4",
+                        "SMILES",
+                    ]
+                ].values
+            ]
+        elif (
+            self.task_kwargs.get("task_variant", "base")
+            == "options_sameformula_canon"
+        ):
             # Drop duplicates (same SMILES)
-            df = df.drop_duplicates(subset='SMILES', keep=False)
+            df = df.drop_duplicates(subset="SMILES", keep=False)
             # Drop compounds with rare molecular formulas (less than 4 occurrences)
-            molecular_formula_dropped = {k for k, v in collections.Counter(df['MolecularFormula'].tolist()).items() if v < 4}
-            df = df[~df['MolecularFormula'].isin(molecular_formula_dropped)]
+            molecular_formula_dropped = {
+                k
+                for k, v in collections.Counter(
+                    df["MolecularFormula"].tolist()
+                ).items()
+                if v < 4
+            }
+            df = df[~df["MolecularFormula"].isin(molecular_formula_dropped)]
             # Build the molecular formula mapping
-            formula_mapping = df.groupby('MolecularFormula')['SMILES'].apply(list).to_dict()
+            formula_mapping = (
+                df.groupby("MolecularFormula")["SMILES"].apply(list).to_dict()
+            )
             # Build the wrong SMILES (different from the correct one but with the same molecular formula and also canonicalized)
-            df_smiles = df['SMILES'].tolist()
-            df_formulas = df['MolecularFormula'].tolist()
+            df_smiles = df["SMILES"].tolist()
+            df_formulas = df["MolecularFormula"].tolist()
             random.seed(42)
-            df_smiles_wrong = [random.sample([sw for sw in formula_mapping[f] if sw != s], k=3) for s, f in zip(df_smiles, df_formulas)]
-            df['SMILES_wrong1'] = [sw[0] for sw in df_smiles_wrong]
-            df['SMILES_wrong2'] = [sw[1] for sw in df_smiles_wrong]
-            df['SMILES_wrong3'] = [sw[2] for sw in df_smiles_wrong]
+            df_smiles_wrong = [
+                random.sample(
+                    [sw for sw in formula_mapping[f] if sw != s], k=3
+                )
+                for s, f in zip(df_smiles, df_formulas)
+            ]
+            df["SMILES_wrong1"] = [sw[0] for sw in df_smiles_wrong]
+            df["SMILES_wrong2"] = [sw[1] for sw in df_smiles_wrong]
+            df["SMILES_wrong3"] = [sw[2] for sw in df_smiles_wrong]
             # Create shuffled with the new values (wrong SMILES but canonicalized & with the same molecular formula)
-            shuffled = [np.random.permutation(row).tolist() for row in df[['SMILES_wrong1', 'SMILES_wrong2', 'SMILES_wrong3', "SMILES"]].values]
+            shuffled = [
+                np.random.permutation(row).tolist()
+                for row in df[
+                    [
+                        "SMILES_wrong1",
+                        "SMILES_wrong2",
+                        "SMILES_wrong3",
+                        "SMILES",
+                    ]
+                ].values
+            ]
         else:
-            raise ValueError(f"task_kwargs.task_variant='{self.task_kwargs.get('task_variant', 'base')}' not recognized")
+            raise ValueError(
+                f"task_kwargs.task_variant='{self.task_kwargs.get('task_variant', 'base')}' not recognized"
+            )
 
         train_dict = {
             "problem": df["SMILES_variant1"].tolist(),

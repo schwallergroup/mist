@@ -10,31 +10,65 @@ This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1),
 > [!IMPORTANT]  
 > Clone this repo into `$HOME/`. This partition has no cleaning policy and your code should be stored there. You can clone it into `$HOME/`, `$HOME/Documents/` or into any other folder of your choice.
 
-Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS cluster.
+Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS or Kuma cluster.
 ```bash
 python3 CSCS_setup.py
+# or
+python3 kuma_setup.py
 ```
 
-After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/`.
+**Cluster-specific launch files (used in the example below):**
+- **If you are using CSCS cluster, you need to use `launch_CSCS.slurm` instead of `launch.slurm`.**
+- **If you are using kuma cluster, you need to use `launch_kuma.slurm` instead of `launch.slurm`.**
 
+After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/` (without the suffix `.yaml`).
 ```bash
 sbatch launch.slurm [MODEL] [TASK]
 
-# Launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
 sbatch launch.slurm Qwen2.5-3B rxnpred
 ```
 
-A third optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
+A third optional parameter is `[RESUME_JOB_ID]`. It is used if you would like to continue the training of a previous job. `[RESUME_JOB_ID]` should contain the job ID of the previous job you want to continue from. If you want to start a run from scratch (without using a previous run checkpoint), then you can set this parameter to 0 (however it is not necessary since the default value is 0 if the parameter is omitted).
+```bash
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID]
+
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, continuing from job ID 123456
+sbatch launch.slurm Qwen2.5-3B rxnpred 123456
+
+# Example: launch from scratch
+sbatch launch.slurm Qwen2.5-3B rxnpred 0
+```
+
+A final fourth optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
 - If you would like to process the dataset in a different manner.
 - If you would like to apply different chat templates / prompt templates.
 - If you would like to compute the rewards in a different manner.
 - Etc... (You can do whatever you want)
 
-If you use it, the parameter `[TASK_MODE]` will be given to the task in `self.task_mode`. If is useful if you would like to run the same recipe files with multiple task modes without rewriting dozens of individual recipes and task classes.
+If you use it, the parameter `[TASK_MODE]` will be given to the task in `self.task_mode`. It is useful if you would like to run the same recipe files with multiple task modes without rewriting dozens of individual recipes and task classes.
+
+Notes:
+- If you would like to use the parameter `[TASK_MODE]`, you need to pass it as the fourth parameter. Therefore, you need to specify the third parameter `[RESUME_JOB_ID]` as well (even if you don't use it). If you do not want to use `[RESUME_JOB_ID]`, you can set it to 0.
+- You can completely omit this fourth parameter, and it won't affect anything if you don't use it. The default value for `[TASK_MODE]` is `"base"`.
+- The `task_mode` parameter should never be specified in a recipe file.
 ```bash
-sbatch launch.slurm [MODEL] [TASK] [TASK_MODE]
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
+
+# Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, running from scratch with task mode "base"
+sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
 ```
-Note: you can completely omit this third parameter and it won't affect anything if you don't use it. The default `[TASK_MODE]` is `"base"`. Additionnally, the `task_mode` parameter should never be specified in a recipe file.
+
+Since the default values are:
+- `[RESUME_JOB_ID]` = 0 (start from scratch)
+- `[TASK_MODE]` = "base" (base task mode)
+
+The 3 following commands are equivalent:
+```bash
+sbatch launch.slurm Qwen2.5-3B rxnpred
+sbatch launch.slurm Qwen2.5-3B rxnpred 0
+sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
+```
 
 ## 📖 Documentation
 
@@ -60,7 +94,7 @@ Then open `http://localhost:8000` in your browser.
 3. Add class to `CHEMTASKS` in `src/open_r1/tasks/__init__.py`, e.g. `'sampletask': SampleTask`
 4. Write a recipe with the same name as the task `recipes/sampletask.yaml`
     - The run will be logged on wandb under the project named r1-`[TASK]` (e.g. r1-sampletask). Therefore, runs using different recipe files will be logged under different wandb projects.
-    - If you add an underscore in your recipe filename (e.g. `sampletask_variant1.yaml`), the run will also be logged under r1-sampletask (everything after the underscore will be ignored). This is useful if you want to run multiple experiments with different recipe files but keep them under the same wandb project for analysis.
+    - If you add a dot in your recipe filename (e.g. `sampletask.variant1.yaml`), the run will also be logged under r1-sampletask (everything after the dot will be ignored). This is useful if you want to run multiple experiments with different recipe files but keep them under the same wandb project for analysis.
 5. Add documentation:
     - Create an entry under `docs/source/tasks/sampletask.rst` (use the template.rst)
     - Add it to the modules index: `docs/source/modules.rst` as `tasks/sampletask.rst`
@@ -125,7 +159,7 @@ Here is a list of the methods that you can implement in your task class:
             - `completions`: list of strings containing the generated text completions (without the prompts). The completions usually contains the thinking and the answer if you follow the standard format.
             - `**kwargs`: any additional column found in `self.dataset` will be passed as keyword arguments (in a list in the same way as `completions`). For example, if you have a column named `"prompt"`, the parameter `prompt=...` will be taken as input. It is useful if you would like to compute rewards and checking if the solutions/expected answer is found in the completions.
     - Output: rewards (list of reward float values with the same length as completions)
-4. **`accuarcy_reward()`** (mandatory): This reward function is used to evaluate the accuracy of the reward (if the answer equals the expected solution).
+4. **`accuracy_reward()`** (mandatory): This reward function is used to evaluate the accuracy of the reward (if the answer equals the expected solution).
 5. **`format_reward()`** (optional): Predefined reward used to reward the correct formatting of the completions (<think> and <answer> tags correctly formatted in the completions).
 6. **`reasoning_steps_reward()`** (optional): Predefined reward used to reward a step-by-step thinking in the completions.
 7. **`get_metrics()`** (optional): Optional function that can be used to log additional metrics in the wandb run. This function is called automatically during the GRPO training.

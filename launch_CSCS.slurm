@@ -5,20 +5,20 @@
 #SBATCH --mem=0
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
-#SBATCH --cpus-per-task=64
-#SBATCH --output=./logs/%x-%j.out
-#SBATCH --err=./logs/%x-%j.err
-#SBATCH --partition=h100
-#SBATCH -A liac
+#SBATCH --output=../sink_logs/%x-%j.out
+#SBATCH --err=../sink_logs/%x-%j.err
+#SBATCH --environment=vllm071
+#SBATCH -A a-a05
 
-export WANDB_API_KEY=cf870797fb856fe5fd2bbfb69114d65c364c59d9
-export CACHE_DIR=/scratch/kuroki/logs
-export CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
-export LLM_MODEL_DIR=/work/liac/LLM_models
-# コンテナ内にCA証明書がないため、ホストのCA証明書をマウント
-# export PROXY_CA=/etc/pki/tls/certs/ca-bundle.crt
-export PROXY_CA=/home/kuroki/sink/cacert.pem
-export PIP_CACHE_DIR=/tmp/pip-cache
+# Run like:
+# Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
+# Example 2: sbatch launch.slurm Qwen2.5-0.5B canonmc base
+# Argument 1: model id (from model_paths.txt)
+# Argument 2: task name (in folder recipes)
+# Argument 3 (optional): job_id to continue training from (if none, the default is 0)
+# Argument 4 (optional): task mode
+# Note: if you would like to use "task mode" without using "job_id", you still need to pass the job_id parameter with the value 0
+# Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
 
@@ -38,7 +38,26 @@ MASTER_PORT=6000
 
 MODEL_ID=$1
 TASK=$2
-RESUME_JOB_ID=$3
+if [[ "$TASK" == *.* ]]; then
+    TASK_SUFFIX="_${TASK#*.}"
+else
+    TASK_SUFFIX=""
+fi
+RESUME_JOB_ID="${3:-0}"
+if [ $RESUME_JOB_ID = 0 ]; then
+    RESUME_JOB_ID=$SLURM_JOB_ID
+fi
+TASK_MODE="${4:-base}"
+if [ "$TASK_MODE" != "base" ]; then
+    TASK_MODE_SUFFIX="_$TASK_MODE"
+else
+    TASK_MODE_SUFFIX=""
+fi
+echo "MODEL ID: ${MODEL_ID}"
+echo "TASK: ${TASK}"
+echo "RESUME_JOB_ID: ${RESUME_JOB_ID}"
+echo "TASK_MODE: ${TASK_MODE}"
+
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
@@ -56,7 +75,8 @@ echo "TASK: ${TASK}"
 echo "TRAINING ON ${NUM_GPUS_FOR_TRAINING} GPU(S)"
 
 export HF_HOME=/cache/huggingface
-export WANDB_PROJECT="r1-$TASK"
+export WANDB_PROJECT="r1-${TASK%%.*}"
+export WANDB_API_KEY=$(cat wandb_api_key.txt)
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
@@ -74,24 +94,15 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/$MODEL_NAME/${RESUME_JOB_ID} \
-    --run_name grpo-${SLURM_JOB_ID}-from_${RESUME_JOB_ID}-${MODEL_ID} \
+    --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
+    --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     "
 
-export REQUESTS_CA_BUNDLE=/certs/cacert.pem
-export SSL_CERT_FILE=/certs/cacert.pem
-
-export LAUNCHER="cd /Documents/sink;
-apt-get update && apt-get install -y ca-certificates;
-update-ca-certificates;
-
-export PIP_CACHE_DIR=/tmp/pip-cache
-
-pip install --no-cache-dir numpy==1.24.4 pandas==2.0.0;
-pip install --no-cache-dir hf_transfer rdkit levenshtein wandb scipy;
-pip install --no-cache-dir -e .;
-pip install --no-cache-dir trl==0.14.0 transformers==4.48.2 gdown==4.7.1;
+export LAUNCHER="conda deactivate;
+cd /Documents/sink;
+pip install hf_transfer gdown levenshtein;
+pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -115,18 +126,9 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 SRUN_ARGS=" \
     --wait=60 \
     --kill-on-bad-exit=1 \
-    "
+    --jobid $SLURM_JOB_ID \
+"
 
-clear;
-# srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
-srun apptainer exec --nv \
-	--bind /scratch \
-    --bind /work \
-	--mount type=bind,src=${LLM_MODEL_DIR},dst=/LLM_models \
-	--mount type=bind,src="$(dirname "$(pwd)")",dst=/Documents \
-	--mount type=bind,src=${CACHE_DIR},dst=/cache \
-    --mount type=bind,src=${PROXY_CA},dst=/certs/cacert.pem \
-	${CONTAINER_PATH} \
-	bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
 
 echo "END TIME: $(date)"
