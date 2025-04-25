@@ -96,16 +96,31 @@ class TestAccuracyReward:
     def test_accuracy_reward(self):
         responses = [response_wrong_format, response_correct_format]
         rewards = self.classification_task.accuracy_reward(responses, ["M20", "M20"])
-        assert rewards == [float(0), float(0.71)]
-    
+        expected_rewards = 0.6 + 0.2 / 12 + 0.2 * 3 / 20
+        assert rewards == [float(0), expected_rewards]
+
     def test_preprocess_response(self):
         ans = self.classification_task.preprocess_response(response_correct_format)
         assert ans == "M20"
         ans = self.classification_task.preprocess_response(response_wrong_format)
         assert ans == "NONE"
 
+    def test_category_reward(self):
+        ans = self.classification_task.category_reward("M1", "M1")
+        assert ans == 1
+        ans = self.classification_task.category_reward("M5", "M4")
+        assert ans == 1/4
+        ans = self.classification_task.category_reward("M6", "M6")
+        assert ans == 1/3
+        ans = self.classification_task.category_reward("M20", "M19")
+        assert ans == 1/12
+
     def test_class_coverage_reward(self):
-        pass
+        ans = self.classification_task.class_coverage_reward(response_correct_format)
+        assert ans == 3/20
     
     def test_data_coverage_reward(self):
+        pass
+
+    def test_get_metrics(self):
         pass
