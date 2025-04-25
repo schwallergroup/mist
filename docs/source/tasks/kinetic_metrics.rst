@@ -1,31 +1,34 @@
 Kinetic Reaction Classification
-===================
+==================================
 
 .. currentmodule:: open_r1.tasks.kinetic_data
 
 KineticDataClassification
--------------
+---------------------------
 
 .. autoclass:: KineticDataClassificationWithMetrics
    :members:
    :show-inheritance:
 
 Task Description
---------------
+------------------
 
 This task is the same as the KineticDataClassification task, but it calculates some metrics, and provide it in the prompt so that the reasoning process is shorter and less complicated.
 The Kinetic Reaction Classification task is designed to identify and classify chemical reaction mechanisms from kinetic data. The task presents experimental data from multiple runs with different initial conditions and requires the model to determine which of the 20 possible reaction mechanisms (M1-M20) best explains the observed behavior.
 
 Features
---------
+----------
 
 - Supports classification of 20 different reaction mechanisms (M1-M20)
+
 - Processes normalized kinetic data from multiple experimental runs
+
 - Handles substrate, product, and catalyst concentration data
+
 - Provides detailed reasoning process for mechanism classification
 
 Usage Example
------------
+--------------
 
 .. code-block:: python
 
@@ -45,62 +48,80 @@ Usage Example
     rewards = task.accuracy_reward(completions, solution)
 
 Data Format
-----------
+-------------
 
 The task expects data files in the following format:
 
 - ``path/to/kinetic/data/x_train/x1_train_M1_M20_train_val_test_set_part_0.pkl``: Training data for initial catalyst concentrations
+
 - ``path/to/kinetic/data/x_train/x2_train_M1_M20_train_val_test_set_part_0.pkl``: Training data for time series measurements
+
 - ``path/to/kinetic/data/y_train/y_train_M1_M20_train_val_test_set.pkl``: Training labels (mechanism classes)
+
 - ``path/to/kinetic/data/x_val/x1_val_M1_M20_train_val_test_set.pkl``: Validation data for initial catalyst concentrations
+
 - ``path/to/kinetic/data/x_val/x2_val_M1_M20_train_val_test_set.pkl``: Validation data for time series measurements
+
 - ``path/to/kinetic/data/y_val/y_val_M1_M20_train_val_test_set.pkl``: Validation labels (mechanism classes)
 
 Reward Functions
---------------
+-----------------
 The accuracy reward is calculated by the weighted sum of the following rewards.
 
 1. **Exact Match (accuracy_reward)**
    
    Calculates binary rewards based on exact mechanism classification:
+   
    - Correct mechanism classification: 1.0
+   
    - Incorrect mechanism classification: 0.0
 
 2. **Class Coverage Reward (accuracy_reward)**
 
    Calculates the reward based on the percentage of the 20 reaction classes that the model considered during the reasoning.
+   
    - If the model considered all 20 reaction classes, the reward is 1.0.
 
 3. **Data Coverage Reward (accuracy_reward)**
 
    Calculates the reward based on the percentage of the 4 data runs that the model considered during the reasoning.
+
    - If the model considered all 4 data runs, the reward is 1.0.
 
 4. **Category Match (accuracy_reward)**
 
    Calculates the reward based on the answer that the model gave is in the same category as the ground truth.
+   
    - If the model gave the answer that is in the same category as the ground truth, the reward is 1.0.
+  
    - For example, if the ground truth is M3, and the model gave M2, the reward is 1.0.
+   
    - Category is defined as follows:
+      
       - M1: Core mechanism
+      
       - M2-M5: Bicatalytic steps
+      
       - M6-M8: Activation steps
+      
       - M9-M20: Deactivation steps
 
 The format reward is calculated by the following reward.
-5. **Format Reward (format_reward)**
+1. **Format Reward (format_reward)**
 
    Calculates the reward based on the format of the answer.
    - If the answer includes ``<think>`` and ``\\boxed{}``, the reward is 1.0.
+  
    - Otherwise, the reward is 0.0.
 
    **Note:**
    - This format is intended to train DeepSeek R1 Distill Qwen.
+
    - There is the suggestion to use the format in the prompt in their transformer website. I once tried to use ``<think>`` and ``<answer>``, but the format reward did not start to increase in the first 50 global steps.
 
 
 Task Example
------------
+--------------
 
 .. code-block:: text
 
@@ -121,7 +142,7 @@ Task Example
    \\boxed{M1}
 
 Reward Functions
---------------
+------------------
 The accuracy reward is calculated by the weighted sum of the following rewards. The weights are set to 0.5, 0.2, 0.2 and 0.1 for exact match, class coverage reward, data coverage reward and category match respectively.
 
 1. **Exact Match (accuracy_reward)**
@@ -180,7 +201,7 @@ The format reward is calculated by the following reward.
 
 
 Task Example
------------
+--------------
 
 .. code-block:: text
 
@@ -202,24 +223,28 @@ Task Example
 
 
 Experimental Method Details
-------------------
+-----------------------------
 
 Base Model Used
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 DeepSeek R1 Distill Qwen 1.5B
 
 Job ID and the Run Name on WanDB
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Job ID: 
+  
   - 436558
+  
   - 438902
   
 - Run Name: 
+  
   - grpo-436856-from_436856-DeepSeek-R1-Distill-Qwen-1.5B
+  
   - grpo-438902-from_436856-DeepSeek-R1-Distill-Qwen-1.5B
 
 Training Details
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 - The base model was trained directly using GRPO without supervised fine-tuning.
   
 - Training was conducted for 1775 global steps.
@@ -259,14 +284,14 @@ The dataset is incorporated into the prompt as follows.
 
 
 Prompt
-^^^^^^^
+^^^^^^^^^
 I included each reaction mechanisms explanation and the metrics that were calculated in advance in the prompt as follows.
 
 Metrics Used in the Task
 """""""""""""""""""""""""""""""""""
 
 Reaction Order
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 Indicates how the reaction rate depends on reactant concentration. Values > 1 suggest nonlinear behavior.
 This metrics are calculated by comparing substrate vs time, ln(substrate) vs time and 1/substrate vs time, which are the best fit with linear regression.
 If substrate vs time is the best fit, the reaction order is 0. If ln(substrate) vs time is the best fit, the reaction order is 1. If 1/substrate vs time is the best fit, the reaction order is 2.
@@ -496,7 +521,7 @@ Mass balance gap measured at the halfway point of the reaction. Can signal mid-r
 
 
 Result
-------
+-----------
 
 Transition of Rewards
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -517,8 +542,11 @@ Below is the model prediction frequency and the correct answer distribution for 
 Overall Metrics at 175 global steps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Total Samples: 99
+  
 - Exact Matches: 4 (4.04%)
+  
 - Possible Matches: 0 (0.00%)
+  
 - Complete Misses: 95 (95.96%)
 
 Model Prediction Frequency at 175 global steps
@@ -583,8 +611,11 @@ Analysis of Correct Predictions at 175 global steps
 Overall Metrics at 1775 global steps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Total Samples: 100
+  
 - Exact Matches: 7 (7.00%)
+
 - Possible Matches: 0 (0.00%)
+  
 - Complete Misses: 93 (93.00%)
 
 Model Prediction Frequency at 1775 global steps
