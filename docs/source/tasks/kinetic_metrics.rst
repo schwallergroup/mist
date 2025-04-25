@@ -1,23 +1,23 @@
 Kinetic Reaction Classification
-==================================
+=========================
 
 .. currentmodule:: open_r1.tasks.kinetic_data
 
 KineticDataClassification
----------------------------
+----------------------
 
 .. autoclass:: KineticDataClassificationWithMetrics
    :members:
    :show-inheritance:
 
 Task Description
-------------------
+-----------------
 
 This task is the same as the KineticDataClassification task, but it calculates some metrics, and provide it in the prompt so that the reasoning process is shorter and less complicated.
 The Kinetic Reaction Classification task is designed to identify and classify chemical reaction mechanisms from kinetic data. The task presents experimental data from multiple runs with different initial conditions and requires the model to determine which of the 20 possible reaction mechanisms (M1-M20) best explains the observed behavior.
 
 Features
-----------
+-------
 
 - Supports classification of 20 different reaction mechanisms (M1-M20)
 
@@ -826,7 +826,7 @@ Several observation are made:
 
 - The overall reasoning process is detailed and follows a reasonable structure, which initially comprehend the definition of the metrics, interprets them, and then tryies to relate them to the possible mechanisms.
 
-- Some hullucinations are present in the response, for example;
+- Some hullucinations are present in the response, for example:
 
   - The model seems to confuse reaction order with trunoever frequency (TOF). It stated "higher than 1 suggests nonlinear behavior" for TOF, but TOF does not indicate if the reaction exhibits nonlinear behavior. This explanation is more applicable to reaction order.
 
