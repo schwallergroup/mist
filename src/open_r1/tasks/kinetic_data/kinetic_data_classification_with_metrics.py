@@ -304,67 +304,53 @@ class KineticDataClassificationWithMetrics(RLTask):
             }
         }
 
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, solutions, **kwargs):
         """Reward function - check that the answer is same as ground truth
         """
         answers = [self.preprocess_response(c) for c in completions]
         rewards = []
-
-        category_dict = {
-            "M1": 0,
-            "M2": 1,
-            "M3": 1,
-            "M4": 1,
-            "M5": 1,
-            "M6": 2,
-            "M7": 2,
-            "M8": 2,
-            "M9": 2,
-            "M10": 3,
-            "M11": 3,
-            "M12": 3,
-            "M13": 3,
-            "M14": 3,
-            "M15": 3,
-            "M16": 3,
-            "M17": 3,
-            "M18": 3,
-            "M19": 3,
-            "M20": 4,
+        rewards_dict = {
+            "accuracy_reward": [],
+            "category_reward": [],
+            "class_coverage_reward": [],
         }
 
-        for answer, sol in zip(answers, solution):
-            # accuracy reward
-            if sol == answer:
-                accuracy_reward = 1
-            else:
-                accuracy_reward = 0
+        for i in range(len(solutions)):
+            sol = solutions[i]
+            answer = answers[i]
+            completion = completions[i]
+
+            # exact match reward
+            accuracy_reward = self.exact_match_reward(sol, answer)
             
             # sometimes the answer is None
             if answer != "NONE":
-                if answer in category_dict.keys():
-                    # accuracy reward (category)
-                    if category_dict[sol] == category_dict[answer]:
-                        category_reward = 1
-                    else:
-                        category_reward = 0
-                    
-                    # class coverage reward
-                    class_coverage_reward = self.class_coverage_reward(answer)
+                # category match reward
+                category_reward = self.category_reward(sol, answer)
 
-                    # data coverage reward
-                    data_coverage_reward = self.data_coverage_reward(answer)
-                else:
-                    category_reward = 0
-                    class_coverage_reward = 0
-                    data_coverage_reward = 0
+                # class coverage reward
+                class_coverage_reward = self.class_coverage_reward(completion)
             else:
                 category_reward = 0
                 class_coverage_reward = 0
-                data_coverage_reward = 0
 
-            reward = 0.5 * accuracy_reward + 0.2 * category_reward + 0.2 * class_coverage_reward + 0.1 * data_coverage_reward
+            reward = 0.6 * accuracy_reward + 0.2 * category_reward + 0.2 * class_coverage_reward
             rewards.append(reward)
+            rewards_dict["accuracy_reward"].append(accuracy_reward)
+            rewards_dict["category_reward"].append(category_reward)
+            rewards_dict["class_coverage_reward"].append(class_coverage_reward)
+
+        self._metrics_output = {
+            "accuracy_reward_ave": sum(rewards_dict["accuracy_reward"]) / len(rewards_dict["accuracy_reward"]),
+            "category_reward_ave": sum(rewards_dict["category_reward"]) / len(rewards_dict["category_reward"]),
+            "class_coverage_reward_ave": sum(rewards_dict["class_coverage_reward"]) / len(rewards_dict["class_coverage_reward"]),
+            "accuracy_reward_max": max(rewards_dict["accuracy_reward"]),
+            "category_reward_max": max(rewards_dict["category_reward"]),
+            "class_coverage_reward_max": max(rewards_dict["class_coverage_reward"]),
+            "accuracy_reward_min": min(rewards_dict["accuracy_reward"]),
+            "category_reward_min": min(rewards_dict["category_reward"]),
+            "class_coverage_reward_min": min(rewards_dict["class_coverage_reward"]),
+        }
         return rewards
     
     def generate_prompt(self, problem, tokenizer, **kwargs):
@@ -410,17 +396,48 @@ class KineticDataClassificationWithMetrics(RLTask):
         else:
             return "NONE"
 
+    def exact_match_reward(self, sol, answer):
+        if sol == answer:
+            return 1
+        else:
+            return 0
+    
+    def category_reward(self, sol, answer):
+        category_dict = {
+            "M1": 0,
+            "M2": 1,
+            "M3": 1,
+            "M4": 1,
+            "M5": 1,
+            "M6": 2,
+            "M7": 2,
+            "M8": 2,
+            "M9": 3,
+            "M10": 3,
+            "M11": 3,
+            "M12": 3,
+            "M13": 3,
+            "M14": 3,
+            "M15": 3,
+            "M16": 3,
+            "M17": 3,
+            "M18": 3,
+            "M19": 3,
+            "M20": 3,
+        }
+        if answer not in category_dict.keys():
+            return 0
+        if category_dict[sol] == category_dict[answer]:
+            population_of_category = len([i for i in category_dict.values() if i == category_dict[sol]])
+            return 1 / population_of_category
+        else:
+            return 0
+
     def class_coverage_reward(self, response):
         # M1〜M20のうち、何種類に言及したか
         classes_mentioned = set(re.findall(r"\bM\d+\b", response))
         score_class_coverage = len(classes_mentioned) / 20
         return score_class_coverage
-    
-    def data_coverage_reward(self, response):
-        # データセットのうち、何種類に言及したか
-        data_mentioned = set(re.findall(r"data\s*([1-4])", response))
-        score_data_coverage = len(data_mentioned) / 4
-        return score_data_coverage
 
     def format_reward(self, completions, **kwargs):
         """
@@ -450,3 +467,6 @@ class KineticDataClassificationWithMetrics(RLTask):
             except Exception:
                 rewards.append(0.0)
         return rewards
+    
+    def get_metrics(self):
+        return self._metrics_output
