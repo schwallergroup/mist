@@ -86,10 +86,10 @@ class ForwardReaction(SMILESBasedTask):
             solutions = [self.process_line(line) for line in f.readlines()]
         
         # randomly shuffle problems and solutions accordingly
-        shuffled_idx = list(range(len(problems)))
-        random.shuffle(shuffled_idx)
-        problems = [problems[i] for i in shuffled_idx]
-        solutions = [solutions[i] for i in shuffled_idx]
+        # shuffled_idx = list(range(len(problems)))
+        # random.shuffle(shuffled_idx)
+        # problems = [problems[i] for i in shuffled_idx]
+        # solutions = [solutions[i] for i in shuffled_idx]
 
         return {
             "problem": problems,
