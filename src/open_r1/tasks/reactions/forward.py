@@ -1,6 +1,7 @@
 import os
 import re
-from random import random
+# from random import random
+import random
 from typing import Any, Dict, Optional
 
 from datasets import Dataset, DatasetDict
@@ -83,6 +84,12 @@ class ForwardReaction(SMILESBasedTask):
 
         with open(tgt_file, "r", encoding="utf-8") as f:
             solutions = [self.process_line(line) for line in f.readlines()]
+        
+        # randomly shuffle problems and solutions accordingly
+        shuffled_idx = list(range(len(problems)))
+        random.shuffle(shuffled_idx)
+        problems = [problems[i] for i in shuffled_idx]
+        solutions = [solutions[i] for i in shuffled_idx]
 
         return {
             "problem": problems,
@@ -188,6 +195,16 @@ class ForwardReaction(SMILESBasedTask):
 
         return rewards
 
+    def get_metrics(self):
+        metrics = {}
+        if self.custom_metrics['n_samples'] > 0:
+            metrics['n_samples'] = self.custom_metrics['n_samples']
+            for k, v in self.custom_metrics.items():
+                if k != 'n_samples':
+                    metrics[k] = sum(v) / len(v)
+                    self.custom_metrics[k] = []
+        
+        return metrics
 
 class ForwardReactionWithTags(ForwardReaction):
     def __init__(self, **kwargs):
