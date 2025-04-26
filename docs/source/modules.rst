@@ -12,4 +12,7 @@ Modules Reference
    tasks/iupacsm
    tasks/smhydrogen
    tasks/kinetic
+   tasks/rxn_inversion
+   tasks/rxn_naming
+   tasks/rxn_replacement
    tasks/template
