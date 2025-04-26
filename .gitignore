@@ -193,3 +193,6 @@ core*
 *.ipynb
 slurm_logs/*.out
 slurm_logs/*.err
+
+# BINARY COMPOUND EXPERIMENT LOG FILES
+src/open_r1/tasks/crystal_structure/reward_server/reward_logs/
