@@ -7,13 +7,10 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: rxn_naming
-dataset_id_or_path: /work/liac/dsegura/datasets/reaction_annotated_dataset.csv
+dataset_id_or_path: /work/liac/dsegura/datasets/reaction_class_prompts_600k.csv
 rewards:
 - format
 - accuracy
-- reasoning_steps
-
-#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/rxn_tasks_david/dataset_swapped500k.csv
 
 # Lora Arguments
 # No LoRA is used here

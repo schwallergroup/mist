@@ -11,9 +11,6 @@ dataset_id_or_path: /work/liac/dsegura/datasets/dataset_swapped500k_prompt.csv
 rewards:
 - format
 - accuracy
-- reasoning_steps
-
-#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/LIAC/dataset_david/dataset_swapped500k.xlsx
 
 # Lora Arguments
 # No LoRA is used here
