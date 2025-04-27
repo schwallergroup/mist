@@ -1,17 +1,19 @@
-import pytest
 import re
-import yaml
 from pathlib import Path
+
+import pytest
 from transformers import AutoTokenizer
 
+import yaml
 from kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics
 
 
 def load_config(config_path: str) -> dict:
     """Load configuration from YAML file"""
-    with open(config_path, 'r') as f:
+    with open(config_path, "r") as f:
         config = yaml.safe_load(f)
     return config
+
 
 response_wrong_format = """
     <think> Hi, I need to figure out the reaction class for these reaction data. Okay, let's see. The user provided four data runs with different initial conditions and time data, and their corresponding substrate and product concentrations. I remember that reaction classes like M1 to M20 are used to classify reactions based on their rate laws and intermediates.
@@ -53,25 +55,26 @@ response_correct_format = """
         \\boxed{M20}
 """
 
+
 class TestAccuracyReward:
     def setup_method(self):
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic.yaml"
         config = load_config(config_path)
-        
+
         self.classification_task = KineticDataClassificationWithMetrics(
             dataset_id_or_path=config["dataset_id_or_path"],
             model_revision=config["model_revision"],
             torch_dtype=config["torch_dtype"],
             attn_implementation=config["attn_implementation"],
             bf16=config["bf16"],
-            tf32=config["tf32"]
+            tf32=config["tf32"],
         )
-        
+
         self.tokenizer = AutoTokenizer.from_pretrained(
             "/work/liac/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa",
             revision=config["model_revision"],
-            trust_remote_code=False
+            trust_remote_code=False,
         )
 
     def test_prompt_format(self):
@@ -91,34 +94,45 @@ class TestAccuracyReward:
         responses = [response_wrong_format, response_correct_format]
         regex = r"<think>(.*?)</think>.*?\\boxed{(.*?)}"
         match = re.search(regex, response_correct_format, re.DOTALL)
-        assert self.classification_task.format_reward(responses) == [float(0), float(1)]
-    
+        assert self.classification_task.format_reward(responses) == [
+            float(0),
+            float(1),
+        ]
+
     def test_accuracy_reward(self):
         responses = [response_wrong_format, response_correct_format]
-        rewards = self.classification_task.accuracy_reward(responses, ["M20", "M20"])
+        rewards = self.classification_task.accuracy_reward(
+            responses, ["M20", "M20"]
+        )
         expected_rewards = 0.6 + 0.2 / 12 + 0.2 * 3 / 20
         assert rewards == [float(0), expected_rewards]
 
     def test_preprocess_response(self):
-        ans = self.classification_task.preprocess_response(response_correct_format)
+        ans = self.classification_task.preprocess_response(
+            response_correct_format
+        )
         assert ans == "M20"
-        ans = self.classification_task.preprocess_response(response_wrong_format)
+        ans = self.classification_task.preprocess_response(
+            response_wrong_format
+        )
         assert ans == "NONE"
 
     def test_category_reward(self):
         ans = self.classification_task.category_reward("M1", "M1")
         assert ans == 1
         ans = self.classification_task.category_reward("M5", "M4")
-        assert ans == 1/4
+        assert ans == 1 / 4
         ans = self.classification_task.category_reward("M6", "M6")
-        assert ans == 1/3
+        assert ans == 1 / 3
         ans = self.classification_task.category_reward("M20", "M19")
-        assert ans == 1/12
+        assert ans == 1 / 12
 
     def test_class_coverage_reward(self):
-        ans = self.classification_task.class_coverage_reward(response_correct_format)
-        assert ans == 3/20
-    
+        ans = self.classification_task.class_coverage_reward(
+            response_correct_format
+        )
+        assert ans == 3 / 20
+
     def test_data_coverage_reward(self):
         pass
 

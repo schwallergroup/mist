@@ -18,3 +18,4 @@ Qwen2.5-3B_pretrained-v1:		/LLM_models/Qwen2.5-3B_pretrained-v1
 Qwen2.5-3B_pretrained-v1_cot-v1:	/LLM_models/Qwen2.5-3B_pretrained-v1_cot-v1
 Qwen2.5-3B_pretrained-v2:		/LLM_models/Qwen2.5-3B_pretrained-v2
 Qwen2.5-3B_pretrained-v3:		/LLM_models/Qwen2.5-3B_pretrained-v3
+Qwen2.5-3B_pretrained-v4-cot:		/LLM_models/Qwen2.5-3B_pretrained-v4-cot

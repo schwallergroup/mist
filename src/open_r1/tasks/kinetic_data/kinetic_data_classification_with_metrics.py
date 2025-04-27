@@ -1,12 +1,13 @@
 import os
-import re
 import pickle
-from typing import List
 import random
+import re
+from typing import List
+
+from datasets import Dataset, DatasetDict
 
 from open_r1.tasks.base import RLTask
 from open_r1.tasks.kinetic_data.calculation_metrics import KineticMetricsCalculator
-from datasets import DatasetDict, Dataset
 
 
 class KineticDataClassificationWithMetrics(RLTask):
@@ -20,7 +21,7 @@ class KineticDataClassificationWithMetrics(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = ("""
+        self.question_template = """
         Analyze the reaction behaviour and catalyst performance, then estimate the reaction class based on the following metrics.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
@@ -90,24 +91,42 @@ class KineticDataClassificationWithMetrics(RLTask):
         {}
 
         <think>
-        """)
-        
+        """
+
     def load(self) -> DatasetDict:
         """
         Load and prepare the dataset for the task.
-        
+
         Returns:
             DatasetDict: Dataset with 'train' and 'test' splits
         """
 
         # Assume the dataset is in the same directory as the script
-        x1_train_path = os.path.join(self.dataset_id_or_path, "x1_train_M1_M20_train_val_test_set_part_0.pkl")
-        x2_train_path = os.path.join(self.dataset_id_or_path, "x2_train_M1_M20_train_val_test_set_part_0.pkl")
-        y_train_path = os.path.join(self.dataset_id_or_path, "y_train_M1_M20_train_val_test_set_part_0.pkl")
+        x1_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "x1_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        x2_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "x2_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        y_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "y_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
 
-        x1_test_path = os.path.join(self.dataset_id_or_path, "x1_val_M1_M20_train_val_test_set_part_0.pkl")
-        x2_test_path = os.path.join(self.dataset_id_or_path, "x2_val_M1_M20_train_val_test_set_part_0.pkl")
-        y_test_path = os.path.join(self.dataset_id_or_path, "y_val_M1_M20_train_val_test_set_part_0.pkl")
+        x1_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "x1_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        x2_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "x2_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        y_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "y_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
 
         # Implement dataset loading logic
         with open(x1_train_path, "rb") as f:
@@ -116,7 +135,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             self.x2_train = pickle.load(f)
         with open(y_train_path, "rb") as f:
             self.y_train = pickle.load(f)
-        
+
         # Validate data shapes
         if not (len(self.x1_train) == len(self.x2_train) == len(self.y_train)):
             raise ValueError(
@@ -138,7 +157,7 @@ class KineticDataClassificationWithMetrics(RLTask):
                 f"x2_test={len(self.x2_test)}, y_test={len(self.y_test)}"
             )
 
-        self.y_test = self.y_test.reshape(-1, 1)[:self.x1_test.shape[0]]
+        self.y_test = self.y_test.reshape(-1, 1)[: self.x1_test.shape[0]]
 
         prompt_template_data = f"""
         # Metrics that calculated from the data
@@ -243,8 +262,13 @@ class KineticDataClassificationWithMetrics(RLTask):
 
         train_dict = {
             "problem": prompts_train,
-            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_train.tolist()],
-            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_train.shape[0])],
+            "solution": [
+                "M" + str(int(y[0]) + 1) for y in self.y_train.tolist()
+            ],
+            "options": [
+                ["M" + str(i) for i in range(1, 21)]
+                for _ in range(self.x1_train.shape[0])
+            ],
         }
 
         prompts_test = []
@@ -256,57 +280,66 @@ class KineticDataClassificationWithMetrics(RLTask):
 
         test_dict = {
             "problem": prompts_test,
-            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_test.tolist()],
-            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_test.shape[0])],
+            "solution": [
+                "M" + str(int(y[0]) + 1) for y in self.y_test.tolist()
+            ],
+            "options": [
+                ["M" + str(i) for i in range(1, 21)]
+                for _ in range(self.x1_test.shape[0])
+            ],
         }
 
-        self.dataset = DatasetDict({"train": Dataset.from_dict(train_dict), "test": Dataset.from_dict(test_dict)})
+        self.dataset = DatasetDict(
+            {
+                "train": Dataset.from_dict(train_dict),
+                "test": Dataset.from_dict(test_dict),
+            }
+        )
         return self.dataset
 
     def generate_data_pass_to_prompt(self, index, is_test=False):
         """
         Generate data dictionary for prompt template.
-        
+
         Args:
             index (int): Index of the data point
             is_test (bool): Whether this is for test data or not
-            
+
         Returns:
             dict: Dictionary containing data for all runs
         """
         x1_data = self.x1_test if is_test else self.x1_train
         x2_data = self.x2_test if is_test else self.x2_train
-        
+
         return {
             "run_1": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 0]),
                 "time_data": x2_data[index, :, 0].tolist(),
                 "substrate_data": x2_data[index, :, 1].tolist(),
-                "product_data": x2_data[index, :, 2].tolist()
+                "product_data": x2_data[index, :, 2].tolist(),
             },
             "run_2": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 1]),
                 "time_data": x2_data[index, :, 3].tolist(),
                 "substrate_data": x2_data[index, :, 4].tolist(),
-                "product_data": x2_data[index, :, 5].tolist()
+                "product_data": x2_data[index, :, 5].tolist(),
             },
             "run_3": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 2]),
                 "time_data": x2_data[index, :, 6].tolist(),
                 "substrate_data": x2_data[index, :, 7].tolist(),
-                "product_data": x2_data[index, :, 8].tolist()
+                "product_data": x2_data[index, :, 8].tolist(),
             },
             "run_4": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 3]),
                 "time_data": x2_data[index, :, 9].tolist(),
                 "substrate_data": x2_data[index, :, 10].tolist(),
-                "product_data": x2_data[index, :, 11].tolist()
-            }
+                "product_data": x2_data[index, :, 11].tolist(),
+            },
         }
 
     def accuracy_reward(self, completions, solutions, **kwargs):
-        """Reward function - check that the answer is same as ground truth
-        """
+        """Reward function - check that the answer is same as ground truth"""
         answers = [self.preprocess_response(c) for c in completions]
         rewards = []
         rewards_dict = {
@@ -322,7 +355,7 @@ class KineticDataClassificationWithMetrics(RLTask):
 
             # exact match reward
             accuracy_reward = self.exact_match_reward(sol, answer)
-            
+
             # sometimes the answer is None
             if answer != "NONE":
                 # category match reward
@@ -334,25 +367,38 @@ class KineticDataClassificationWithMetrics(RLTask):
                 category_reward = 0
                 class_coverage_reward = 0
 
-            reward = 0.6 * accuracy_reward + 0.2 * category_reward + 0.2 * class_coverage_reward
+            reward = (
+                0.6 * accuracy_reward
+                + 0.2 * category_reward
+                + 0.2 * class_coverage_reward
+            )
             rewards.append(reward)
             rewards_dict["accuracy_reward"].append(accuracy_reward)
             rewards_dict["category_reward"].append(category_reward)
             rewards_dict["class_coverage_reward"].append(class_coverage_reward)
 
         self._metrics_output = {
-            "accuracy_reward_ave": sum(rewards_dict["accuracy_reward"]) / len(rewards_dict["accuracy_reward"]),
-            "category_reward_ave": sum(rewards_dict["category_reward"]) / len(rewards_dict["category_reward"]),
-            "class_coverage_reward_ave": sum(rewards_dict["class_coverage_reward"]) / len(rewards_dict["class_coverage_reward"]),
+            "accuracy_reward_ave": sum(rewards_dict["accuracy_reward"])
+            / len(rewards_dict["accuracy_reward"]),
+            "category_reward_ave": sum(rewards_dict["category_reward"])
+            / len(rewards_dict["category_reward"]),
+            "class_coverage_reward_ave": sum(
+                rewards_dict["class_coverage_reward"]
+            )
+            / len(rewards_dict["class_coverage_reward"]),
             "accuracy_reward_max": max(rewards_dict["accuracy_reward"]),
             "category_reward_max": max(rewards_dict["category_reward"]),
-            "class_coverage_reward_max": max(rewards_dict["class_coverage_reward"]),
+            "class_coverage_reward_max": max(
+                rewards_dict["class_coverage_reward"]
+            ),
             "accuracy_reward_min": min(rewards_dict["accuracy_reward"]),
             "category_reward_min": min(rewards_dict["category_reward"]),
-            "class_coverage_reward_min": min(rewards_dict["class_coverage_reward"]),
+            "class_coverage_reward_min": min(
+                rewards_dict["class_coverage_reward"]
+            ),
         }
         return rewards
-    
+
     def generate_prompt(self, problem, tokenizer, **kwargs):
         r1_prefix = [
             {
@@ -364,7 +410,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             "prompt": tokenizer.apply_chat_template(
                 r1_prefix, tokenize=False, continue_final_message=True
             ),
-            "problem": problem
+            "problem": problem,
         }
 
     def dataset_preprocess(self, tokenizer):
@@ -380,9 +426,7 @@ class KineticDataClassificationWithMetrics(RLTask):
         )
 
         self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(
-                x["problem"], tokenizer
-            )
+            lambda x: self.generate_prompt(x["problem"], tokenizer)
         )
         return self.dataset
 
@@ -401,7 +445,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             return 1
         else:
             return 0
-    
+
     def category_reward(self, sol, answer):
         category_dict = {
             "M1": 0,
@@ -428,7 +472,9 @@ class KineticDataClassificationWithMetrics(RLTask):
         if answer not in category_dict.keys():
             return 0
         if category_dict[sol] == category_dict[answer]:
-            population_of_category = len([i for i in category_dict.values() if i == category_dict[sol]])
+            population_of_category = len(
+                [i for i in category_dict.values() if i == category_dict[sol]]
+            )
             return 1 / population_of_category
         else:
             return 0
@@ -467,6 +513,6 @@ class KineticDataClassificationWithMetrics(RLTask):
             except Exception:
                 rewards.append(0.0)
         return rewards
-    
+
     def get_metrics(self):
         return self._metrics_output
