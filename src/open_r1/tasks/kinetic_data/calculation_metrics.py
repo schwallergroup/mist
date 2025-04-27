@@ -1,8 +1,10 @@
-import numpy as np
-from scipy.stats import linregress
-from typing import Dict, Any
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+
+from scipy.stats import linregress
 
 
 class KineticMetricsCalculator:
@@ -19,23 +21,38 @@ class KineticMetricsCalculator:
                 "catalyst_stability": self._calc_stability(run_data),
                 "induction_period": self._calc_induction_period(run_data),
                 "mass_balance_gap": self._calc_mass_balance_gap(run_data),
-                "deactivation_rate_constant": self._calc_deactivation(run_data),
+                "deactivation_rate_constant": self._calc_deactivation(
+                    run_data
+                ),
                 "time_max_curvature": self._calc_time_max_curvature(run_data),
-                "active_catalyst_fraction": self._calc_active_catalyst_fraction(run_data),
-                "catalyst_activity_half_life": self._calc_activity_half_life(run_data),
+                "active_catalyst_fraction": self._calc_active_catalyst_fraction(
+                    run_data
+                ),
+                "catalyst_activity_half_life": self._calc_activity_half_life(
+                    run_data
+                ),
                 "Keq": self._calc_Keq(run_data),
                 "SP_mid_ratio": self._calc_SP_mid_ratio(run_data),
-                "mass_gap_mid": self._calc_mass_gap_mid(run_data)
+                "mass_gap_mid": self._calc_mass_gap_mid(run_data),
             }
         return metrics
 
     def summarize_metrics_for_ml(self) -> Dict[str, float]:
         metrics = self.calculate_all_metrics()
-        numeric_metrics = ["TOF", "TON", "catalyst_stability", "induction_period",
-                           "mass_balance_gap", "deactivation_rate_constant",
-                           "time_max_curvature", "active_catalyst_fraction",
-                           "catalyst_activity_half_life", "Keq",
-                           "SP_mid_ratio", "mass_gap_mid"]
+        numeric_metrics = [
+            "TOF",
+            "TON",
+            "catalyst_stability",
+            "induction_period",
+            "mass_balance_gap",
+            "deactivation_rate_constant",
+            "time_max_curvature",
+            "active_catalyst_fraction",
+            "catalyst_activity_half_life",
+            "Keq",
+            "SP_mid_ratio",
+            "mass_gap_mid",
+        ]
 
         summary = {}
         for metric in numeric_metrics:
@@ -46,7 +63,9 @@ class KineticMetricsCalculator:
             summary[f"{metric}_max"] = np.max(values)
 
         order_mapping = {"zero-order": 0, "first-order": 1, "second-order": 2}
-        orders = np.array([order_mapping[metrics[run]["reaction_order"]] for run in metrics])
+        orders = np.array(
+            [order_mapping[metrics[run]["reaction_order"]] for run in metrics]
+        )
         summary["reaction_order_mean"] = np.mean(orders)
         summary["reaction_order_std"] = np.std(orders)
 
@@ -55,14 +74,18 @@ class KineticMetricsCalculator:
     def _calc_reaction_order(self, run_data):
         t = np.array(run_data["time_data"])
         s = np.array(run_data["substrate_data"])
-        
+
         zero_order_fit = linregress(t, s)
         first_order_fit = linregress(t, np.log(np.clip(s, 1e-8, None)))
-        second_order_fit = linregress(t, 1/np.clip(s, 1e-8, None))
-        
-        fits = [abs(zero_order_fit.rvalue), abs(first_order_fit.rvalue), abs(second_order_fit.rvalue)]
+        second_order_fit = linregress(t, 1 / np.clip(s, 1e-8, None))
+
+        fits = [
+            abs(zero_order_fit.rvalue),
+            abs(first_order_fit.rvalue),
+            abs(second_order_fit.rvalue),
+        ]
         order = np.argmax(fits)
-        
+
         return ["zero-order", "first-order", "second-order"][order]
 
     def _calc_tof(self, run_data):
@@ -74,7 +97,9 @@ class KineticMetricsCalculator:
 
     def _calc_ton(self, run_data):
         cat_conc = run_data["initial_concentration_of_catalyst"]
-        total_product = run_data["product_data"][-1] - run_data["product_data"][0]
+        total_product = (
+            run_data["product_data"][-1] - run_data["product_data"][0]
+        )
         return total_product / cat_conc
 
     def _calc_stability(self, run_data):
@@ -90,7 +115,9 @@ class KineticMetricsCalculator:
         t = np.array(run_data["time_data"])
         threshold = 0.05 * (p[-1] - p[0])  # 5% of total product
         indices_above_thresh = np.where(p - p[0] > threshold)[0]
-        induction_time = t[indices_above_thresh[0]] if len(indices_above_thresh) > 0 else 0
+        induction_time = (
+            t[indices_above_thresh[0]] if len(indices_above_thresh) > 0 else 0
+        )
         return induction_time
 
     def _calc_mass_balance_gap(self, run_data):
@@ -133,7 +160,11 @@ class KineticMetricsCalculator:
     def _calc_Keq(self, run_data):
         substrate_final = run_data["substrate_data"][-1]
         product_final = run_data["product_data"][-1]
-        return product_final / substrate_final if substrate_final > 1e-6 else np.inf
+        return (
+            product_final / substrate_final
+            if substrate_final > 1e-6
+            else np.inf
+        )
 
     def _calc_SP_mid_ratio(self, run_data):
         midpoint = len(run_data["time_data"]) // 2
