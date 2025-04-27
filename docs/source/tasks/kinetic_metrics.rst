@@ -291,68 +291,68 @@ Metrics Used in the Task
 """""""""""""""""""""""""""""""""""
 
 Reaction Order
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates how the reaction rate depends on reactant concentration. Values > 1 suggest nonlinear behavior.
 This metrics are calculated by comparing substrate vs time, ln(substrate) vs time and 1/substrate vs time, which are the best fit with linear regression.
 If substrate vs time is the best fit, the reaction order is 0. If ln(substrate) vs time is the best fit, the reaction order is 1. If 1/substrate vs time is the best fit, the reaction order is 2.
 
 Turnover frequency (TOF)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Is how many product molecules are formed per catalyst site per second.
 This metrics are calculated by the initial slope of the product vs time using first three data points.
 
 Turnover number (TON)
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates how many times a single catalyst can act before deactivating. 
 TON is calculated by dividing the total amount of product formed by the initial concentration of catalyst.
 
 Catalyst stability
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates how stable the catalyt is. If a value is near 1, it means that the catalyst is stable. Much less than 1 means that the catalyst is unstable.
 This metrics is calculated by the final rate devided by the initial rate. The final rate and the initial rate are calculated by last and first two data points.
 
 Induction period
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates the time before the reaction rate becomes significant. A long period may suggest catalyst activation delays.
 This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
 
 Mass balance gap
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates how much mass is “missing” from expected total. High gaps may imply side reactions or deativation.
 This is calculated by comparing the substrate loss to product gain, and returning the absolute value of the difference.
 
 Deactivation rate constant
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Indicates the rate of catalyst deactivation. Higher value mans faster deactivation. 
 This metrics is calculated by the negative slope by fitting ln(reaction rate) vs time. Reaction rate is time-derivatives of product.
 
 Time of maximum curvature
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Time at which the rate of change in conversion is highest. Indicates key kinetic transitions.
 This is calculated by detecting the time when the second derivative of product vs time is maximum.
 
 Active catalyst fraction
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Proportion of catalyst that remains active during the reaction. 1.0 means fully active.
 This is calculated by the final reaction rate devided by the initial reaction rate.
 
 Catalyst activity half-life
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Time until catalyst activity falls to half. Longer means more durable catalyst.
 This is calculated by detecting the time when the reaction rate is half of the initial rate.
 
 Equilibrium constant (Keq)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Ratio of product to reactant at equilibrium. Higher values indicate more favorable product formation.
 This is calculated by the ratio of product to substrate at the end of the reaction.
 
 SP_mid_ratio
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Ratio of substrate to product at midpoint of the reaction. Useful for understanding reaction progress.
 This is calculated by the ratio of substrate to product at midpoint of the reaction.
 
 Mass gap at midpoint
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Mass balance gap measured at the halfway point of the reaction. Can signal mid-reaction instabilities.
 
   
@@ -524,7 +524,7 @@ Result
 -----------
 
 Transition of Rewards
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - The format reward increases from around 0.3 at the beggining to 0.99 at 300 global steps.
 
 - The accuracy reward (which includes exact match reward, category reward, class coverage reward and data run coverage reward as explained above) is around 0.03 at the beggining, and reaches around 0.10 around 300 global steps. It keeps increasing to around 0.15 at 1000 global steps, and then it seeems to reach plateau around 0.15.
@@ -540,7 +540,7 @@ Below is the model prediction frequency and the correct answer distribution for 
 
 
 Overall Metrics at 175 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 - Total Samples: 99
   
 - Exact Matches: 4 (4.04%)
@@ -550,7 +550,7 @@ Overall Metrics at 175 global steps
 - Complete Misses: 95 (95.96%)
 
 Model Prediction Frequency at 175 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 |     |   Count |
 |:----|--------:|
 | M1  |      29 |
@@ -575,7 +575,7 @@ Model Prediction Frequency at 175 global steps
 | M20 |       5 |
 
 Correct Answer Distribution at 175 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 |     |   Count |
 |:----|--------:|
 | M1  |       6 |
@@ -600,8 +600,8 @@ Correct Answer Distribution at 175 global steps
 | M20 |       5 |
 
 Analysis of Correct Predictions at 175 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        | correct_answer   |   Count |   Percentage |
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+| correct_answer   |   Count |   Percentage |
 |:-----------------|--------:|-------------:|
 | M1               |       2 |           50 |
 | M9               |       1 |           25 |
@@ -609,7 +609,7 @@ Analysis of Correct Predictions at 175 global steps
 
 
 Overall Metrics at 1775 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 - Total Samples: 100
   
 - Exact Matches: 7 (7.00%)
@@ -619,7 +619,7 @@ Overall Metrics at 1775 global steps
 - Complete Misses: 93 (93.00%)
 
 Model Prediction Frequency at 1775 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 |     |   Count |
 |:----|--------:|
 | M1  |       5 |
@@ -644,7 +644,7 @@ Model Prediction Frequency at 1775 global steps
 | M20 |       2 |
 
 Correct Answer Distribution at 1775 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 |     |   Count |
 |:----|--------:|
 | M1  |       6 |
@@ -669,7 +669,7 @@ Correct Answer Distribution at 1775 global steps
 | M20 |       5 |
 
 Analysis of Correct Predictions at 1775 global steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 | correct_answer   |   Count |   Percentage |
 |:-----------------|--------:|-------------:|
 | M18              |       4 |        57.14 |
@@ -677,7 +677,7 @@ Analysis of Correct Predictions at 1775 global steps
 | M19              |       1 |        14.29 |
 
 Observation and Analysis
-~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 - The model is biased towards M1 at 175 global steps, but it is biased towards M10 - M20 at 1775 global steps.
 
 - This can be considered as a sign of wrong reward function design, especially the category reward.
