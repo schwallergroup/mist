@@ -7,7 +7,14 @@ from transformers import AutoTokenizer
 
 from tasks import CHEMTASKS
 from trl import GRPOConfig, ModelConfig, TrlParser, get_peft_config
-from utils import ExtendedGRPOConfig, ExtendedGRPOTrainer, get_checkpoint, get_reward_list, setup_logger, load_sampling_params_config
+from utils import (
+    ExtendedGRPOConfig,
+    ExtendedGRPOTrainer,
+    get_checkpoint,
+    get_reward_list,
+    load_sampling_params_config,
+    setup_logger,
+)
 
 
 logger = setup_logger(__name__)
@@ -103,7 +110,9 @@ def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
 def main():
     parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
     model_args, training_args = parser.parse_args_and_config()
-    training_args = load_sampling_params_config(training_args)  # Load sampling parameters
+    training_args = load_sampling_params_config(
+        training_args
+    )  # Load sampling parameters
     grpo_function(model_args, training_args)
 
 

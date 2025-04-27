@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import json
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -39,9 +39,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 "temperature": args.temperature,  # default from TRL 0.14.0
                 "max_tokens": self.max_completion_length,  # default from TRL 0.14.0
             }
-            sampling_params_dict.update(args.sampling_params_config)  # added from the sampling_params config -> overwrite default values
+            sampling_params_dict.update(
+                args.sampling_params_config
+            )  # added from the sampling_params config -> overwrite default values
             self.sampling_params = SamplingParams(**sampling_params_dict)
-        print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
+        print(
+            f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}"
+        )
 
     def add_custom_metrics(self):
         # Additional logging
@@ -131,30 +135,49 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
 
     # Read model_default_sampling_params.txt
     model_default_sampling_params = dict()
-    with open(f"{sampling_params_dir}/model_default_sampling_params.txt", mode='r') as f:
+    with open(
+        f"{sampling_params_dir}/model_default_sampling_params.txt", mode="r"
+    ) as f:
         for line in f:
-            if ':' not in line:
+            if ":" not in line:
                 continue
-            line_split = line.split(':')
-            assert len(line_split) == 2, f"Invalid format in model_default_sampling_params.txt -> each line should be in the format 'key: value' (with a single ':', found {len(line_split)-1} instead of 1)"
+            line_split = line.split(":")
+            assert (
+                len(line_split) == 2
+            ), f"Invalid format in model_default_sampling_params.txt -> each line should be in the format 'key: value' (with a single ':', found {len(line_split)-1} instead of 1)"
             model_id = line_split[0].strip()
             sampling_params_config_name = line_split[1].strip()
-            assert model_id not in model_default_sampling_params, f"Invalid format in model_default_sampling_params.txt -> model_id {model_id} is duplicated"
+            assert (
+                model_id not in model_default_sampling_params
+            ), f"Invalid format in model_default_sampling_params.txt -> model_id {model_id} is duplicated"
             if sampling_params_config_name != "default":
-                assert os.path.isfile(f"{sampling_params_dir}/{sampling_params_config_name}.json"), f"Invalid format in model_default_sampling_params.txt -> sampling_params_config_name ({sampling_params_config_name}.json) does not exist"
-            model_default_sampling_params[model_id] = sampling_params_config_name
+                assert os.path.isfile(
+                    f"{sampling_params_dir}/{sampling_params_config_name}.json"
+                ), f"Invalid format in model_default_sampling_params.txt -> sampling_params_config_name ({sampling_params_config_name}.json) does not exist"
+            model_default_sampling_params[model_id] = (
+                sampling_params_config_name
+            )
 
     # Update training_args.sampling_params_config_name (if needed)
     if training_args.sampling_params_config_name == "default":
         if training_args.base_model_id in model_default_sampling_params:
-            training_args.sampling_params_config_name = model_default_sampling_params[training_args.base_model_id]
+            training_args.sampling_params_config_name = (
+                model_default_sampling_params[training_args.base_model_id]
+            )
 
     # Update training_args.sampling_params_config (if needed)
     if training_args.sampling_params_config_name != "default":
-        sampling_params = json.load(open(f"{sampling_params_dir}/{training_args.sampling_params_config_name}.json", mode='r'))
+        sampling_params = json.load(
+            open(
+                f"{sampling_params_dir}/{training_args.sampling_params_config_name}.json",
+                mode="r",
+            )
+        )
         training_args.sampling_params_config = sampling_params
     else:
         # Ensure sampling_params/default.json does not exist (the default should never be modified)
-        assert not os.path.isfile(f"{sampling_params_dir}/default.json"), f"The file sampling_params/default.json exists. The global default sampling_params can't be overwritten, please remove this file (or put the config in a new file)."
+        assert not os.path.isfile(
+            f"{sampling_params_dir}/default.json"
+        ), f"The file sampling_params/default.json exists. The global default sampling_params can't be overwritten, please remove this file (or put the config in a new file)."
 
     return training_args
