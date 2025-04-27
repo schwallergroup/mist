@@ -1,10 +1,10 @@
 import os
 from datetime import datetime
 
+
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from paths import expand_path
 from tasks import CHEMTASKS
 from trl import GRPOConfig, ModelConfig, TrlParser, get_peft_config
 from utils import (
@@ -15,6 +15,7 @@ from utils import (
     load_sampling_params_config,
     setup_logger,
 )
+
 
 logger = setup_logger(__name__)
 
@@ -70,8 +71,13 @@ def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
 
     # Check for last checkpoint
     last_checkpoint = get_checkpoint(training_args)
-    if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
-        logger.info(f"Checkpoint detected, resuming training at {last_checkpoint}.")
+    if (
+        last_checkpoint is not None
+        and training_args.resume_from_checkpoint is None
+    ):
+        logger.info(
+            f"Checkpoint detected, resuming training at {last_checkpoint}."
+        )
 
     # Train the model
     logger.info(
@@ -104,8 +110,9 @@ def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
 def main():
     parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
     model_args, training_args = parser.parse_args_and_config()
-    training_args.dataset_id_or_path = expand_path(training_args.dataset_id_or_path)
-    training_args = load_sampling_params_config(training_args)  # Load sampling parameters
+    training_args = load_sampling_params_config(
+        training_args
+    )  # Load sampling parameters
     grpo_function(model_args, training_args)
 
 
