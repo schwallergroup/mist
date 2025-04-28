@@ -318,7 +318,7 @@ This metrics is calculated by detecting the first time point where product excee
 
 Mass balance gap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Indicates how much mass is “missing” from expected total. High gaps may imply side reactions or deativation.
+Indicates how much mass is "missing" from expected total. High gaps may imply side reactions or deativation.
 This is calculated by comparing the substrate loss to product gain, and returning the absolute value of the difference.
 
 Deactivation rate constant
@@ -461,7 +461,7 @@ Mass balance gap measured at the halfway point of the reaction. Can signal mid-r
    - Max: {{induction_period_max}}
 
    ## Mass balance gap
-   Indicates how much mass is “missing” from expected total. High gaps may imply side reactions or errors.
+   Indicates how much mass is "missing" from expected total. High gaps may imply side reactions or errors.
    - Mean: {{mass_balance_gap_mean}}
    - Std: {{mass_balance_gap_std}}
    - Min: {{mass_balance_gap_min}}
@@ -540,59 +540,108 @@ Overall Metrics at 175 global steps
 
 Model Prediction Frequency at 175 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
-     |   Count 
- M1  |      29 
- M2  |       4 
- M3  |       3 
- M4  |       6 
- M5  |       3 
- M6  |       9 
- M7  |       2 
- M8  |       0 
- M9  |       4 
- M10 |      12 
- M11 |       2 
- M12 |       1 
- M13 |       2 
- M14 |       1 
- M15 |       0 
- M16 |       0 
- M17 |       8 
- M18 |       4 
- M19 |       3 
- M20 |       5 
++--------+--------+
+| Class  | Count  |
++========+========+
+| M1     | 29     |
++--------+--------+
+| M2     | 4      |
++--------+--------+
+| M3     | 3      |
++--------+--------+
+| M4     | 6      |
++--------+--------+
+| M5     | 3      |
++--------+--------+
+| M6     | 9      |
++--------+--------+
+| M7     | 2      |
++--------+--------+
+| M8     | 0      |
++--------+--------+
+| M9     | 4      |
++--------+--------+
+| M10    | 12     |
++--------+--------+
+| M11    | 2      |
++--------+--------+
+| M12    | 1      |
++--------+--------+
+| M13    | 2      |
++--------+--------+
+| M14    | 1      |
++--------+--------+
+| M15    | 0      |
++--------+--------+
+| M16    | 0      |
++--------+--------+
+| M17    | 8      |
++--------+--------+
+| M18    | 4      |
++--------+--------+
+| M19    | 3      |
++--------+--------+
+| M20    | 5      |
++--------+--------+
 
 Correct Answer Distribution at 175 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
-     |   Count 
- M1  |       6 
- M2  |      10 
- M3  |       5 
- M4  |       3 
- M5  |       4 
- M6  |       5 
- M7  |       7 
- M8  |       3 
- M9  |       3 
- M10 |       4 
- M11 |       3 
- M12 |       5 
- M13 |       4 
- M14 |       3 
- M15 |       6 
- M16 |       9 
- M17 |       2 
- M18 |       6 
- M19 |       6 
- M20 |       5 
++--------+--------+
+| Class  | Count  |
++========+========+
+| M1     | 6      |
++--------+--------+
+| M2     | 10     |
++--------+--------+
+| M3     | 5      |
++--------+--------+
+| M4     | 3      |
++--------+--------+
+| M5     | 4      |
++--------+--------+
+| M6     | 5      |
++--------+--------+
+| M7     | 7      |
++--------+--------+
+| M8     | 3      |
++--------+--------+
+| M9     | 3      |
++--------+--------+
+| M10    | 4      |
++--------+--------+
+| M11    | 3      |
++--------+--------+
+| M12    | 5      |
++--------+--------+
+| M13    | 4      |
++--------+--------+
+| M14    | 3      |
++--------+--------+
+| M15    | 6      |
++--------+--------+
+| M16    | 9      |
++--------+--------+
+| M17    | 2      |
++--------+--------+
+| M18    | 6      |
++--------+--------+
+| M19    | 6      |
++--------+--------+
+| M20    | 5      |
++--------+--------+
 
 
 Analysis of Correct Predictions at 175 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
- correct_answer   |   Count |   Percentage 
- M1               |       2 |           50 
- M9               |       1 |           25 
- M4               |       1 |           25 
++----------------+--------+-------------+
+| correct_answer | Count  | Percentage  |
++================+========+=============+
+| M1             | 2      | 50          |
++----------------+--------+-------------+
+| M9             | 1      | 25          |
++----------------+--------+-------------+
+| M4             | 1      | 25          |
++----------------+--------+-------------+
 
 
 Overall Metrics at 1775 global steps
@@ -607,51 +656,95 @@ Overall Metrics at 1775 global steps
 
 Model Prediction Frequency at 1775 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
-     |   Count 
- M1  |       5 
- M2  |       0 
- M3  |       0 
- M4  |       0 
- M5  |       1 
- M6  |       1 
- M7  |       3 
- M8  |       0 
- M9  |       0 
- M10 |      12 
- M11 |       1 
- M12 |       1 
- M13 |       7 
- M14 |      10 
- M15 |       3 
- M16 |       0 
- M17 |       8 
- M18 |      20 
- M19 |      26 
- M20 |       2 
++--------+--------+
+| Class  | Count  |
++========+========+
+| M1     | 5      |
++--------+--------+
+| M2     | 0      |
++--------+--------+
+| M3     | 0      |
++--------+--------+
+| M4     | 0      |
++--------+--------+
+| M5     | 1      |
++--------+--------+
+| M6     | 1      |
++--------+--------+
+| M7     | 3      |
++--------+--------+
+| M8     | 0      |
++--------+--------+
+| M9     | 0      |
++--------+--------+
+| M10    | 12     |
++--------+--------+
+| M11    | 1      |
++--------+--------+
+| M12    | 1      |
++--------+--------+
+| M13    | 7      |
++--------+--------+
+| M14    | 10     |
++--------+--------+
+| M15    | 3      |
++--------+--------+
+| M16    | 0      |
++--------+--------+
+| M17    | 8      |
++--------+--------+
+| M18    | 20     |
++--------+--------+
+| M19    | 26     |
++--------+--------+
+| M20    | 2      |
++--------+--------+
 
 Correct Answer Distribution at 1775 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
-Class | Count
-M1 | 6
-M2 | 9
-M3 | 4
-M4 | 2
-M5 | 4
-M6 | 5
-M7 | 6
-M8 | 3
-M9 | 6
-M10 | 9
-M11 | 5
-M12 | 4
-M13 | 5
-M14 | 3
-M15 | 7
-M16 | 1
-M17 | 5
-M18 | 6
-M19 | 5
-M20 | 5
++--------+--------+
+| Class  | Count  |
++========+========+
+| M1     | 6      |
++--------+--------+
+| M2     | 9      |
++--------+--------+
+| M3     | 4      |
++--------+--------+
+| M4     | 2      |
++--------+--------+
+| M5     | 4      |
++--------+--------+
+| M6     | 5      |
++--------+--------+
+| M7     | 6      |
++--------+--------+
+| M8     | 3      |
++--------+--------+
+| M9     | 6      |
++--------+--------+
+| M10    | 9      |
++--------+--------+
+| M11    | 5      |
++--------+--------+
+| M12    | 4      |
++--------+--------+
+| M13    | 5      |
++--------+--------+
+| M14    | 3      |
++--------+--------+
+| M15    | 7      |
++--------+--------+
+| M16    | 1      |
++--------+--------+
+| M17    | 5      |
++--------+--------+
+| M18    | 6      |
++--------+--------+
+| M19    | 5      |
++--------+--------+
+| M20    | 5      |
++--------+--------+
 
 Analysis of Correct Predictions at 1775 global steps
 """""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -782,9 +875,7 @@ The following is the final response on the log.
 
    I think the key is that in M17, S is transformed into P directly, but then inactive, which might lead to more turnover because S isn't being converted immediately, but rather passed through inactive catS. That might lead to more catalytic activity. Wait, but in the given metrics, turnover number is 9, which is moderate.
 
-   But then I think the mechanism may not directly affect the metric. Wait, the metrics don't include substrate S, only products. So perhaps they aren't measuring the same thing.
-
-   Wait, looking back, the metrics provided are all for the overall catalyst behavior, not the products. So all these metrics are about the catalyst's turnover and its activity, not how much substrate is used. Then perhaps M17 is more about the catalytic cycle, but overall, the TOF andTON are also considered.
+   But then I think the mechanism may not directly affect the metric. Wait, the metrics provided are all for the overall catalyst behavior, not the products. So all these metrics are about the catalyst's turnover and its activity, not how much substrate is used. Then perhaps M17 is more about the catalytic cycle, but overall, the TOF andTON are also considered.
 
    Wait, but the program is asking for the reaction class based on these metrics. Maybe each metric corresponds to individual aspects. For example, TOF is about turnover, which is a key factor.
 
