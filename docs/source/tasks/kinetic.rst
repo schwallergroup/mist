@@ -306,14 +306,14 @@ Result
 
 Reward Progression
 ^^^^^^^^^^^^
-.. image:: ../_static/kinetic_format_reward.png
+.. image:: ./_static/kinetic_format_reward.png
    :alt: Reward Progression
    :width: 600px
    :align: center
 
 - The format reward is improved from around 0.3 at the beggining to 0.9 at 200 global steps.
 
-.. image:: ../_static/kinetic_accuracy_reward.png
+.. image:: ./_static/kinetic_accuracy_reward.png
    :alt: Accuracy Reward Progression
    :width: 600px
    :align: center
