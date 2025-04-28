@@ -680,6 +680,9 @@ Observation and Discussion
 
 Reward Progression
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+wandb link: https://wandb.ai/liac/r1-kinetic_metrics?nw=nwuserryokuroki
+
 .. image:: ./_static/kinetic_metrics_format_reward.png
    :alt: Format Reward Progression
    :width: 600px
