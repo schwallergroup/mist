@@ -1,8 +1,8 @@
 import os
 import pickle
+import random
 import re
 from typing import List
-import random
 
 from datasets import Dataset, DatasetDict
 
@@ -91,7 +91,7 @@ class KineticDataClassification(RLTask):
 
         <think>
         """
-        
+
     def load(self) -> DatasetDict:
         """
         Load and prepare the dataset for the task.
@@ -311,7 +311,7 @@ class KineticDataClassification(RLTask):
                 accuracy_reward = 1
             else:
                 accuracy_reward = 0
-            
+
             # sometimes the answer is None
             if answer != "NONE":
                 if answer in category_dict.keys():
@@ -320,7 +320,7 @@ class KineticDataClassification(RLTask):
                         category_reward = 1
                     else:
                         category_reward = 0
-                    
+
                     # class coverage reward
                     class_coverage_reward = self.class_coverage_reward(answer)
 
@@ -335,7 +335,12 @@ class KineticDataClassification(RLTask):
                 class_coverage_reward = 0
                 data_coverage_reward = 0
 
-            reward = 0.5 * accuracy_reward + 0.2 * category_reward + 0.2 * class_coverage_reward + 0.1 * data_coverage_reward
+            reward = (
+                0.5 * accuracy_reward
+                + 0.2 * category_reward
+                + 0.2 * class_coverage_reward
+                + 0.1 * data_coverage_reward
+            )
             rewards.append(reward)
         return rewards
 
@@ -385,7 +390,7 @@ class KineticDataClassification(RLTask):
         classes_mentioned = set(re.findall(r"\bM\d+\b", response))
         score_class_coverage = len(classes_mentioned) / 20
         return score_class_coverage
-    
+
     def data_coverage_reward(self, response):
         # データセットのうち、何種類に言及したか
         data_mentioned = set(re.findall(r"data\s*([1-4])", response))

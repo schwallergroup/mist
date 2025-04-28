@@ -304,12 +304,34 @@ I included each reaction mechanisms explanation and four data runs in the prompt
 Result
 ------
 
-Transition of Rewards
+Reward Progression
 ^^^^^^^^^^^^
-- The format reward increases from around 0.3 at the beggining to 0.9 at 200 global steps.
+.. image:: ../_static/kinetic_format_reward.png
+   :alt: Reward Progression
+   :width: 600px
+   :align: center
+
+- The format reward is improved from around 0.3 at the beggining to 0.9 at 200 global steps.
+
+.. image:: ../_static/kinetic_accuracy_reward.png
+   :alt: Accuracy Reward Progression
+   :width: 600px
+   :align: center
 
 - The accuracy reward (which includes exact match reward, category reward, class coverage reward and data run coverage reward as explained above) is around 0.02 at the beggining, and reaches approximetly 0.06 at 200 global steps. 
-  This seems to correspond to the improvement in the format reward, both reward increase rouphly threehold, suggesting that the accuracy reward of the responses with correct format remains almost unchanged from the begginning.
+
+Discussion
+""""""""""""
+The improvement in the accuracy reward roughly corresponds to the improvement in format reward, both approximately tripling.
+Additionally, the accuracy reward can only be acquired when the format is correct, because it assumes the format is correct.
+This suggests that the accuracy reward of the responses with correct format remains almost unchanged from the begginning, while the format reward shows significant improvement.
+
+The notable improvement in format reward indicates that the reinforcement learning pipeline properly works. Despite the fact, the accuracy reward with correct format remains almost unchanged.
+I hypothesize two explanations for the phenomenon.
+
+1. The model may have weak reasoning ability for this task, limiting the possbility of reaching the correct answer. As a result, the model can not detect the improvement of the accuracy reward.
+2. The accuracy reward may be too sparse for the model to detect meaningful improvement.
+
 
 Sample Responses
 ^^^^^^^^^^^^^^^^
