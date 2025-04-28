@@ -523,17 +523,6 @@ Mass balance gap measured at the halfway point of the reaction. Can signal mid-r
 Result
 -----------
 
-Transition of Rewards
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-- The format reward increases from around 0.3 at the beggining to 0.99 at 300 global steps.
-
-- The accuracy reward (which includes exact match reward, category reward, class coverage reward and data run coverage reward as explained above) is around 0.03 at the beggining, and reaches around 0.10 around 300 global steps. It keeps increasing to around 0.15 at 1000 global steps, and then it seeems to reach plateau around 0.15.
-  The improvement until 300 global steps seems to correspond to the improvement in the format reward, both reward increase rouphly threehold, suggesting that the accuracy reward of the responses with correct format remains almost unchanged from the begginning.
-
-- Looking into the exact match reward, category reward, class coverage reward and data run coverage reward, they are all improved until 300 global steps, corresponding the improvement in the format reward. However, after 300 global steps, three rewards except the category reward remains almost the same. The exact match reward remains around 0.05, which is the same reward that should be obtained from random responses.
-
-- Only the class coverage reward out of the four rewards seems to be increasing after 300 global steps, and it reaches aroud 0.5 at 1000 global steps. 
-
 The Comparison between Model Prediction Frequency and Correct Answer Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Below is the model prediction frequency and the correct answer distribution for the first 100 samples from validation data at 175 global steps and 1775 global steps.
@@ -676,13 +665,70 @@ Analysis of Correct Predictions at 1775 global steps
 | M10              |       2 |        28.57 |
 | M19              |       1 |        14.29 |
 
-Observation and Analysis
+Observation and Discussion
 """""""""""""""""""""""""""""""""""""""""""""""""""""
-- The model is biased towards M1 at 175 global steps, but it is biased towards M10 - M20 at 1775 global steps.
+- The model is biased towards M1 at 175 global steps, while at 1775 global steps, it became biased towards M10 - M20.
 
 - This can be considered as a sign of wrong reward function design, especially the category reward.
-  The category reward gives 1.0 if the model gives the answer that is in the same category as the ground truth.
-  The population of the category is not uniform, and the model is biased towards M10 - M20, which are the most frequent classes in the dataset.)
+
+- Currently, the category reward assigns 1.0 whenever the predicted class belongs to the same category as the actual class. However, since the distribution of the category is not uniform, the model is biased towards M10 - M20, which are the most frequent classes in the dataset.
+
+- Additionally, the current implementation mistakenly defines the category for deactivation reactions as M10 - M20, while it should have been as M9 - M20.
+  
+- To avoid the bias, the category reward should be calculated by 1 / (number of classes in categories). This adjustment makes the expectation value of each category the same, and prevents the bias.
+
+
+Reward Progression
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. image:: ./_static/kinetic_metrics_format_reward.png
+   :alt: Format Reward Progression
+   :width: 600px
+   :align: center
+
+The format reward increases from around 0.3 at the beggining to 0.99 at 300 global steps.
+
+.. image:: ./_static/kinetic_metrics_accuracy_reward.png
+   :alt: Accuracy Reward Progression
+   :width: 600px
+   :align: center
+
+The accuracy reward (which includes exact match reward, category reward, class coverage reward and data run coverage reward as explained above) is around 0.03 at the beggining, and reaches around 0.10 around 300 global steps. 
+It keeps increasing to around 0.15 at 1000 global steps, and then it seeems to reach plateau around 0.15.
+
+.. image:: ./_static/kinetic_metrics_exact_match_reward.png
+   :alt: Exact Match Reward Progression
+   :width: 600px
+   :align: center
+
+The exact match reward is calculated by the average of the exact match reward in group of 8 samples. The exact match reward is around 0.01 at the beggining, and reaches plateau around 0.05 at 300 global steps.
+
+.. image:: ./_static/kinetic_metrics_category_reward.png
+   :alt: Category Reward Progression
+   :width: 600px
+   :align: center
+
+The category reward is calculated by the average of the category reward in group of 8 samples. The category reward is around 0.1 at the beggining, and reaches around 0.3 at 300 global steps. It keeps increasing to around 0.5 at around 1000 global steps.
+
+.. image:: ./_static/kinetic_metrics_class_coverage_reward.png
+   :alt: Class Coverage Reward Progression
+   :width: 600px
+   :align: center
+
+The class coverage reward is calculated by the average of the class coverage reward in group of 8 samples. The class coverage reward is around 0.015 around the beggining, and reaches plateau around 0.05 at 300 global steps.
+
+
+Discussion
+"""""""""""""""""
+The improvement of the accuracy reward until 300 global steps seems to correspond to the improvement in the format reward, with both reward increase roughly tripling. Additionally, the accuracy reward can only be obtained when the format is correct, as it assumes the format is correct. Thus, it suggests that the accuracy reward of the responses with correct format remains almost unchanged from the beginning until 300 global steps.
+
+The accuracy reward keeps increasing from 300 global steps until 1000 global steps, while the format reward reaches plateau. This suggests that the accuracy reward itself is improving until 1000 global steps.
+
+Examining the exact match reward, category reward and class coverage reward, they are all improved until 300 global steps, corresponding to the improvement in the format reward. However, after 300 global steps, only the category reward continues increasing. This is the cause of improvement in the accuracy reward after 300 global steps. The exact match reward remains around 0.05, which equals the reward that expected from random responses (calculated one divided by 20 reaction classes).
+
+As discussed in the previous section, the increase in the category reward is likely due to improper reward function design. Specifically, the category reward assigns 1.0 whenever the model prediction is in the same category as the actual class, without considering the population of the category is not uniform. Consiquently, the model becomes biased towards the M10 - M20, which are the most frequent classes in the dataset.
+
+The class coverage reward was incorrectly implemented. The auguments provided to the class coverage reward should be the model's response and the ground truth's class, but they were incorrectly set as the model's predicted answer and the ground truth, causing the reward calculation to consistently detect only one class.
+
 
 Sample Responses
 ^^^^^^^^^^^^^^^^^^
@@ -837,3 +883,10 @@ Several observation are made:
   - The model stated that "Looking at metrics, TOF is over 1, which fits M13 but also M17", and it started to consider M17 as a possible candidate. However, the model likely confused reaction order with TOF. The value of TOF being over 1 does not indicate anything about the reaction mechanism or behavior.
 
 
+Discussion -- Current Challenges
+----------------------
+- **Hullucinations**: The model shows hullucinations. By assuming that the possibility of reaching the correct answer is calculated by the accumulation of correct reasoning, models that show less hullucinations should be used.
+
+- **Learning standard values**: The task requires the model not only to reason correctly but also to learn the standard value of the metrics for each reaction class.
+
+- **Class Coverage Reward**: The current implementation of the class coverage reward is incorrect. It introduces bias due to ununiform category distribution. Revising the reward function to predict equally for each class is essential for accurate model performance.
