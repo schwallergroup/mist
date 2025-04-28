@@ -124,19 +124,18 @@ The correct answer is A, as the reaction involves a `hydrogenation of the nitril
 
 2. **GRPO training performances**
 
-.. image:: _static/accuracy_inversion_26april.png
+.. image:: _static/accuracy_inversion_29april.png
    :width: 200
    :align: center
-   :alt: The plot shows the evolution of the accuracy reward of one unique run of the pre-trained-v4-cot model.
+   :alt: The plot shows the evolution of the accuracy reward of two runs of the pre-trained-v4-cot and vanilla Qwen2.5-3B models.
 
 
-The performances suggest that the model struggles to reach the random baseline (25%). The reason for this result for the trained model could also strongly be caused to formating struggles. 
+The performances suggest that the pretrained model struggles to reach the random baseline (25%). The reason for this result for the trained model could also strongly be caused to formating struggles. Concerning the vanilla model, even though the performance converges to 25% random (random guessing), the model picks up the format along the training steps. Both results could support the evidence that the pre-trained v4 model lacks ability to follow instructions. 
 
-.. image:: _static/format_inversion_26april.png
+.. image:: _static/format_inversion_29april.png
    :width: 200
    :align: center
-   :alt: The plot shows the evolution of the format reward of one unique run of the pre-trained-v4-cot model.
+   :alt: The plot shows the evolution of the format reward of two runs of the pre-trained-v4-cot and vanilla models.
 
-The performances suggest that the model struggles to reach positive reward format.
-
+The performances suggest that the pretrained model struggles to reach positive reward format, which is not the case for the vanilla model.
 
