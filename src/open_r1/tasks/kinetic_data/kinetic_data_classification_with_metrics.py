@@ -250,7 +250,9 @@ class KineticDataClassificationWithMetrics(RLTask):
         prompts_test = []
         for i in range(self.x1_test.shape[0]):
             data = self.generate_data_pass_to_prompt(i, is_test=True)
-            metrics = KineticMetricsCalculator(data).summarize_metrics_for_ml()
+            calculator = KineticMetricsCalculator(data).summarize_metrics_for_ml()
+            calculator.process_samples()
+            metrics = calculator.summarize_minimum_important_value()
             prompt = prompt_template_data.format(**metrics)
             prompts_test.append(prompt)
 
