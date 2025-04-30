@@ -29,12 +29,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # Set up logging of good completions
         self.logging_completions = {
             "save_completions": args.save_completions,
-            "save_completions_dir": args.save_completions_dir,
+            "save_completions_dir": f"{args.save_completions_dir}/{args.slurm_job_id}",
             "save_completions_min_reward_threshold": args.save_completions_min_reward_threshold,
             "save_completions_min_reward_adaptive": False,
             "save_completions_top_reward_percentage": args.save_completions_top_reward_percentage,
             "save_completions_chunk_size": args.save_completions_chunk_size,
             "current_chunk_id": 1,
+            "slurm_job_id": args.slurm_job_id,
             "n_completions": 0,
             "min_reward_seen": None,
             "max_reward_seen": None,
