@@ -1,6 +1,7 @@
-import json
 import logging
 import os
+import json
+import functools
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -10,11 +11,6 @@ from transformers.trainer_utils import get_last_checkpoint
 from pydantic import Field
 from trl import GRPOConfig, GRPOTrainer
 from vllm import SamplingParams
-
-try:
-    from .paths import sampling_params_dir
-except ImportError:  # pragma: no cover - script execution path
-    from paths import sampling_params_dir
 
 
 MetricFunc = Callable[[], dict]
@@ -28,7 +24,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         metric_funcs: Optional[Union[MetricFunc, list[MetricFunc]]] = None,
         **kwargs_,
     ):
-        # Note: current TRL version used in this repository: 0.14.0
+        # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args_, args=args, **kwargs_)
 
         # Set up logging of good completions
@@ -57,6 +53,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             if os.path.isdir(self.logging_completions["save_completions_dir"]) is False:
                 os.makedirs(self.logging_completions["save_completions_dir"], exist_ok=True)
             def _reward_func_wrapper(reward_func):
+                @functools.wraps(reward_func)  # used to keep the original function name (reward_func.__name__)
                 def reward_func_wrapper(*args, **kwargs):
                     reward_key = f"_reward/{reward_func.__name__}"
                     assert reward_key not in kwargs, f"[ExtendedGRPOTrainer.__init__] reward_key ({reward_key}) should not be in kwargs"
@@ -91,9 +88,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 "temperature": args.temperature,  # default from TRL 0.14.0
                 "max_tokens": self.max_completion_length,  # default from TRL 0.14.0
             }
-            sampling_params_dict.update(
-                args.sampling_params_config
-            )  # added from the sampling_params config -> overwrite default values
+            sampling_params_dict.update(args.sampling_params_config)  # added from the sampling_params config -> overwrite default values
             self.sampling_params = SamplingParams(**sampling_params_dict)
         print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
 
@@ -105,7 +100,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             for metric_name, metric_value in metrics.items():
                 if mode in self._metrics.keys():
                     # Compatible with the current version 'main' of trl repository
-                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
+                    self._metrics[mode][f"custom/{metric_name}"].append(
+                        metric_value
+                    )
                 else:
                     # Compatible with the "older versions" of trl repository (0.14.0 included)
                     self._metrics[f"custom/{metric_name}"].append(metric_value)
@@ -116,8 +113,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             return None
 
         # Check the number of new completions
-        assert len(set([len(b) for b in self.logging_completions["buffer"]])) == 1, "[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same length for all logged completions"
-        n_new_completions = list(set([len(b) for b in self.logging_completions["buffer"]]))[0]
+        assert len(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b])) == 1, "[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same length for all logged completions"
+        n_new_completions = list(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b]))[0]
 
         # Merge self.logging_completions["buffer"] into logged_completions_buffer
         logged_completions_buffer = dict()
@@ -225,7 +222,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
 @dataclass
 class ExtendedGRPOConfig(GRPOConfig):
-    dataset_id_or_path: str = "${MIST_DATA_DIR}/rxnpred/USPTO_480k_clean"
+    dataset_id_or_path: str = "/cache/data/"
     chem_task: str = "CountdownTask"
     task_mode: str = "base"
     task_kwargs: Dict[str, Any] = field(default_factory=dict)
@@ -285,31 +282,21 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
     :param training_args: Training arguments [ExtendedGRPOConfig]
     :return: Updated training arguments [ExtendedGRPOConfig]
     """
-    sampling_dir = sampling_params_dir()
+    sampling_params_dir = "/Documents/sink/sampling_params"
 
     # Read model_default_sampling_params.txt
     model_default_sampling_params = dict()
-    with open(sampling_dir / "model_default_sampling_params.txt", mode="r") as f:
+    with open(f"{sampling_params_dir}/model_default_sampling_params.txt", mode='r') as f:
         for line in f:
-            if ":" not in line:
+            if ':' not in line:
                 continue
-            line_split = line.split(":")
-            assert len(line_split) == 2, (
-                "Invalid format in model_default_sampling_params.txt -> "
-                "each line should be in the format 'key: value' "
-                f"(with a single ':', found {len(line_split)-1} instead of 1)"
-            )
+            line_split = line.split(':')
+            assert len(line_split) == 2, f"Invalid format in model_default_sampling_params.txt -> each line should be in the format 'key: value' (with a single ':', found {len(line_split)-1} instead of 1)"
             model_id = line_split[0].strip()
             sampling_params_config_name = line_split[1].strip()
-            assert model_id not in model_default_sampling_params, (
-                "Invalid format in model_default_sampling_params.txt -> " f"model_id {model_id} is duplicated"
-            )
+            assert model_id not in model_default_sampling_params, f"Invalid format in model_default_sampling_params.txt -> model_id {model_id} is duplicated"
             if sampling_params_config_name != "default":
-                config_path = sampling_dir / f"{sampling_params_config_name}.json"
-                assert config_path.is_file(), (
-                    "Invalid format in model_default_sampling_params.txt -> "
-                    f"sampling_params_config_name ({sampling_params_config_name}.json) does not exist"
-                )
+                assert os.path.isfile(f"{sampling_params_dir}/{sampling_params_config_name}.json"), f"Invalid format in model_default_sampling_params.txt -> sampling_params_config_name ({sampling_params_config_name}.json) does not exist"
             model_default_sampling_params[model_id] = sampling_params_config_name
 
     # Update training_args.sampling_params_config_name (if needed)
@@ -319,17 +306,10 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
 
     # Update training_args.sampling_params_config (if needed)
     if training_args.sampling_params_config_name != "default":
-        config_path = sampling_dir / f"{training_args.sampling_params_config_name}.json"
-        with open(config_path, mode="r") as handle:
-            sampling_params = json.load(handle)
+        sampling_params = json.load(open(f"{sampling_params_dir}/{training_args.sampling_params_config_name}.json", mode='r'))
         training_args.sampling_params_config = sampling_params
     else:
         # Ensure sampling_params/default.json does not exist (the default should never be modified)
-        default_path = sampling_dir / "default.json"
-        assert not default_path.is_file(), (
-            "The file sampling_params/default.json exists. The global "
-            "default sampling_params can't be overwritten, please remove "
-            "this file (or put the config in a new file)."
-        )
+        assert not os.path.isfile(f"{sampling_params_dir}/default.json"), f"The file sampling_params/default.json exists. The global default sampling_params can't be overwritten, please remove this file (or put the config in a new file)."
 
     return training_args
