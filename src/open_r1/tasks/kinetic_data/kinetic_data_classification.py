@@ -1,5 +1,6 @@
 import os
 import pickle
+import random
 import re
 from typing import List
 
@@ -23,7 +24,7 @@ class KineticDataClassification(RLTask):
         Reason and estimate the reaction class for the following reaction.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
-        and finally put your final answer within \\boxed{{}}.
+        then end with </think>, and finally put your final answer within \\boxed{{}} tags, for example \\boxed{{M1}}.
 
         # Possible reaction classes
         // M1 Mechanism
@@ -87,6 +88,8 @@ class KineticDataClassification(RLTask):
         S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
         
         {}
+
+        <think>
         """
 
     def load(self) -> DatasetDict:
@@ -279,17 +282,70 @@ class KineticDataClassification(RLTask):
         answers = [self.preprocess_response(c) for c in completions]
         rewards = []
 
+        category_dict = {
+            "M1": 0,
+            "M2": 1,
+            "M3": 1,
+            "M4": 1,
+            "M5": 1,
+            "M6": 2,
+            "M7": 2,
+            "M8": 2,
+            "M9": 2,
+            "M10": 3,
+            "M11": 3,
+            "M12": 3,
+            "M13": 3,
+            "M14": 3,
+            "M15": 3,
+            "M16": 3,
+            "M17": 3,
+            "M18": 3,
+            "M19": 3,
+            "M20": 4,
+        }
+
         for answer, sol in zip(answers, solution):
+            # accuracy reward
             if sol == answer:
-                rewards.append(1)
+                accuracy_reward = 1
             else:
-                rewards.append(0)
+                accuracy_reward = 0
+
+            # sometimes the answer is None
+            if answer != "NONE":
+                if answer in category_dict.keys():
+                    # accuracy reward (category)
+                    if category_dict[sol] == category_dict[answer]:
+                        category_reward = 1
+                    else:
+                        category_reward = 0
+
+                    # class coverage reward
+                    class_coverage_reward = self.class_coverage_reward(answer)
+
+                    # data coverage reward
+                    data_coverage_reward = self.data_coverage_reward(answer)
+                else:
+                    category_reward = 0
+                    class_coverage_reward = 0
+                    data_coverage_reward = 0
+            else:
+                category_reward = 0
+                class_coverage_reward = 0
+                data_coverage_reward = 0
+
+            reward = (
+                0.5 * accuracy_reward
+                + 0.2 * category_reward
+                + 0.2 * class_coverage_reward
+                + 0.1 * data_coverage_reward
+            )
+            rewards.append(reward)
         return rewards
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
-        """Generate prompt for the MCQA task."""
         r1_prefix = [
-            {"role": "system", "content": self.system_prompt},
             {
                 "role": "user",
                 "content": self.question_template.format(problem),
@@ -321,16 +377,51 @@ class KineticDataClassification(RLTask):
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>(.*)<\/answer>"
+        pattern = r"\\boxed{(.*?)}"
         m = re.search(pattern, response, re.DOTALL)
         if m:
-            ans = m.groups()[0]
+            ans = m.groups()[-1]
             return ans
         else:
             return "NONE"
 
+    def class_coverage_reward(self, response):
+        # M1〜M20のうち、何種類に言及したか
+        classes_mentioned = set(re.findall(r"\bM\d+\b", response))
+        score_class_coverage = len(classes_mentioned) / 20
+        return score_class_coverage
 
-if __name__ == "__main__":
-    task = KineticDataClassification(dataset_id_or_path="/work/liac/kinetic")
-    task.load()
-    print(task.dataset)
+    def data_coverage_reward(self, response):
+        # データセットのうち、何種類に言及したか
+        data_mentioned = set(re.findall(r"data\s*([1-4])", response))
+        score_data_coverage = len(data_mentioned) / 4
+        return score_data_coverage
+
+    def format_reward(self, completions, **kwargs):
+        """
+        Format: <think>...</think>\boxed{}
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+
+        Returns:
+            list[float]: Reward scores
+        """
+        rewards = []
+
+        for completion in completions:
+            completion = "<think>" + completion
+            try:
+                if random.random() < 0.01:  # 1% chance to print a completion
+                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+
+                regex = r"<think>(.*?)</think>.*?\\boxed{(.*?)}"
+                match = re.search(regex, completion, re.DOTALL)
+                # if the format is not correct, reward is 0
+                if match is None or len(match.groups()) != 2:
+                    rewards.append(0.0)
+                else:
+                    rewards.append(1.0)
+            except Exception:
+                rewards.append(0.0)
+        return rewards
