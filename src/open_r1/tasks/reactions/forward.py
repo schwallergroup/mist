@@ -62,7 +62,7 @@ class ForwardReaction(SMILESBasedTask):
             self.question_template = (
                 "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n"
                 "<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES]. As a hint, I also provide the functional group information of each molecule:\n\t{}\n"
-                "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and make edits accordingly to the reactant SMILES to find the product.<|im_end|>\n"
+                "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and edits the reactant SMILES accordingly to find the product.<|im_end|>\n"
                 "<|im_start|>assistant\Response:\n"
                 "<think>"
             )
