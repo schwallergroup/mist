@@ -16,8 +16,7 @@
 # Argument 2: task name (in folder recipes)
 # Argument 3 (optional): job_id to continue training from (if none, the default is 0)
 # Argument 4 (optional): task mode
-# Argument 5 (optional): sampling_params config
-# Note: if you would like to use "task mode" without using "job_id" for example, you still need to pass the job_id parameter with the value 0
+# Note: if you would like to use "task mode" without using "job_id", you still need to pass the job_id parameter with the value 0
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
@@ -53,12 +52,10 @@ if [ "$TASK_MODE" != "base" ]; then
 else
     TASK_MODE_SUFFIX=""
 fi
-SAMPLING_PARAMS_CONFIG_NAME="${5:-default}"
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
 echo "RESUME_JOB_ID: ${RESUME_JOB_ID}"
 echo "TASK_MODE: ${TASK_MODE}"
-echo "SAMPLING_PARAMS_CONFIG_NAME: ${SAMPLING_PARAMS_CONFIG_NAME}"
 
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
@@ -88,14 +85,8 @@ export CMD=" \
     --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
     --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
-    --base_model_id=$MODEL_ID \
-    --task_recipe=${TASK}.yaml \
-    --task_recipe_suffix=$TASK_SUFFIX \
     --task_mode=$TASK_MODE \
-    --slurm_job_id=$SLURM_JOB_ID \
-    --slurm_resume_job_id=$RESUME_JOB_ID \
-    --sampling_params_config_name=$SAMPLING_PARAMS_CONFIG_NAME \
-"
+    "
 
 export LAUNCHER="conda deactivate;
 cd /Documents/sink;

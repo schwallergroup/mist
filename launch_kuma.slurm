@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
@@ -17,8 +17,7 @@
 # Argument 2: task name (in folder recipes)
 # Argument 3 (optional): job_id to continue training from (if none, the default is 0)
 # Argument 4 (optional): task mode
-# Argument 5 (optional): sampling_params config
-# Note: if you would like to use "task mode" without using "job_id" for example, you still need to pass the job_id parameter with the value 0
+# Note: if you would like to use "task mode" without using "job_id", you still need to pass the job_id parameter with the value 0
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
@@ -58,12 +57,10 @@ if [ "$TASK_MODE" != "base" ]; then
 else
     TASK_MODE_SUFFIX=""
 fi
-SAMPLING_PARAMS_CONFIG_NAME="${5:-default}"
 echo "MODEL ID: ${MODEL_ID}"
 echo "TASK: ${TASK}"
 echo "RESUME_JOB_ID: ${RESUME_JOB_ID}"
 echo "TASK_MODE: ${TASK_MODE}"
-echo "SAMPLING_PARAMS_CONFIG_NAME: ${SAMPLING_PARAMS_CONFIG_NAME}"
 
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
@@ -93,19 +90,27 @@ export CMD=" \
     --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
     --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
-    --base_model_id=$MODEL_ID \
-    --task_recipe=${TASK}.yaml \
-    --task_recipe_suffix=$TASK_SUFFIX \
     --task_mode=$TASK_MODE \
-    --slurm_job_id=$SLURM_JOB_ID \
-    --slurm_resume_job_id=$RESUME_JOB_ID \
-    --sampling_params_config_name=$SAMPLING_PARAMS_CONFIG_NAME \
-"
+    "
+
+export REQUESTS_CA_BUNDLE=/certs/cacert.pem
+export SSL_CERT_FILE=/certs/cacert.pem
 
 export LAUNCHER="cd /Documents/sink;
+apt-get update && apt-get install -y ca-certificates;
+update-ca-certificates;
+pip install --upgrade pip
 pip install hf_transfer rdkit levenshtein wandb gdown;
 pip install -e .;
 pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
+
+export PYTHONPATH=\$HOME/.local/lib/python3.12/site-packages:\$PYTHONPATH
+export HF_HUB_ENABLE_HF_TRANSFER=1
+export ACCELERATE_LOG_LEVEL=debug
+export TRANSFORMERS_VERBOSITY=debug
+export TRANSFORMERS_LOG_LEVEL=debug
+export PYTHONFAULTHANDLER=1
+
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
@@ -119,7 +124,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="SSL_CERT_FILE=/certs/cacert.pem wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
@@ -131,13 +136,15 @@ SRUN_ARGS=" \
     --kill-on-bad-exit=1 \
     --jobid $SLURM_JOB_ID \
     apptainer exec --nv \
-    --bind /scratch \
-    --bind /home \
-    --bind /work \
-    --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
-    --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
-    --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
-    ${CONTAINER_PATH} \
+        --bind /scratch \
+        --bind /home \
+        --bind /work \
+        --bind ${KUMA_FOLDER_LLM_MODELS}:/LLM_models \
+        --bind ${KUMA_FOLDER_DOCUMENTS}:/Documents \
+        --bind ${KUMA_FOLDER_CACHE}:/cache \
+        --bind /etc/ssl/certs:/etc/ssl/certs \
+        --bind /etc/pki:/etc/pki \
+        $CONTAINER_PATH \
 "
 
 clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
