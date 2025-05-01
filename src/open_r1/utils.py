@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import functools
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -52,6 +53,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             if os.path.isdir(self.logging_completions["save_completions_dir"]) is False:
                 os.makedirs(self.logging_completions["save_completions_dir"], exist_ok=True)
             def _reward_func_wrapper(reward_func):
+                @functools.wraps(reward_func)  # used to keep the original function name (reward_func.__name__)
                 def reward_func_wrapper(*args, **kwargs):
                     reward_key = f"_reward/{reward_func.__name__}"
                     assert reward_key not in kwargs, f"[ExtendedGRPOTrainer.__init__] reward_key ({reward_key}) should not be in kwargs"
@@ -111,8 +113,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             return None
 
         # Check the number of new completions
-        assert len(set([len(b) for b in self.logging_completions["buffer"]])) == 1, "[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same length for all logged completions"
-        n_new_completions = list(set([len(b) for b in self.logging_completions["buffer"]]))[0]
+        assert len(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b])) == 1, "[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same length for all logged completions"
+        n_new_completions = list(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b]))[0]
 
         # Merge self.logging_completions["buffer"] into logged_completions_buffer
         logged_completions_buffer = dict()
