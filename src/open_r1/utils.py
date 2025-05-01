@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import platform
 import functools
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -30,7 +31,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # Set up logging of good completions
         self.logging_completions = {
             "save_completions": args.save_completions,
-            "save_completions_dir": f"{args.save_completions_dir}/{args.slurm_job_id}",
+            "save_completions_dir": f"{args.save_completions_dir}/{args.slurm_job_id}/{platform.node()}",
             "save_completions_min_reward_threshold": args.save_completions_min_reward_threshold,
             "save_completions_min_reward_adaptive": False,
             "save_completions_top_reward_percentage": args.save_completions_top_reward_percentage,
