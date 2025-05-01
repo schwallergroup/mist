@@ -179,6 +179,76 @@ class Smiles2Name(RLTask):
                 rewards.append(0.0)
         return rewards
 
+    def format_continuous_reward(
+        self, completions, **kwargs
+    ):
+        """
+        Format: <think>...</think><answer>...</answer>
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+
+        Returns:
+            list[float]: Reward scores
+        """
+        # Reward goal: ensure a good format
+        # Reward range: -1 to 1
+
+        completions = self.preprocess_completions(completions)
+        rewards = []
+
+        for completion_id, completion in enumerate(completions):
+            current_reward = 0.0
+            try:
+                # 0.2 reward if each tag is present once
+                for tag_word in [
+                    "<think>",
+                    "</think>",
+                    "<answer>",
+                    "</answer>",
+                ]:
+                    if completion.count(tag_word) == 1:
+                        current_reward += 0.05
+                    else:
+                        current_reward -= 0.05
+                # 0.1 reward if the completion starts with <think> and ends with </answer>
+                if completion.startswith("<think>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                if completion.endswith("</answer>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                # 0.1 reward if the thinking is followed by an answer
+                if completion.count("</think>\n<answer>") == 1:
+                    current_reward += 0.1
+                else:
+                    current_reward -= 0.1
+                # 0.2 reward is the answer is present
+                pattern = r"<answer>(.*)<\/answer>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.2
+                elif len(match.groups()) != 1:
+                    current_reward -= 0.05
+                else:
+                    current_reward += 0.2
+                # 0.4 reward is the format is correct
+                pattern = r"<think>(.*)<\/think>\n<answer>(.*)<\/answer>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.4
+                elif len(match.groups()) != 2:
+                    current_reward -= 0.1
+                else:
+                    current_reward += 0.4
+            except:
+                pass
+            rewards.append(current_reward)
+
+        return rewards
+
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         if not response.startswith("<think>"):
