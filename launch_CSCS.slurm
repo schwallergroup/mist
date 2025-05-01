@@ -91,7 +91,7 @@ export CMD=" \
 
 export LAUNCHER="conda deactivate;
 cd /Documents/sink;
-pip install hf_transfer gdown levenshtein rdkit wandb;
+pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip uninstall trl -y;
 pip install -U transformers==4.48.2 pandas==2.0.0;
