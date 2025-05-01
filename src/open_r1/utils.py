@@ -239,7 +239,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     slurm_resume_job_id: str = "None"
     sampling_params_config_name: str = "default"
     sampling_params_config: Dict[str, Any] = field(default_factory=dict)
-    save_completions: bool = True
+    save_completions: bool = False
     save_completions_dir: str = "/Documents/sink_good_completions"
     save_completions_min_reward_threshold: float = None
     save_completions_top_reward_percentage: float = 0.1
