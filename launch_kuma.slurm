@@ -95,7 +95,7 @@ export CMD=" \
     "
 
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb gdown;
+pip install hf_transfer rdkit levenshtein wandb gdown exmol;
 pip install -e .;
 pip install -U transformers==4.48.2 pandas==2.0.0;
 pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release;

@@ -7,12 +7,21 @@ from typing import Any, Dict, Optional
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
+import exmol
 
 from open_r1.download_data import download_data
 
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_sim
 
+def tanimoto_score(mol1: str, mol2: str, beta=1):
+    if (
+        Chem.MolFromSmiles(mol1) is None
+        or Chem.MolFromSmiles(mol2) is None
+    ):
+        return 0.0
+    sim = tanimoto_sim(mol1, mol2)
+    return sim**beta
 
 class ForwardReaction(SMILESBasedTask):
     src_train_file: str = ""
@@ -36,28 +45,75 @@ class ForwardReaction(SMILESBasedTask):
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
         self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
         self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
-        # self.question_template = (
-        #     f"What is the product of the following reaction? Here are the reactants in SMILES notation: {self.begin_smiles_tag} {{}} {self.end_smiles_tag} "
-        #     "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
-        # )
-        self.question_template = (
-            "You are an organic chemistry expert, and I have a task for you. "
-            "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
-            "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
-            "Here are the reagents: [START_SMILES] {} [END_SMILES]. "
-            "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
-        )
+       
+        if self.task_mode == "base":
+            # self.question_template = (
+            #     "You are an organic chemistry expert, and I have a task for you. "
+            #     "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
+            #     "Show your reasoning in <think> </think> tags and return the final answer in <answer> </answer> tags. "
+            #     "Here are the reagents: [START_SMILES] {} [END_SMILES]. "
+            #     "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
+            # )
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+        elif self.task_mode == "tagged":
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+        
+        elif self.task_mode == "fg_tagged":
+            self.question_template = (
+                "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES]. As a hint, I also provide the functional group information of each molecule:\n\t{}\n"
+                "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and make edits accordingly to the reactant SMILES to find the product.<|im_end|>\n"
+                "<|im_start|>assistant\Response:\n"
+                "<think>"
+            )
+            
+        else:
+            raise ValueError(f"Unknown task mode: {self.task_mode}")
 
         self.custom_metrics = {
             "n_samples": 0,
             "n_waits": [],
-            "reasoning_score": [],
-            "answer_scores": [],
+            # "reasoning_tanimoto_score": [],
+            # "answer_scores": [],
+            "reasoning_reward": [],
+            "answer_reward": [],
+            "reasoning_tanimoto": [],
+            "answer_tanimoto": [],
         }
+    def _question_template_format_with_fgs(self, reactants: str):
+        reactant_list = reactants.split('.')
+        reactant_with_fgs = []
+        for reactant in reactant_list:
+            fgs = exmol.get_functional_groups(reactant)
+            if fgs:
+                if 'tagged' in self.task_mode:
+                    reactant_with_fgs.append(f'[START_SMILES] {reactant} [END_SMILES]: {", ".join(fgs)}')
+                else:
+                    reactant_with_fgs.append(f'{reactant}: {", ".join(fgs)}')
+        reactant_with_fgs = '\n\t'.join(reactant_with_fgs)
+        return self.question_template.format(reactants, reactant_with_fgs)
+        
+    
+    def _extract_smiles_in_tags(self, completion: str):
+        smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
+        smiles = [s.replace(" ", "") for s in smiles]
+        return smiles
+    
+    def question_template_format(self, reactants: str):
+        if 'fg' in self.task_mode:
+            return self._question_template_format_with_fgs(reactants)
+        else:
+            return self.question_template.format(reactants)
+    
+    def extract_smiles(self, completion: str):
+        if self.task_mode == 'base':
+            return super().extract_smiles(completion)
+        elif 'tagged' in self.task_mode:
+            return self._extract_smiles_in_tags(completion)
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
         prompt = {
-            "prompt": self.question_template.format(problem),
+            "prompt": problem,
             "problem": problem,
         }
 
@@ -77,8 +133,8 @@ class ForwardReaction(SMILESBasedTask):
         """Read source and target files and create dataset dictionary."""
         with open(src_file, "r", encoding="utf-8") as f:
             problems = [
-                # self.question_template.format(self.process_line(line))
-                self.process_line(line)
+                self.question_template_format(self.process_line(line))
+                # self.process_line(line)
                 for line in f.readlines()
             ]
 
@@ -118,56 +174,69 @@ class ForwardReaction(SMILESBasedTask):
         )
 
         return self.dataset
+    
+    def extract_smiles_from_response(self, reasoning: str, prompt: str=None):
+        smiles = self.extract_smiles(reasoning)
+        if prompt is None:
+            return smiles
+        smiles_prompt = self.extract_smiles(prompt)
+        smiles_prompt_flatten = [s for smiles in smiles_prompt for s in smiles.split('.')]
+        smiles_prompt.extend(smiles_prompt_flatten)
+        smiles = [s for s in smiles if s not in smiles_prompt]
+        return smiles
 
     def extract_smiles_from_answer(self, answer, prompt):
         """To prevent the longest smiles in answer turns out to be the copy of the starting reagents"""
-        answer_smiles = self.extract_smiles(answer)
-        input_smiles = self.extract_smiles(prompt)
-        input_smiles_flatten = [s for smiles in input_smiles for s in smiles.split('.')]
+        answer_smiles = self.extract_smiles_from_response(answer, prompt)
+        # input_smiles = self.extract_smiles(prompt)
+        # input_smiles_flatten = [s for smiles in input_smiles for s in smiles.split('.')]
         
-        answer_smiles = [s for s in answer_smiles if s not in input_smiles and s not in input_smiles_flatten]
+        # answer_smiles = [s for s in answer_smiles if s not in input_smiles and s not in input_smiles_flatten]
         answer_smiles = max(answer_smiles, key=len) if answer_smiles else None
         return answer_smiles
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
 
-        def _calc_score(mol1: str, mol2: str, beta=20):
-            if (
-                Chem.MolFromSmiles(mol1) is None
-                or Chem.MolFromSmiles(mol2) is None
-            ):
-                return 0.0
-            sim = tanimoto_sim(mol1, mol2)
-            return sim**beta
+        
 
         rewards = []
 
         for completion, ref, prompt in zip(completions, solution, prompts):
             reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
-            reasoning_smiles = self.extract_smiles(reasoning)
-            scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
-            max_score = max(scores) if scores else -0.5
+            reasoning_smiles = self.extract_smiles_from_response(reasoning, prompt)
+            reasoning_tanimoto_scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
+            max_reasoning_tanimoto_score = max(reasoning_tanimoto_scores) if reasoning_tanimoto_scores else -0.5
             best_smiles_reasoning = (
-                reasoning_smiles[scores.index(max_score)]
-                if max_score in scores
+                reasoning_smiles[reasoning_tanimoto_scores.index(max_reasoning_tanimoto_score)]
+                if max_reasoning_tanimoto_score in reasoning_tanimoto_scores
                 else "None"
             )
-            reasoning_score = max_score
-            if reasoning_score == 1.0:
-                reasoning_score += (
-                    1.0  # massive bonus for truly correct reasoning
-                )
+            reasoning_tanimoto_score = max_reasoning_tanimoto_score
+            if reasoning_tanimoto_score == 1.0:
+                # reasoning_tanimoto_score += (
+                #     1.0  # massive bonus for truly correct reasoning
+                # )
+                reasoning_reward = 1.0
+            elif reasoning_tanimoto_score < 0:
+                reasoning_reward = -1  # no SMILES found
+            else:
+                reasoning_reward = -0.5 # SMILES found but not correct
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer, prompt)
-            answer_score = (
-                _calc_score(answer_smiles, ref) if answer_smiles else 0
+            answer_tanimoto_score = (
+                tanimoto_score(answer_smiles, ref) if answer_smiles else -0.5
             )
-            if answer_score == 1.0:
-                answer_score += 1.0  # massive bonus for truly correct answer
+            if answer_tanimoto_score == 1.0:
+                # answer_tanimoto_score += 1.0  # massive bonus for truly correct answer
+                answer_reward = 1.0
+            elif answer_tanimoto_score < 0:
+                answer_reward = -1
+            else:
+                answer_reward = -0.5
 
-            reward = reasoning_score + answer_score
+            reward = reasoning_reward + answer_reward
 
             answer_smiles = answer_smiles if answer_smiles else "None"
             self.random_log = {
@@ -175,9 +244,11 @@ class ForwardReaction(SMILESBasedTask):
                 "reference": ref,
                 "answer": answer_smiles,
                 "best_smiles_in_reasoning": best_smiles_reasoning,
-                "reasoning_score [0, 2]": reasoning_score,
-                "answer_score [0, 2]": answer_score,
-                "accuracy_reward [0, 4]": reward,
+                "reasoning_tanimoto_score [0, 1]": reasoning_tanimoto_score,
+                "answer_tanimoto_score [0, 1]": answer_tanimoto_score,
+                "reasoning_reward [-0.5, 1]": reasoning_reward,
+                "answer_reward [-0.5, 1]": answer_reward,
+                "accuracy_reward [-1, 2]": reward,
                 "full_completion": completion,
             }
 
@@ -190,8 +261,10 @@ class ForwardReaction(SMILESBasedTask):
 
             self.custom_metrics["n_samples"] += 1
             self.custom_metrics["n_waits"].append(self.count_waits(completion))
-            self.custom_metrics["reasoning_score"].append(reasoning_score)
-            self.custom_metrics["answer_scores"].append(answer_score)
+            self.custom_metrics["reasoning_reward"].append(reasoning_reward)
+            self.custom_metrics["answer_reward"].append(answer_reward)
+            self.custom_metrics["reasoning_tanimoto"].append(reasoning_tanimoto_score)
+            self.custom_metrics["answer_tanimoto"].append(answer_tanimoto_score)
 
         return rewards
 
