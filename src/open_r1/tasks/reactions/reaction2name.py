@@ -107,35 +107,36 @@ class Smiles2Name(RLTask):
             reward = 0.0
 
             if any(ans.lower() == gold.lower() for ans in answers):
-                reward = 1.0
-                print("======= FULL_COMPLETION_CORRECT =======")
-                print(f"All Completion:   {completion}")
-                print(f"All answers:   {answers}")
-                print(f"Selected ans:  {selected!r}")
-                print(f"Ground truth:  {gold!r}\n")
+                reward = 1.0 / len(answers)
+                if random() < 0.1:
+                    print("======= FULL_COMPLETION_CORRECT =======")
+                    print(f"All Completion:   {completion}")
+                    print(f"All answers:   {answers}")
+                    print(f"Selected ans:  {selected!r}")
+                    print(f"Ground truth:  {gold!r}\n")
 
             else:
                 matching = [ans for ans in answers if ans.lower() in lc_choices]
                 if matching:
                     reward = 0.2
-                    print("======= FULL_COMPLETION_VALID_CHOICE =======")
-                    print(f"All Completion:   {completion}")
-                    print(f"All answers:       {answers}")
-                    print(f"Valid choices hit: {matching}")
-                    print(f"Selected ans:      {selected!r}")
-                    print(f"Ground truth:      {gold!r}\n")
+                    if random() < 0.02:
+                        print("======= FULL_COMPLETION_VALID_CHOICE =======")
+                        print(f"All Completion:   {completion}")
+                        print(f"All answers:       {answers}")
+                        print(f"Valid choices hit: {matching}")
+                        print(f"Selected ans:      {selected!r}")
+                        print(f"Ground truth:      {gold!r}\n")
 
                 else:
                     reward = -0.2
-
-                    if random() < 0.05:
+                    if random() < 0.01:
                         print("======= FULL_COMPLETION_INVALID =======")
                         print(f"All Completion:   {completion}")
                         print(f"All answers:  {answers}")
                         print(f"Selected ans: {selected!r}")
                         print(f"Ground truth: {gold!r}\n")
             
-            # Reward if metnioning the correct classes
+            # Reward if mentioning the correct classes
             tm = re.search(r"<think>(.*?)</think>", completion, re.DOTALL)
             if tm:
                 think_text = tm.group(1).lower()
