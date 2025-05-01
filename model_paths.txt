@@ -15,5 +15,3 @@ Qwen2.5-3B_pretrained-v2:		/LLM_models/Qwen2.5-3B_pretrained-v2
 Qwen2.5-3B_pretrained-v3:		/LLM_models/Qwen2.5-3B_pretrained-v3
 Qwen2.5-3B_pretrained-v4-cot:		/LLM_models/Qwen2.5-3B_pretrained-v4-cot
 Qwen2.5-3B_pretrained-v5-1:             /LLM_models/Qwen2.5-3B_pretrained-v5-1
-qwen_sft_full:				/LLM_models/qwen_sft_full
-qwen_r1:				/work/liac/qwen_r1
