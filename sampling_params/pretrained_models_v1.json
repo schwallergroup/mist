@@ -2,5 +2,5 @@
     "stop_token_ids": [151643, 151644, 151645, 151665],
     "top_p": 0.8,
     "top_k": 20,
-    "repetition_penalty": 1.0,
+    "repetition_penalty": 1.0
 }
