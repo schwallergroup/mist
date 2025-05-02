@@ -7,7 +7,8 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: rxnpred
-dataset_id_or_path: ${MIST_DATA_DIR}/rxnpred/USPTO_480k_clean
+dataset_id_or_path: /data/CRLLM-PubChem/CRLLM-PubChem-compounds1M.csv
+#dataset_id_or_path: /cache/data/
 
 # Lora Arguments
 # No LoRA is used here
