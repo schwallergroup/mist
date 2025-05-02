@@ -3,8 +3,8 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
     --main_process_port 29501 \
     --num_processes 1 \
     src/open_r1/run_r1_grpo.py \
-    --config recipes/rxnpred.test.yaml \
-    --task_mode fg_tagged \
+    --config recipes/iupacsm.test.yaml \
+    --task_mode tagged \
     --model_name_or_path Qwen/Qwen2.5-0.5B \
     --output_dir output/grpo \
-    --dataset_id_or_path /home/vu/Documents/open-r1/data/USPTO_480k_clean_no_sft[]
+    --dataset_id_or_path /home/vu/Documents/open-r1/data/CRLLM-PubChem-compounds1M-simple.csv

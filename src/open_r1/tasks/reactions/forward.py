@@ -14,16 +14,16 @@ from tqdm import tqdm
 from open_r1.download_data import download_data
 
 from ..base import RLTask, SMILESBasedTask
-from .utils import tanimoto_sim
+from .utils import tanimoto_score
 
-def tanimoto_score(mol1: str, mol2: str, beta=1):
-    if (
-        Chem.MolFromSmiles(mol1) is None
-        or Chem.MolFromSmiles(mol2) is None
-    ):
-        return 0.0
-    sim = tanimoto_sim(mol1, mol2)
-    return sim**beta
+# def tanimoto_score(mol1: str, mol2: str, beta=1):
+#     if (
+#         Chem.MolFromSmiles(mol1) is None
+#         or Chem.MolFromSmiles(mol2) is None
+#     ):
+#         return 0.0
+#     sim = tanimoto_sim(mol1, mol2)
+#     return sim**beta
 
 class ForwardReaction(SMILESBasedTask):
     src_train_file: str = ""
@@ -79,16 +79,16 @@ class ForwardReaction(SMILESBasedTask):
         else:
             raise ValueError(f"Unknown task mode: {self.task_mode}")
 
-        self.custom_metrics = {
-            "n_samples": 0,
-            "n_waits": [],
-            # "reasoning_tanimoto_score": [],
-            # "answer_scores": [],
-            "reasoning_reward": [],
-            "answer_reward": [],
-            "reasoning_tanimoto": [],
-            "answer_tanimoto": [],
-        }
+        # self.custom_metrics = {
+        #     "n_samples": 0,
+        #     "n_waits": [],
+        #     # "reasoning_tanimoto_score": [],
+        #     # "answer_scores": [],
+        #     "reasoning_reward": [],
+        #     "answer_reward": [],
+        #     "reasoning_tanimoto": [],
+        #     "answer_tanimoto": [],
+        # }
     def _question_template_format_with_fgs(self, reactants: str):
         # mol_to_fgs = {}
         # if os.path.exists(self.mol_to_fgs_file):
@@ -114,22 +114,17 @@ class ForwardReaction(SMILESBasedTask):
         return self.question_template.format(reactants, reactant_with_fgs)
         
     
-    def _extract_smiles_in_tags(self, completion: str):
-        smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
-        smiles = [s.replace(" ", "") for s in smiles]
-        return smiles
-    
     def question_template_format(self, reactants: str):
         if 'fg' in self.task_mode:
             return self._question_template_format_with_fgs(reactants)
         else:
             return self.question_template.format(reactants)
     
-    def extract_smiles(self, completion: str):
-        if self.task_mode == 'base':
-            return super().extract_smiles(completion)
-        elif 'tagged' in self.task_mode:
-            return self._extract_smiles_in_tags(completion)
+    # def extract_smiles(self, completion: str):
+    #     if 'tagged' in self.task_mode:
+    #         return self._extract_smiles_in_tags(completion)
+    #     else:
+    #         return super().extract_smiles(completion)
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
         prompt = {
@@ -288,16 +283,16 @@ class ForwardReaction(SMILESBasedTask):
 
         return rewards
 
-    def get_metrics(self):
-        metrics = {}
-        if self.custom_metrics['n_samples'] > 0:
-            metrics['n_samples'] = self.custom_metrics['n_samples']
-            for k, v in self.custom_metrics.items():
-                if k != 'n_samples':
-                    metrics[k] = sum(v) / len(v)
-                    self.custom_metrics[k] = []
+    # def get_metrics(self):
+    #     metrics = {}
+    #     if self.custom_metrics['n_samples'] > 0:
+    #         metrics['n_samples'] = self.custom_metrics['n_samples']
+    #         for k, v in self.custom_metrics.items():
+    #             if k != 'n_samples':
+    #                 metrics[k] = sum(v) / len(v)
+    #                 self.custom_metrics[k] = []
         
-        return metrics
+    #     return metrics
 
 class ForwardReactionWithTags(ForwardReaction):
     def __init__(self, **kwargs):

@@ -14,3 +14,12 @@ def tanimoto_sim(mol1, mol2):
     )
 
     return DataStructs.TanimotoSimilarity(fp1, fp2)
+
+def tanimoto_score(mol1: str, mol2: str, beta=1):
+    if (
+        Chem.MolFromSmiles(mol1) is None
+        or Chem.MolFromSmiles(mol2) is None
+    ):
+        return 0.0
+    sim = tanimoto_sim(mol1, mol2)
+    return sim**beta

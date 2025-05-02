@@ -203,6 +203,14 @@ class RLTask(BaseModel):
 
 
 class SMILESBasedTask(RLTask):
+    custom_metrics: dict = {
+        "n_samples": 0,
+        "n_waits": [],
+        "reasoning_reward": [],
+        "answer_reward": [],
+        "reasoning_tanimoto": [],
+        "answer_tanimoto": [],
+    }
     def _post_process_smiles(self, smiles):
         smiles = re.sub(r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles)
         smiles = re.sub(r"\[CH\d?\]", "C", smiles)
@@ -213,7 +221,7 @@ class SMILESBasedTask(RLTask):
         )
         return smiles
 
-    def extract_smiles(self, completion: str, **kwargs):
+    def _extract_smiles_by_rdkit(self, completion: str, **kwargs):
 
         excluded_smiles = set(("I"))
         words = completion.split()
@@ -225,6 +233,17 @@ class SMILESBasedTask(RLTask):
         smiles = [self._post_process_smiles(s) for s in smiles]
         smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
         return smiles
+    
+    def _extract_smiles_in_tags(self, completion: str, **kwargs):
+        smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
+        smiles = [s.replace(" ", "") for s in smiles]
+        return smiles
+    
+    def extract_smiles(self, completion: str, **kwargs):
+        if 'tagged' in self.task_mode:
+            return self._extract_smiles_in_tags(completion, **kwargs)
+        else:
+            return self._extract_smiles_by_rdkit(completion, **kwargs)
 
     def extract_smiles_from_answer(self, answer: str, **kwargs):
         """Extract the longest SMILES from the answer"""
@@ -242,3 +261,14 @@ class SMILESBasedTask(RLTask):
             return m.groups()[1]
         else:
             return "NONE"
+        
+    def get_metrics(self):
+        metrics = {}
+        if self.custom_metrics['n_samples'] > 0:
+            metrics['n_samples'] = self.custom_metrics['n_samples']
+            for k, v in self.custom_metrics.items():
+                if k != 'n_samples':
+                    metrics[k] = sum(v) / len(v)
+                    self.custom_metrics[k] = []
+        
+        return metrics

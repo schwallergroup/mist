@@ -9,7 +9,7 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
 from ..base import RLTask, SMILESBasedTask
-from .utils import tanimoto_sim
+from .utils import tanimoto_score
 
 
 class Iupac2Smiles(SMILESBasedTask):
@@ -21,20 +21,32 @@ class Iupac2Smiles(SMILESBasedTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = (
-            "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
-            "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
-            # "What is the SMILES for this molecule? {}. "
-            "Here is the IUPAC name: {}.\n"
-            # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
-        )
+        if self.task_mode == 'base':
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following IUPAC name of a molecule, please write the molecule in SMILES notation. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and write the following molecule in SMILES notation: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+        
+        elif self.task_mode == 'tagged':
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following IUPAC name of a molecule, please write the molecule in SMILES notation. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and write the following molecule in SMILES notation: [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+            
+        elif self.task_mode == 'no_instruct':
+            self.question_template = (
+                "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
+                "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
+                # "What is the SMILES for this molecule? {}. "
+                "Here is the IUPAC name: {}.\n"
+                # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
+            )
+        else:
+            raise ValueError(
+                f"Unknown task mode: {self.task_mode}. Supported modes: base, tagged, no_instruct"
+            )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
-        self.custom_metrics = {
-            "n_samples": 0,
-            "n_waits": [],
-            "reasoning_score": [],
-            "answer_scores": [],
-        }
+        
+        # self.custom_metrics = {
+        #     "n_samples": 0,
+        #     "n_waits": [],
+        #     "reasoning_score": [],
+        #     "answer_scores": [],
+        # }
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
         prompt = {
@@ -69,30 +81,24 @@ class Iupac2Smiles(SMILESBasedTask):
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
-        # def tanimoto_sim(mol1, mol2):
-        #     mol1 = Chem.MolFromSmiles(mol1)
-        #     mol2 = Chem.MolFromSmiles(mol2)
-
-        #     fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, radius=2, useChirality=True)
-        #     fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, radius=2, useChirality=True)
 
         #     return DataStructs.TanimotoSimilarity(fp1, fp2)
 
-        def _calc_score(mol1: str, mol2: str, beta=10):
-            if (
-                Chem.MolFromSmiles(mol1) is None
-                or Chem.MolFromSmiles(mol2) is None
-            ):
-                return 0.0
-            sim = tanimoto_sim(mol1, mol2)
-            return sim**beta
+        # def _calc_score(mol1: str, mol2: str, beta=10):
+        #     if (
+        #         Chem.MolFromSmiles(mol1) is None
+        #         or Chem.MolFromSmiles(mol2) is None
+        #     ):
+        #         return 0.0
+        #     sim = tanimoto_sim(mol1, mol2)
+        #     return sim**beta
 
         rewards = []
 
         for completion, ref, prompt in zip(completions, solution, prompts):
             reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
             reasoning_smiles = self.extract_smiles(reasoning)
-            scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
+            scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
             best_smiles_reasoning = (
                 reasoning_smiles[scores.index(max_score)]
@@ -101,19 +107,25 @@ class Iupac2Smiles(SMILESBasedTask):
             )
             reasoning_score = max_score
             if reasoning_score == 1.0:
-                reasoning_score += (
-                    1.0  # massive bonus for truly correct reasoning
-                )
+                reasoning_reward = 1.0
+            elif reasoning_score < 0:
+                reasoning_reward = -1
+            else:
+                reasoning_reward = -0.5
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer)
             answer_score = (
-                _calc_score(answer_smiles, ref) if answer_smiles else 0
+                tanimoto_score(answer_smiles, ref) if answer_smiles else 0
             )
             if answer_score == 1.0:
-                answer_score += 1.0  # massive bonus for truly correct answer
+                answer_reward += 1.0  # massive bonus for truly correct answer
+            elif answer_score < 0:
+                answer_reward = -1
+            else:
+                answer_reward = -0.5
 
-            reward = reasoning_score + answer_score
+            reward = reasoning_reward + answer_reward
 
             answer_smiles = answer_smiles if answer_smiles else "None"
             self.random_log = {
@@ -121,22 +133,27 @@ class Iupac2Smiles(SMILESBasedTask):
                 "reference": ref,
                 "answer": answer_smiles,
                 "best_smiles_in_reasoning": best_smiles_reasoning,
-                "reasoning_score [0, 2]": reasoning_score,
-                "answer_score [0, 2]": answer_score,
-                "accuracy_reward [0, 4]": reward,
+                "reasoning_tanimoto_score [0, 1]": reasoning_score,
+                "answer_tanimoto_score [0, 1]": answer_score,
+                "reasoning_reward [-0.5, 1]": reasoning_reward,
+                "answer_reward [-0.5, 1]": answer_reward,
+                "accuracy_reward [-1, 2]": reward,
                 "full_completion": completion,
             }
 
-            self.random_print(self.random_log)
             if reward > 0.3:
                 self.good_print(self.random_log)
+            else:
+                self.random_print(self.random_log)
 
             rewards.append(reward)
 
             self.custom_metrics["n_samples"] += 1
             self.custom_metrics["n_waits"].append(self.count_waits(completion))
-            self.custom_metrics["reasoning_score"].append(reasoning_score)
-            self.custom_metrics["answer_scores"].append(answer_score)
+            self.custom_metrics["reasoning_reward"].append(reasoning_reward)
+            self.custom_metrics["answer_reward"].append(answer_reward)
+            self.custom_metrics["reasoning_tanimoto"].append(reasoning_score)
+            self.custom_metrics["answer_tanimoto"].append(answer_score)
 
         return rewards
 
@@ -201,8 +218,8 @@ class Iupac2Smiles(SMILESBasedTask):
         else:
             return "NONE"
 
-    def get_metrics(self):
-        return super().get_metrics()
+    # def get_metrics(self):
+    #     return super().get_metrics()
 
 
 class Iupac2SmilesWithTags(Iupac2Smiles):
