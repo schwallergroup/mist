@@ -7,13 +7,13 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: kinetic
-dataset_id_or_path: /work/liac/kinetic
+dataset_id_or_path: /data/kinetic
 rewards:
 - format
 - accuracy
 
 # Training arguments
-max_steps: 900
+max_steps: 2000
 per_device_train_batch_size: 1
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
@@ -24,8 +24,8 @@ lr_scheduler_type: cosine
 warmup_ratio: 0.03
 # GRPO specific parameters
 beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
-max_prompt_length: 256
-max_completion_length: 1024
+max_prompt_length: 1000
+max_completion_length: 4000
 num_generations: 8
 use_vllm: true
 vllm_device: "cuda:3"

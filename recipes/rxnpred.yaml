@@ -7,14 +7,14 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: rxnpred
-dataset_id_or_path: /work/liac/sink/data/rxn_pred/USPTO_480k_clean_no_sft/
+dataset_id_or_path: /data/USPTO/USPTO_base
 rewards:
 - format
 - accuracy
 # - reasoning_steps
 # - tanimoto_accuracy
 
-#dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
+#dataset_id_or_path: /data/CRLLM-PubChem/CRLLM-PubChem-compounds1M.csv
 
 # Lora Arguments
 # No LoRA is used here

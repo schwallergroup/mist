@@ -39,6 +39,7 @@ if __name__ == "__main__":
                 f'  "/iopsstor",\n'
                 f'  "/users",\n'
                 f'  "/iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/:/LLM_models",\n'
+                f'  "/iopsstor/store/cscs/swissai/a05/LIAC/data/:/data",\n'
                 f'  "{path_Documents}/:/Documents",\n'
                 f'  "/iopsstor/scratch/cscs/{username}/.cache/:/cache",\n'
                 f"]\n"

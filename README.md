@@ -40,7 +40,7 @@ sbatch launch.slurm Qwen2.5-3B rxnpred 123456
 sbatch launch.slurm Qwen2.5-3B rxnpred 0
 ```
 
-A final fourth optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
+A fourth optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
 - If you would like to process the dataset in a different manner.
 - If you would like to apply different chat templates / prompt templates.
 - If you would like to compute the rewards in a different manner.
@@ -59,16 +59,29 @@ sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
 sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
 ```
 
+A fifth optional parameter is `[SAMPLING_PARAMS_CONFIG_NAME]`, it can be used if you would like to use a specific sampling parameters configuration file during an experiment (it will overwrite the default sampling parameters).
+- You can check the documentation about the "Sampling parameters" in the documentation for more information.
+- This parameter should be the name of the sampling parameters configuration file (without the suffix `.json`). These files are found in the folder `sampling_params/`.
+```bash
+sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE] [SAMPLING_PARAMS_CONFIG_NAME]
+
+# Example: launch a job for training Qwen2.5-3B_pretrained-v4-cot as specified in recipes/rxnpred.yaml, running from scratch with task mode "base" and uusing the sampling parameters specified in sampling_params/pretrained_models_v1.json
+sbatch launch.slurm Qwen2.5-3B_pretrained-v4-cot rxnpred 0 base pretrained_models_v1
+```
+
 Since the default values are:
 - `[RESUME_JOB_ID]` = 0 (start from scratch)
 - `[TASK_MODE]` = "base" (base task mode)
+- `[SAMPLING_PARAMS_CONFIG_NAME]` = "default" (default sampling parameters)
 
-The 3 following commands are equivalent:
+The 4 following commands are equivalent:
 ```bash
 sbatch launch.slurm Qwen2.5-3B rxnpred
 sbatch launch.slurm Qwen2.5-3B rxnpred 0
 sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
+sbatch launch.slurm Qwen2.5-3B rxnpred 0 base default
 ```
+As a final note, remind that the parameter order is important. If you want to use the last parameters, it is necessary to specify the previous parameters as well (you can use the default values written above).
 
 ## 📖 Documentation
 
@@ -221,8 +234,6 @@ task_kwargs:
     - This argument is optional and can be omitted in the recipe file if you don't need it.
 5. There are many other training parameters in the recipe file, you can keep the default values (as in `recipes/template.yaml`) but feel free to modify them if you need it (however it could lead to unexpected results or crashes). If you just built your task, it's recommended to keep the default parameters, ensure that your task is working and then modify these parameters to your needs.
 
-```yaml
-
 ### Task Requirements
 
 When creating a new task, ensure:
@@ -252,3 +263,36 @@ When creating a new task, ensure:
 
 For detailed examples and API reference, please check the [documentation](link-to-docs).
 
+### Models
+The list of models can be found in the file `model_paths.txt`.
+- The models are stored in the folder `LLM_models/`.
+- If you want to add a new model, you can add it in the file `model_paths.txt` (in a new line with the format `[model_id]: [path]`) and add the model in the appropriate folder (`LLM_models`).
+
+Multiple custom models were pretrained:
+- Qwen2.5-3B_pretrained-v1
+  - Original name: qwen_3b_pretrained
+- Qwen2.5-3B_pretrained-v1_cot-v1
+  - Original name: qwen-cot
+- Qwen2.5-3B_pretrained-v2
+  - Original name: qwen_3b_sft
+- Qwen2.5-3B_pretrained-v3
+  - Original name: qwen_sft_full
+- Qwen2.5-3B_pretrained-v4-cot
+  - Original name: qwen_cot_v3
+- Qwen2.5-3B_pretrained-v5
+  - qwen_v5
+- Qwen2.5-3B_pretrained-v6-1
+  - Original name: step_12000
+- Qwen2.5-3B_pretrained-v6-2
+  - Original name: step_22000
+- Qwen2.5-3B_pretrained-v6-3
+  - Original name: step_32000
+
+### Sampling parameters
+It is possible to modify the sampling parameters used during the training by writing configurations in the folder `sampling_params/`:
+- `sampling_params/model_default_sampling_params.txt`: This file contains the default sampling parameters configurations used for the models. The line format is the following: `[model_id]: [sampling_params_config_name]`. It is optional, if a model is not specified, it means that the default sampling parameters will be used.
+  - **/!\ The default sampling parameters should only be modified when adding a new model and never modified afterwards (for experiment tracking purposes).**
+  - The default sampling parameters have been modified for custom pretrained models that specifically need a different configuration (these models can't be used with the default configuration).
+- `sampling_params/*.json`: These files contain the sampling parameters configurations.
+  - **/!\ The 'default' configuration is a reserved keyword. You can't create a file called `sampling_params/default.json`. Please use a different naming, the default configuration should never be modified.**
+  - You can create a new configuration file if you want to experiment with different sampling parameters. In that case, do not modify the file `sampling_params/model_default_sampling_params.txt` which contain the default configurations only. You can give the name of your sampling parameters configuration (without the suffix '.json') during the launch of the SLURM job (see above in the launch.slurm section at the start of the documentation).

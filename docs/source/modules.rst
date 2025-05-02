@@ -13,3 +13,4 @@ Modules Reference
    tasks/smhydrogen
    tasks/kinetic
    tasks/template
+   tasks/smi_permute
