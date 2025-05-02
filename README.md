@@ -279,6 +279,14 @@ Multiple custom models were pretrained:
   - Original name: qwen_sft_full
 - Qwen2.5-3B_pretrained-v4-cot
   - Original name: qwen_cot_v3
+- Qwen2.5-3B_pretrained-v5
+  - qwen_v5
+- Qwen2.5-3B_pretrained-v6-1
+  - Original name: step_12000
+- Qwen2.5-3B_pretrained-v6-2
+  - Original name: step_22000
+- Qwen2.5-3B_pretrained-v6-3
+  - Original name: step_32000
 
 ### Sampling parameters
 It is possible to modify the sampling parameters used during the training by writing configurations in the folder `sampling_params/`:

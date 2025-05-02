@@ -85,6 +85,7 @@ export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
 export NCCL_TREE_THRESHOLD=0
 export CUDA_LAUNCH_BLOCKING=1
+export SSL_CERT_FILE="cacert.pem"
 
 
 export CMD=" \
@@ -103,7 +104,7 @@ export CMD=" \
 "
 
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb gdown;
+pip install hf_transfer rdkit levenshtein wandb gdown exmol;
 pip install -e .;
 pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
@@ -135,6 +136,7 @@ SRUN_ARGS=" \
     --bind /home \
     --bind /work \
     --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
+    --mount type=bind,src=${KUMA_FOLDER_DATA},dst=/data \
     --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
     --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
     ${CONTAINER_PATH} \
