@@ -34,7 +34,7 @@ class ForwardReaction(SMILESBasedTask):
     mol_to_fgs: Dict[str, str] = {}
     question_template: str = ""
 
-    custom_metrics: Dict[str, Any] = {}
+    # custom_metrics: Dict[str, Any] = {}
     random_log: Dict[str, Any] = {}
     printed_sample_prompt: bool = False
 

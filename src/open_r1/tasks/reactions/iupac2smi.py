@@ -15,17 +15,17 @@ from .utils import tanimoto_score
 class Iupac2Smiles(SMILESBasedTask):
     question_template: str = ""
 
-    custom_metrics: Dict[str, Any] = {}
+    # custom_metrics: Dict[str, Any] = {}
     random_log: Dict[str, Any] = {}
     printed_sample_prompt: bool = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if self.task_mode == 'base':
-            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following IUPAC name of a molecule, please write the molecule in SMILES notation. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and write the following molecule in SMILES notation: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
         
         elif self.task_mode == 'tagged':
-            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following IUPAC name of a molecule, please write the molecule in SMILES notation. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and write the following molecule in SMILES notation: [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
             
         elif self.task_mode == 'no_instruct':
             self.question_template = (
