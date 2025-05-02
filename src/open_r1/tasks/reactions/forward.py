@@ -31,6 +31,7 @@ class ForwardReaction(SMILESBasedTask):
     src_test_file: str = ""
     tgt_test_file: str = ""
     mol_to_fgs_file: str = ""
+    mol_to_fgs: Dict[str, str] = {}
     question_template: str = ""
 
     custom_metrics: Dict[str, Any] = {}
@@ -50,6 +51,9 @@ class ForwardReaction(SMILESBasedTask):
         self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         
         self.mol_to_fgs_file = os.path.join(self.dataset_id_or_path, "fgs.csv")
+        if os.path.exists(self.mol_to_fgs_file):
+            mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
+            self.mol_to_fgs = {row.smiles: row.fgs.split('.') for row in mol_to_fgs_df.itertuples()}
        
         if self.task_mode == "base":
             # self.question_template = (
@@ -67,7 +71,7 @@ class ForwardReaction(SMILESBasedTask):
             self.question_template = (
                 "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n"
                 "<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES]. As a hint, I also provide the functional group information of each molecule:\n\t{}\n"
-                "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and edits the reactant SMILES accordingly to find the product.<|im_end|>\n"
+                "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and editing the reactant SMILES accordingly to find the product.<|im_end|>\n"
                 "<|im_start|>assistant\Response:\n"
                 "<think>"
             )
@@ -86,21 +90,21 @@ class ForwardReaction(SMILESBasedTask):
             "answer_tanimoto": [],
         }
     def _question_template_format_with_fgs(self, reactants: str):
-        mol_to_fgs = {}
-        if os.path.exists(self.mol_to_fgs_file):
-            mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
-            for row in mol_to_fgs_df.itertuples():
-                mol_to_fgs[row.smiles] = row.fgs
+        # mol_to_fgs = {}
+        # if os.path.exists(self.mol_to_fgs_file):
+        #     mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
+        #     for row in mol_to_fgs_df.itertuples():
+        #         mol_to_fgs[row.smiles] = row.fgs
         
         reactant_list = reactants.split('.')
         reactant_with_fgs = []
         for reactant in reactant_list:
-            if reactant in mol_to_fgs:
-                fgs = mol_to_fgs[reactant].split('.')
+            if reactant in self.mol_to_fgs:
+                fgs = self.mol_to_fgs[reactant]
             else:
-                fgs = exmol.gdet_functional_groups(reactant, cutoff=500)
+                fgs = exmol.get_functional_groups(reactant, cutoff=500)
                 if fgs:
-                    mol_to_fgs[reactant] = '.'.join(fgs)
+                    self.mol_to_fgs[reactant] = '.'.join(fgs)
             if fgs:
                 if 'tagged' in self.task_mode:
                     reactant_with_fgs.append(f'[START_SMILES] {reactant} [END_SMILES]: {", ".join(fgs)}')

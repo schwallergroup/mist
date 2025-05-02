@@ -7,4 +7,4 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
     --task_mode fg_tagged \
     --model_name_or_path Qwen/Qwen2.5-0.5B \
     --output_dir output/grpo \
-    --dataset_id_or_path /home/vu/Documents/open-r1/data/USPTO_480k_clean_no_sft
+    --dataset_id_or_path /home/vu/Documents/open-r1/data/USPTO_480k_clean_no_sft[]
