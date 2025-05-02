@@ -135,6 +135,7 @@ SRUN_ARGS=" \
     --bind /home \
     --bind /work \
     --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
+    --mount type=bind,src=${KUMA_FOLDER_DATA},dst=/data \
     --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
     --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
     ${CONTAINER_PATH} \
