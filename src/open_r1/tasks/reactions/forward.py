@@ -5,9 +5,11 @@ import random
 from typing import Any, Dict, Optional
 
 from datasets import Dataset, DatasetDict
+import pandas as pd
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 import exmol
+from tqdm import tqdm
 
 from open_r1.download_data import download_data
 
@@ -28,6 +30,7 @@ class ForwardReaction(SMILESBasedTask):
     tgt_train_file: str = ""
     src_test_file: str = ""
     tgt_test_file: str = ""
+    mol_to_fgs_file: str = ""
     question_template: str = ""
 
     custom_metrics: Dict[str, Any] = {}
@@ -45,6 +48,8 @@ class ForwardReaction(SMILESBasedTask):
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
         self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
         self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
+        
+        self.mol_to_fgs_file = os.path.join(self.dataset_id_or_path, "fgs.csv")
        
         if self.task_mode == "base":
             # self.question_template = (
@@ -81,10 +86,21 @@ class ForwardReaction(SMILESBasedTask):
             "answer_tanimoto": [],
         }
     def _question_template_format_with_fgs(self, reactants: str):
+        mol_to_fgs = {}
+        if os.path.exists(self.mol_to_fgs_file):
+            mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
+            for row in mol_to_fgs_df.itertuples():
+                mol_to_fgs[row.smiles] = row.fgs
+        
         reactant_list = reactants.split('.')
         reactant_with_fgs = []
         for reactant in reactant_list:
-            fgs = exmol.get_functional_groups(reactant)
+            if reactant in mol_to_fgs:
+                fgs = mol_to_fgs[reactant].split('.')
+            else:
+                fgs = exmol.gdet_functional_groups(reactant, cutoff=500)
+                if fgs:
+                    mol_to_fgs[reactant] = '.'.join(fgs)
             if fgs:
                 if 'tagged' in self.task_mode:
                     reactant_with_fgs.append(f'[START_SMILES] {reactant} [END_SMILES]: {", ".join(fgs)}')
@@ -135,7 +151,7 @@ class ForwardReaction(SMILESBasedTask):
             problems = [
                 self.question_template_format(self.process_line(line))
                 # self.process_line(line)
-                for line in f.readlines()
+                for line in tqdm(f.readlines(), desc="Reading source file")
             ]
 
         with open(tgt_file, "r", encoding="utf-8") as f:
