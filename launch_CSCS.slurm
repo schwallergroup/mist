@@ -21,6 +21,7 @@
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
+ulimit -c 0  # Avoid core dumps
 
 source ~/.bashrc
 cd /Documents/sink
