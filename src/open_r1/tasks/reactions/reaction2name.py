@@ -376,19 +376,19 @@ class Smiles2NameV2(Smiles2Name):
                 print(f"Answer:   {answer_formatted}")
                 print(f"Solution buffer: {self.answer_history[solution]}")
                 current_buffer_size = min(len(self.answer_history[solution]), answer_penalty_buffer_size)
-                print(f"\tCorrect solution: {self.answer_history[solution].count(solution)}/{current_buffer_size}")
+                print(f"    Correct solution: {self.answer_history[solution].count(solution)}/{current_buffer_size}")
                 if info_answer_given != "__unknown":
-                    print(f"\tThis answer: {self.answer_history[solution].count(info_answer_given)}/{current_buffer_size}")
+                    print(f"    This answer: {self.answer_history[solution].count(info_answer_given)}/{current_buffer_size}")
                 else:
-                    print(f"\tThis answer: unknown")
+                    print(f"    This answer: unknown")
                 print(f"Accuray reward: {reward:.4f}")
-                print(f"\tn_answers: {n_answers}{' (+0.1)' if n_answers == 1 else ''}", end='')
-                print(f"\tcorrect solution: {info_correct_solution}{' (+0.6)' if info_correct_solution else ''}")
+                print(f"    n_answers: {n_answers}{' (+0.1)' if n_answers == 1 else ''}")
+                print(f"    correct solution: {info_correct_solution}{' (+0.6)' if info_correct_solution else ''}")
                 if reward_answer_penalty is None:
-                    print(f"\tanswer penalty: {reward_answer_penalty}")
+                    print(f"    answer penalty: {reward_answer_penalty}")
                 else:
-                    print(f"\tanswer penalty: {reward_answer_penalty:.4f}")
-                print(f"\tcorrect think: {info_correct_think}{' (+0.3)' if info_correct_think else ''}")
+                    print(f"    answer penalty: {reward_answer_penalty:.4f}")
+                print(f"    correct think: {info_correct_think}{' (+0.3)' if info_correct_think else ''}")
                 print(f"Completion:\n{completion}\n")
 
         return rewards
