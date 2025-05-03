@@ -369,7 +369,8 @@ class Smiles2NameV2(Smiles2Name):
             if random() < print_proba:
                 print("======= RANDOM_COMPLETION =======")
                 print(f"Solution: {solution}")
-                print(f"Answer:   {answer.replace('\n',' ')[:128]}")
+                answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
+                print(f"Answer:   {answer_formatted}")
                 print(f"Solution buffer: {self.answer_history[solution]}")
                 current_buffer_size = min(len(self.answer_history[solution]), answer_penalty_buffer_size)
                 print(f"\tCorrect solution: {self.answer_history[solution].count(solution)}/{current_buffer_size}")
