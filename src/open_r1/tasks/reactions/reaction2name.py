@@ -384,7 +384,10 @@ class Smiles2NameV2(Smiles2Name):
                 print(f"Accuray reward: {reward:.4f}")
                 print(f"\tn_answers: {n_answers}{' (+0.1)' if n_answers == 1 else ''}", end='')
                 print(f"\tcorrect solution: {info_correct_solution}{' (+0.6)' if info_correct_solution else ''}")
-                print(f"\tanswer penalty: {reward_answer_penalty:.4f}")
+                if reward_answer_penalty is None:
+                    print(f"\tanswer penalty: {reward_answer_penalty}")
+                else:
+                    print(f"\tanswer penalty: {reward_answer_penalty:.4f}")
                 print(f"\tcorrect think: {info_correct_think}{' (+0.3)' if info_correct_think else ''}")
                 print(f"Completion:\n{completion}\n")
 
