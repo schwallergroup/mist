@@ -148,6 +148,29 @@ class Smiles2Name(RLTask):
 
         return rewards
 
+    def accuracy_percentage_reward(self, completions, **kwargs):
+        completions = self.preprocess_completions(completions)
+        completions = [c.lower() for c in completions]
+
+        solutions = kwargs.get("solution", [])
+        solutions = [sol.lower() for sol in solutions]
+
+        rewards = []
+
+        for completion, solution in zip(completions, solutions):
+            # Parse answer
+            answers = re.findall(r"<answer>(.*?)</answer>", completion, re.DOTALL)
+            answers = [ans.strip() for ans in answers]
+            answer = answers[0] if answers else ""
+
+            # Reward answer
+            if answer == solution:
+                reward = 1.0
+            else:
+                reward = 0.0
+            rewards.append(reward)
+        return rewards
+
     def format_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
@@ -261,7 +284,106 @@ class Smiles2Name(RLTask):
         else:
             return "NONE"
 
+class Smiles2NameV2(Smiles2Name):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.answer_history = dict()
 
+    def accuracy_reward(self, completions, **kwargs):
+        answer_penalty_buffer_size = 10
+        answer_penalty = 0.4
 
+        completions = self.preprocess_completions(completions)
+        completions = [c.lower() for c in completions]
+
+        valid_choices = ['Acylation', 'Aromatic Heterocycle Formation', 'C-C Coupling', 'Deprotection',
+                         'Functional Group Addition', 'Functional Group Interconversion',
+                         'Heteroatom Alkylation and Arylation', 'Miscellaneous', 'Protection', 'Reduction']
+        valid_choices = [c.lower() for c in valid_choices]
+        for choice in valid_choices:
+            if choice not in self.answer_history.keys():
+                self.answer_history[choice] = []
+        def _get_choice_counts(text, choices):
+            """
+            Count the occurrences of each choice in the text.
+            """
+            counts = {choice: text.count(choice) for choice in choices}
+            return counts
+
+        solutions = kwargs.get("solution", [])
+        solutions = [sol.lower() for sol in solutions]
+
+        rewards = []
+
+        for completion, solution in zip(completions, solutions):
+            reward = 0.0
+            info_correct_solution = False
+            reward_answer_penalty = None
+            info_correct_think = False
+            info_answer_given = "__unknown"
+
+            # Parse answer
+            answers = re.findall(r"<answer>(.*?)</answer>", completion, re.DOTALL)
+            answers = [ans.strip() for ans in answers]
+            answer = answers[0] if answers else ""
+            answer_counts = _get_choice_counts(answer, valid_choices)
+            answer_counts = {k: v for k, v in answer_counts.items() if v > 0}
+            n_answers = sum(answer_counts.values())
+
+            # Reward answer
+            # if 1 < n_answers <= 3:
+            #     if solution in answer_counts.keys():
+            #         reward += 0.2 / (n_answers - 1)
+            if n_answers == 1:
+                answer_given = list(answer_counts.keys())[0]
+                info_answer_given = answer_given
+                reward += 0.1
+                if answer_given == solution:
+                    reward += 0.6
+                    info_correct_solution = True
+                else:
+                    reward_answer_penalty = -(self.answer_history[solution].count(answer_given) / answer_penalty_buffer_size) * answer_penalty
+                    reward += reward_answer_penalty
+                if len(self.answer_history[solution]) >= answer_penalty_buffer_size:
+                    self.answer_history[solution].pop(0)
+                self.answer_history[solution].append(answer_given)
+
+            # Parse & reward think
+            think_matches = re.search(r"<think>(.*?)</think>", completion, re.DOTALL)
+            if think_matches:
+                think_text = think_matches.group(1)
+                think_text_counts = _get_choice_counts(think_text, valid_choices)
+                think_text_max_count = max(think_text_counts.values())
+                think_text_max_counts = {k: v for k, v in think_text_counts.items() if v == think_text_max_count}
+                if len(think_text_max_counts) == 1:
+                    if list(think_text_max_counts.keys())[0] == solution:
+                        reward += 0.3
+                        info_correct_think = True
+
+            rewards.append(reward)
+
+            # Print
+            print_proba = 0.01
+            if n_answers == 1:
+                print_proba = print_proba * 5
+            if random() < print_proba:
+                print("======= RANDOM_COMPLETION =======")
+                print(f"Solution: {solution}")
+                print(f"Answer:   {answer.replace('\n',' ')[:128]}")
+                print(f"Solution buffer: {self.answer_history[solution]}")
+                current_buffer_size = min(len(self.answer_history[solution]), answer_penalty_buffer_size)
+                print(f"\tCorrect solution: {self.answer_history[solution].count(solution)}/{current_buffer_size}")
+                if info_answer_given != "__unknown":
+                    print(f"\tThis answer: {self.answer_history[solution].count(info_answer_given)}/{current_buffer_size}")
+                else:
+                    print(f"\tThis answer: unknown")
+                print(f"Accuray reward: {reward:.4f}")
+                print(f"\tn_answers: {n_answers}{' (+0.1)' if n_answers == 1 else ''}", end='')
+                print(f"\tcorrect solution: {info_correct_solution}{' (+0.6)' if info_correct_solution else ''}")
+                print(f"\tanswer penalty: {reward_answer_penalty:.4f}")
+                print(f"\tcorrect think: {info_correct_think}{' (+0.3)' if info_correct_think else ''}")
+                print(f"Completion:\n{completion}\n")
+
+        return rewards
 
 
