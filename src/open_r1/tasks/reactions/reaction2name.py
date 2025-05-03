@@ -9,6 +9,7 @@ from rdkit.Chem import AllChem
 import pandas as pd
 from random import random
 import difflib
+from dataclasses import field
 
 class Smiles2Name(RLTask):
     question_template: str = ""
@@ -285,6 +286,8 @@ class Smiles2Name(RLTask):
             return "NONE"
 
 class Smiles2NameV2(Smiles2Name):
+    answer_history: dict = field(default_factory=dict)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.answer_history = dict()
