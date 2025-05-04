@@ -267,7 +267,7 @@ class SMILESBasedTask(RLTask):
         if self.custom_metrics['n_samples'] > 0:
             metrics['n_samples'] = self.custom_metrics['n_samples']
             for k, v in self.custom_metrics.items():
-                if k != 'n_samples':
+                if k != 'n_samples' and v:
                     metrics[k] = sum(v) / len(v)
                     self.custom_metrics[k] = []
         

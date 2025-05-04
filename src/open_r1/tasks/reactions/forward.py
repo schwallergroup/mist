@@ -63,9 +63,9 @@ class ForwardReaction(SMILESBasedTask):
             #     "Here are the reagents: [START_SMILES] {} [END_SMILES]. "
             #     "Note that individual reagents are separated by a dot '.', and that some of them might just be observers.\n"
             # )
-            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think> Okay"
         elif self.task_mode == "tagged":
-            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think> Okay"
         
         elif self.task_mode == "fg_tagged":
             self.question_template = (
@@ -73,7 +73,7 @@ class ForwardReaction(SMILESBasedTask):
                 "<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES]. As a hint, I also provide the functional group information of each molecule:\n\t{}\n"
                 "Therefore, you don't have to parse the full structure of each molecule, instead focus on identifying which functional group(s) would react and editing the reactant SMILES accordingly to find the product.<|im_end|>\n"
                 "<|im_start|>assistant\Response:\n"
-                "<think>"
+                "<think> Okay"
             )
             
         else:
@@ -218,25 +218,25 @@ class ForwardReaction(SMILESBasedTask):
         rewards = []
 
         for completion, ref, prompt in zip(completions, solution, prompts):
-            reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
-            reasoning_smiles = self.extract_smiles_from_response(reasoning, prompt)
-            reasoning_tanimoto_scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
-            max_reasoning_tanimoto_score = max(reasoning_tanimoto_scores) if reasoning_tanimoto_scores else -0.5
-            best_smiles_reasoning = (
-                reasoning_smiles[reasoning_tanimoto_scores.index(max_reasoning_tanimoto_score)]
-                if max_reasoning_tanimoto_score in reasoning_tanimoto_scores
-                else "None"
-            )
-            reasoning_tanimoto_score = max_reasoning_tanimoto_score
-            if reasoning_tanimoto_score == 1.0:
-                # reasoning_tanimoto_score += (
-                #     1.0  # massive bonus for truly correct reasoning
-                # )
-                reasoning_reward = 1.0
-            elif reasoning_tanimoto_score < 0:
-                reasoning_reward = -1  # no SMILES found
-            else:
-                reasoning_reward = -0.5 # SMILES found but not correct
+            # reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
+            # reasoning_smiles = self.extract_smiles_from_response(reasoning, prompt)
+            # reasoning_tanimoto_scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
+            # max_reasoning_tanimoto_score = max(reasoning_tanimoto_scores) if reasoning_tanimoto_scores else -0.5
+            # best_smiles_reasoning = (
+            #     reasoning_smiles[reasoning_tanimoto_scores.index(max_reasoning_tanimoto_score)]
+            #     if max_reasoning_tanimoto_score in reasoning_tanimoto_scores
+            #     else "None"
+            # )
+            # reasoning_tanimoto_score = max_reasoning_tanimoto_score
+            # if reasoning_tanimoto_score == 1.0:
+            #     # reasoning_tanimoto_score += (
+            #     #     1.0  # massive bonus for truly correct reasoning
+            #     # )
+            #     reasoning_reward = 1.0
+            # elif reasoning_tanimoto_score < 0:
+            #     reasoning_reward = -1  # no SMILES found
+            # else:
+            #     reasoning_reward = -0.5 # SMILES found but not correct
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer, prompt)
@@ -251,19 +251,20 @@ class ForwardReaction(SMILESBasedTask):
             else:
                 answer_reward = -0.5
 
-            reward = reasoning_reward + answer_reward
+            # reward = reasoning_reward + answer_reward
+            reward = answer_reward
 
             answer_smiles = answer_smiles if answer_smiles else "None"
             self.random_log = {
                 "prompt": prompt,
                 "reference": ref,
                 "answer": answer_smiles,
-                "best_smiles_in_reasoning": best_smiles_reasoning,
-                "reasoning_tanimoto_score [0, 1]": reasoning_tanimoto_score,
+                # "best_smiles_in_reasoning": best_smiles_reasoning,
+                # "reasoning_tanimoto_score [0, 1]": reasoning_tanimoto_score,
                 "answer_tanimoto_score [0, 1]": answer_tanimoto_score,
-                "reasoning_reward [-0.5, 1]": reasoning_reward,
-                "answer_reward [-0.5, 1]": answer_reward,
-                "accuracy_reward [-1, 2]": reward,
+                # "reasoning_reward [-0.5, 1]": reasoning_reward,
+                # "answer_reward [-0.5, 1]": answer_reward,
+                "accuracy_reward [-0.5, 1]": reward,
                 "full_completion": completion,
             }
 
@@ -276,11 +277,38 @@ class ForwardReaction(SMILESBasedTask):
 
             self.custom_metrics["n_samples"] += 1
             self.custom_metrics["n_waits"].append(self.count_waits(completion))
-            self.custom_metrics["reasoning_reward"].append(reasoning_reward)
+            # self.custom_metrics["reasoning_reward"].append(reasoning_reward)
             self.custom_metrics["answer_reward"].append(answer_reward)
-            self.custom_metrics["reasoning_tanimoto"].append(reasoning_tanimoto_score)
+            # self.custom_metrics["reasoning_tanimoto"].append(reasoning_tanimoto_score)
             self.custom_metrics["answer_tanimoto"].append(answer_tanimoto_score)
 
+        return rewards
+    
+    def reasoning_reward(self, completions, solution, prompts, **kwargs):
+        """Reward function - check that completion is same as ground truth."""
+        rewards = []
+        for completion, ref, prompt in zip(completions, solution, prompts):
+            reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
+            reasoning_smiles = self.extract_smiles_from_response(reasoning, prompt)
+            reasoning_tanimoto_scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
+            max_reasoning_tanimoto_score = max(reasoning_tanimoto_scores) if reasoning_tanimoto_scores else -0.5
+            # best_smiles_reasoning = (
+            #     reasoning_smiles[reasoning_tanimoto_scores.index(max_reasoning_tanimoto_score)]
+            #     if max_reasoning_tanimoto_score in reasoning_tanimoto_scores
+            #     else "None"
+            # )
+            reasoning_tanimoto_score = max_reasoning_tanimoto_score
+            if reasoning_tanimoto_score == 1.0:
+                # reasoning_tanimoto_score += (
+                #     1.0  # massive bonus for truly correct reasoning
+                # )
+                reasoning_reward = 1.0
+            elif reasoning_tanimoto_score < 0:
+                reasoning_reward = -1
+            self.custom_metrics["reasoning_reward"].append(reasoning_reward)
+            self.custom_metrics["reasoning_tanimoto"].append(reasoning_tanimoto_score)
+                
+            rewards.append(reasoning_reward)
         return rewards
 
     # def get_metrics(self):
