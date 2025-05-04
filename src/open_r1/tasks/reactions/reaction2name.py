@@ -3,6 +3,7 @@ from ..base import RLTask
 from typing import Dict
 import re
 import os
+import hashlib
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
@@ -287,15 +288,29 @@ class Smiles2Name(RLTask):
 
 class Smiles2NameV2(Smiles2Name):
     answer_history: dict = field(default_factory=dict)
+    completion_hash_history: list = field(default_factory=list)
+    answer_history_buffer_size: int = 10
+    answer_history_penalty: float = 0.4
+    completion_hash_history_buffer_size: int = 1024
+    completion_hash_history_penalty: float = 2.0
+    completion_hash_history_max_repetitions: int = 2
+    completion_size_penalty: float = 1.0
+    completion_size_minimum: int = 50
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.answer_history = dict()
+        self.completion_hash_history = []
+
+        self.answer_history_buffer_size = self.task_kwargs.get("answer_history_buffer_size", 10)
+        self.answer_history_penalty = self.task_kwargs.get("answer_history_penalty", 0.4)
+        self.completion_hash_history_buffer_size = self.task_kwargs.get("completion_hash_history_buffer_size", 1024)
+        self.completion_hash_history_penalty = self.task_kwargs.get("completion_hash_history_penalty", 2.0)
+        self.completion_hash_history_max_repetitions = self.task_kwargs.get("completion_hash_history_max_repetitions", 2)
+        self.completion_size_penalty = self.task_kwargs.get("completion_size_penalty", 1.0)
+        self.completion_size_minimum = self.task_kwargs.get("completion_size_minimum", 50)
 
     def accuracy_reward(self, completions, **kwargs):
-        answer_penalty_buffer_size = 10
-        answer_penalty = 0.4
-
         completions = self.preprocess_completions(completions)
         completions = [c.lower() for c in completions]
 
@@ -345,9 +360,9 @@ class Smiles2NameV2(Smiles2Name):
                     reward += 0.6
                     info_correct_solution = True
                 else:
-                    reward_answer_penalty = -(self.answer_history[solution].count(answer_given) / answer_penalty_buffer_size) * answer_penalty
+                    reward_answer_penalty = -(self.answer_history[solution].count(answer_given) / self.answer_history_buffer_size) * self.answer_history_penalty
                     reward += reward_answer_penalty
-                if len(self.answer_history[solution]) >= answer_penalty_buffer_size:
+                if len(self.answer_history[solution]) >= self.answer_history_buffer_size:
                     self.answer_history[solution].pop(0)
                 self.answer_history[solution].append(answer_given)
 
@@ -375,7 +390,7 @@ class Smiles2NameV2(Smiles2Name):
                 answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
                 print(f"Answer:   {answer_formatted}")
                 print(f"Solution buffer: {self.answer_history[solution]}")
-                current_buffer_size = min(len(self.answer_history[solution]), answer_penalty_buffer_size)
+                current_buffer_size = min(len(self.answer_history[solution]), self.answer_history_buffer_size)
                 print(f"    Correct solution: {self.answer_history[solution].count(solution)}/{current_buffer_size}")
                 if info_answer_given != "__unknown":
                     print(f"    This answer: {self.answer_history[solution].count(info_answer_given)}/{current_buffer_size}")
@@ -393,4 +408,33 @@ class Smiles2NameV2(Smiles2Name):
 
         return rewards
 
+    def completion_difference_reward(self, completions, **kwargs):
+        rewards = []
+
+        for completion_id, completion in enumerate(completions):
+            reward = 0.0
+            completion_hash = hashlib.sha256(completion.encode()).hexdigest()[:8]
+
+            # Give penalty if the completion is a repetition
+            if self.completion_hash_history.count(completion_hash) >= self.completion_hash_history_max_repetitions:
+                reward = -self.completion_hash_history_penalty
+
+            # Update hash history
+            self.completion_hash_history.append(completion_hash)
+            if len(self.completion_hash_history) > self.completion_hash_history_buffer_size:
+                self.completion_hash_history.pop(0)
+
+            rewards.append(reward)
+
+        return rewards
+
+    def completion_size_reward(self, completions, **kwargs):
+        rewards = []
+        for completion in completions:
+            reward = 0.0
+            size = len(completion)
+            if size < self.completion_size_minimum:
+                reward = -self.completion_size_penalty * (self.completion_size_minimum - size) / self.completion_size_minimum
+            rewards.append(reward)
+        return rewards
 
