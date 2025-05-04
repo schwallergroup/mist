@@ -103,10 +103,15 @@ export CMD=" \
     --sampling_params_config_name=$SAMPLING_PARAMS_CONFIG_NAME \
 "
 
+# pip install --force-reinstall --no-deps transformers==4.52.0.dev0;
+# pip install hf_transfer rdkit levenshtein wandb gdown exmol;
+# pip install -e .;
+# pip install -U transformers==4.48.2 pandas==2.0.0 trl==0.14.0;
+# pip install numpy==1.26.4
+# pip install vllm==0.8.4
+# pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1
 export LAUNCHER="cd /Documents/sink;
-pip install hf_transfer rdkit levenshtein wandb gdown exmol;
-pip install -U -e .;
-pip install -U transformers==4.48.2 pandas==2.0.0 trl==0.14.0;
+. env/bin/activate;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
