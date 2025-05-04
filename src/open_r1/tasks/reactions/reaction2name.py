@@ -360,7 +360,7 @@ class Smiles2NameV2(Smiles2Name):
                     reward += 0.6
                     info_correct_solution = True
                 else:
-                    reward_answer_penalty = -(self.answer_history[solution].count(answer_given) / self.answer_history_buffer_size) * self.answer_history_penalty
+                    reward_answer_penalty = -(self.answer_history[solution].count(answer_given) / len(self.answer_history[solution])) * self.answer_history_penalty
                     reward += reward_answer_penalty
                 if len(self.answer_history[solution]) >= self.answer_history_buffer_size:
                     self.answer_history[solution].pop(0)
