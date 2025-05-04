@@ -22,10 +22,10 @@ class Iupac2Smiles(SMILESBasedTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if self.task_mode == 'base':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
         
         elif self.task_mode == 'tagged':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
             
         elif self.task_mode == 'no_instruct':
             self.question_template = (
@@ -96,6 +96,73 @@ class Iupac2Smiles(SMILESBasedTask):
         rewards = []
 
         for completion, ref, prompt in zip(completions, solution, prompts):
+            # reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
+            # reasoning_smiles = self.extract_smiles(reasoning)
+            # scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
+            # max_score = max(scores) if scores else -0.5
+            # best_smiles_reasoning = (
+            #     reasoning_smiles[scores.index(max_score)]
+            #     if max_score in scores
+            #     else "None"
+            # )
+            # reasoning_score = max_score
+            # if reasoning_score == 1.0:
+            #     reasoning_reward = 1.0
+            # elif reasoning_score < 0:
+            #     reasoning_reward = -1
+            # else:
+            #     reasoning_reward = -0.5
+
+            answer = self.preprocess_response(completion)
+            answer_smiles = self.extract_smiles_from_answer(answer)
+            answer_score = (
+                tanimoto_score(answer_smiles, ref) if answer_smiles else 0
+            )
+            if answer_score == 1.0:
+                answer_reward += 1.0  # massive bonus for truly correct answer
+            elif answer_score < 0:
+                answer_reward = -1
+            else:
+                answer_reward = -0.5
+
+            # reward = reasoning_reward + answer_reward
+            reward = answer_reward
+
+            answer_smiles = answer_smiles if answer_smiles else "None"
+            self.random_log = {
+                "prompt": prompt,
+                "reference": ref,
+                "answer": answer_smiles,
+                # "best_smiles_in_reasoning": best_smiles_reasoning,
+                # "reasoning_tanimoto_score [0, 1]": reasoning_score,
+                "answer_tanimoto_score [0, 1]": answer_score,
+                # "reasoning_reward [-0.5, 1]": reasoning_reward,
+                # "answer_reward [-0.5, 1]": answer_reward,
+                "accuracy_reward [-1, 2]": reward,
+                "full_completion": completion,
+            }
+
+            if reward > 0.3:
+                self.good_print(self.random_log)
+            else:
+                self.random_print(self.random_log)
+
+            rewards.append(reward)
+
+            self.custom_metrics["n_samples"] += 1
+            self.custom_metrics["n_waits"].append(self.count_waits(completion))
+            # self.custom_metrics["reasoning_reward"].append(reasoning_reward)
+            self.custom_metrics["answer_reward"].append(answer_reward)
+            # self.custom_metrics["reasoning_tanimoto"].append(reasoning_score)
+            self.custom_metrics["answer_tanimoto"].append(answer_score)
+
+        return rewards
+    
+    def reasoning_reward(self, completions, solution, prompts, **kwargs):
+        """Reward function - check that reasoning is same as ground truth."""
+        rewards = []
+
+        for completion, ref, prompt in zip(completions, solution, prompts):
             reasoning = completion.rsplit("<answer>", maxsplit=1)[0]
             reasoning_smiles = self.extract_smiles(reasoning)
             scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
@@ -113,47 +180,10 @@ class Iupac2Smiles(SMILESBasedTask):
             else:
                 reasoning_reward = -0.5
 
-            answer = self.preprocess_response(completion)
-            answer_smiles = self.extract_smiles_from_answer(answer)
-            answer_score = (
-                tanimoto_score(answer_smiles, ref) if answer_smiles else 0
-            )
-            if answer_score == 1.0:
-                answer_reward += 1.0  # massive bonus for truly correct answer
-            elif answer_score < 0:
-                answer_reward = -1
-            else:
-                answer_reward = -0.5
-
-            reward = reasoning_reward + answer_reward
-
-            answer_smiles = answer_smiles if answer_smiles else "None"
-            self.random_log = {
-                "prompt": prompt,
-                "reference": ref,
-                "answer": answer_smiles,
-                "best_smiles_in_reasoning": best_smiles_reasoning,
-                "reasoning_tanimoto_score [0, 1]": reasoning_score,
-                "answer_tanimoto_score [0, 1]": answer_score,
-                "reasoning_reward [-0.5, 1]": reasoning_reward,
-                "answer_reward [-0.5, 1]": answer_reward,
-                "accuracy_reward [-1, 2]": reward,
-                "full_completion": completion,
-            }
-
-            if reward > 0.3:
-                self.good_print(self.random_log)
-            else:
-                self.random_print(self.random_log)
-
-            rewards.append(reward)
-
-            self.custom_metrics["n_samples"] += 1
-            self.custom_metrics["n_waits"].append(self.count_waits(completion))
             self.custom_metrics["reasoning_reward"].append(reasoning_reward)
-            self.custom_metrics["answer_reward"].append(answer_reward)
             self.custom_metrics["reasoning_tanimoto"].append(reasoning_score)
-            self.custom_metrics["answer_tanimoto"].append(answer_score)
+            
+            rewards.append(reasoning_reward)
 
         return rewards
 
