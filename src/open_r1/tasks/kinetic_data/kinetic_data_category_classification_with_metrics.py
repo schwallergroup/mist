@@ -320,13 +320,13 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             },
         }
 
-    def accuracy_reward(self, completions, solutions, **kwargs):
+    def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer is same as ground truth"""
         answers = [self.preprocess_response(c) for c in completions]
         rewards = []
 
-        for i in range(len(solutions)):
-            sol = solutions[i]
+        for i in range(len(solution)):
+            sol = solution[i]
             answer = answers[i]
 
             if sol == answer:

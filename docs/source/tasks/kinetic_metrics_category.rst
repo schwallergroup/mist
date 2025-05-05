@@ -69,6 +69,12 @@ The task expects data files in the following format:
 
 - ``path/to/kinetic/data/y_val/y_val_M1_M20_train_val_test_set.pkl``: Validation labels (mechanism classes)
 
+
+Data Load
+-------------
+In the ``dataset_preprocess`` method, the dataset is preprocessed to balance the number of samples for each category so that the model is not biased to the category with more samples.
+Without any consideration, the number of the data with core mechanism has small, since it consists of only M1, and the number of the data with category of deactivation steps has the most.
+
 Reward Functions
 -----------------
 
@@ -281,6 +287,8 @@ The prompt includes each reaction category explanation and the metrics as follow
    This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
 
    <think>
+
+The metrics in the prompt are verified that random forest algorimth can classify the reaction category with accuracy == .
 
 
 Result

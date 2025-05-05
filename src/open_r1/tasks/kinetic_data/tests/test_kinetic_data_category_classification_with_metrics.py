@@ -78,9 +78,6 @@ class TestAccuracyReward:
         )
 
     def test_prompt_format(self):
-        """
-        Test if the prompt includes \\boxed{} tags
-        """
         self.classification_task.load()
         self.classification_task.dataset_preprocess(self.tokenizer)
         problem = self.classification_task.dataset["train"][0]["problem"]
@@ -90,6 +87,14 @@ class TestAccuracyReward:
         regex = r"<answer>(.*?)</answer>"
         match = re.search(regex, question)
         assert len(match.groups()) == 1
+
+        for i in range(10):
+            solution = self.classification_task.dataset["train"][i]["solution"]
+            assert solution in ["Core mechanism", "Mechanism with bicatalytic steps", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
+
+        for i in range(10):
+            solution = self.classification_task.dataset["test"][i]["solution"]
+            assert solution in ["Core mechanism", "Mechanism with bicatalytic steps", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
 
     def test_format_reward(self):
         responses = [response_wrong_format, response_correct_format]
