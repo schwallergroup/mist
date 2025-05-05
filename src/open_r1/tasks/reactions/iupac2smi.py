@@ -64,6 +64,7 @@ class Iupac2Smiles(SMILESBasedTask):
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
         df = df.drop_duplicates(subset=["SMILES"])
+        df = df.sample(frac=1, random_state=42).reset_index(drop=True)
         train_dict = {
             "problem": df["IUPAC"].tolist(),
             "solution": df["SMILES"].tolist(),
