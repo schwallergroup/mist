@@ -57,7 +57,7 @@ response_correct_format = """
 class TestAccuracyReward:
     def setup_method(self):
         # Load configuration
-        config_path = "/home/kuroki/sink/recipes/kinetic.yaml"
+        config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
         config = load_config(config_path)
 
         self.classification_task = (
@@ -123,6 +123,26 @@ class TestAccuracyReward:
             float(0.0),
             float(1.0),
         ]
+
+    def test_format_continuous_reward(self):
+        responses = [response_wrong_format, response_correct_format]
+        regex = r"<think>(.*?)</think>.*?<answer>(.*?)</answer>"
+        match = re.search(regex, response_correct_format, re.DOTALL)
+
+        regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+        match = re.search(regex, response_correct_format, re.DOTALL)
+        print("----match groups----")
+        print(match.groups())
+
+        for r in self.classification_task.format_continuous_reward(responses):
+            assert r >= -1.0 and r <= 1.0
+
+    def test_answer_covered_in_reasoning_traces_reward(self):
+        responses = [response_wrong_format, response_correct_format]
+        rewards = self.classification_task.answer_covered_in_reasoning_traces_reward(
+            responses, "Core Mechanism"
+        )
+        assert rewards == [float(0), float(0.1)]
 
     def test_accuracy_reward(self):
         responses = [response_wrong_format, response_correct_format]
