@@ -234,7 +234,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         train_dict = {
             "problem": prompts_train,
             "solution": [
-                convert_from_class_to_category[y] for y in self.y_train.flatten().tolist()
+                convert_from_class_to_category[y]
+                for y in self.y_train.flatten().tolist()
             ],
             "options": [
                 [
@@ -258,7 +259,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         test_dict = {
             "problem": prompts_test,
             "solution": [
-                convert_from_class_to_category[y] for y in self.y_test.flatten().tolist()
+                convert_from_class_to_category[y]
+                for y in self.y_test.flatten().tolist()
             ],
             "options": [
                 [
@@ -356,48 +358,58 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             "Core mechanism": [],
             "Mechanism with bicatalytic steps": [],
             "Mechanism with catalyst activation steps": [],
-            "Mechanism with catalyst deactivation steps": []
+            "Mechanism with catalyst deactivation steps": [],
         }
-        
+
         # トレーニングデータをカテゴリごとに分類
         for i in range(len(self.dataset["train"])):
             category = self.dataset["train"][i]["solution"]
             train_samples_by_category[category].append(i)
-        
+
         # 各カテゴリから均等にサンプルを選択
-        min_samples_per_category = min(len(samples) for samples in train_samples_by_category.values())
+        min_samples_per_category = min(
+            len(samples) for samples in train_samples_by_category.values()
+        )
         selected_indices = []
-        
+
         for category_samples in train_samples_by_category.values():
             # 各カテゴリからmin_samples_per_category個のサンプルをランダムに選択
-            selected_indices.extend(random.sample(category_samples, min_samples_per_category))
-        
+            selected_indices.extend(
+                random.sample(category_samples, min_samples_per_category)
+            )
+
         # 選択したサンプルをシャッフル
         random.shuffle(selected_indices)
-        
+
         # データセットを更新
         self.dataset["train"] = self.dataset["train"].select(selected_indices)
-        
+
         # テストデータも同様に処理
         test_samples_by_category = {
             "Core mechanism": [],
             "Mechanism with bicatalytic steps": [],
             "Mechanism with catalyst activation steps": [],
-            "Mechanism with catalyst deactivation steps": []
+            "Mechanism with catalyst deactivation steps": [],
         }
-        
+
         for i in range(len(self.dataset["test"])):
             category = self.dataset["test"][i]["solution"]
             test_samples_by_category[category].append(i)
-        
-        min_test_samples_per_category = min(len(samples) for samples in test_samples_by_category.values())
+
+        min_test_samples_per_category = min(
+            len(samples) for samples in test_samples_by_category.values()
+        )
         selected_test_indices = []
-        
+
         for category_samples in test_samples_by_category.values():
-            selected_test_indices.extend(random.sample(category_samples, min_test_samples_per_category))
-        
+            selected_test_indices.extend(
+                random.sample(category_samples, min_test_samples_per_category)
+            )
+
         random.shuffle(selected_test_indices)
-        self.dataset["test"] = self.dataset["test"].select(selected_test_indices)
+        self.dataset["test"] = self.dataset["test"].select(
+            selected_test_indices
+        )
 
         # プロンプトを生成
         self.dataset = self.dataset.map(
@@ -414,4 +426,3 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             return ans
         else:
             return "NONE"
-

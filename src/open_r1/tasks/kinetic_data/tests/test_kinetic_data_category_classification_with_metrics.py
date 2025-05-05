@@ -5,9 +5,7 @@ import pytest
 from transformers import AutoTokenizer
 
 import yaml
-from kinetic_data_category_classification_with_metrics import (
-    KineticDataCategoryClassificationWithMetrics,
-)
+from kinetic_data_category_classification_with_metrics import KineticDataCategoryClassificationWithMetrics
 
 
 def load_config(config_path: str) -> dict:
@@ -62,13 +60,15 @@ class TestAccuracyReward:
         config_path = "/home/kuroki/sink/recipes/kinetic.yaml"
         config = load_config(config_path)
 
-        self.classification_task = KineticDataCategoryClassificationWithMetrics(
-            dataset_id_or_path=config["dataset_id_or_path"],
-            model_revision=config["model_revision"],
-            torch_dtype=config["torch_dtype"],
-            attn_implementation=config["attn_implementation"],
-            bf16=config["bf16"],
-            tf32=config["tf32"],
+        self.classification_task = (
+            KineticDataCategoryClassificationWithMetrics(
+                dataset_id_or_path=config["dataset_id_or_path"],
+                model_revision=config["model_revision"],
+                torch_dtype=config["torch_dtype"],
+                attn_implementation=config["attn_implementation"],
+                bf16=config["bf16"],
+                tf32=config["tf32"],
+            )
         )
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -90,23 +90,36 @@ class TestAccuracyReward:
 
         for i in range(10):
             solution = self.classification_task.dataset["train"][i]["solution"]
-            assert solution in ["Core mechanism", "Mechanism with bicatalytic steps", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
+            assert solution in [
+                "Core mechanism",
+                "Mechanism with bicatalytic steps",
+                "Mechanism with catalyst activation steps",
+                "Mechanism with catalyst deactivation steps",
+            ]
 
         for i in range(10):
             solution = self.classification_task.dataset["test"][i]["solution"]
-            assert solution in ["Core mechanism", "Mechanism with bicatalytic steps", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
+            assert solution in [
+                "Core mechanism",
+                "Mechanism with bicatalytic steps",
+                "Mechanism with catalyst activation steps",
+                "Mechanism with catalyst deactivation steps",
+            ]
 
     def test_format_reward(self):
         responses = [response_wrong_format, response_correct_format]
         regex = r"<think>(.*?)</think>.*?<answer>(.*?)</answer>"
         match = re.search(regex, response_correct_format, re.DOTALL)
-        
+
         regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         match = re.search(regex, response_correct_format, re.DOTALL)
         print("----match groups----")
         print(match.groups())
 
-        assert [round(r, 1) for r in self.classification_task.format_reward(responses)] == [
+        assert [
+            round(r, 1)
+            for r in self.classification_task.format_reward(responses)
+        ] == [
             float(0.0),
             float(1.0),
         ]
