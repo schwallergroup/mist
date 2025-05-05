@@ -291,6 +291,7 @@ class Smiles2NameV2(Smiles2Name):
     completion_hash_history: list = field(default_factory=list)
     answer_history_buffer_size: int = 10
     answer_history_penalty: float = 0.4
+    accuracy_give_penalty_to_invalid_answer: bool = False
     completion_hash_history_buffer_size: int = 1024
     completion_hash_history_penalty: float = 2.0
     completion_hash_history_max_repetitions: int = 2
@@ -309,6 +310,7 @@ class Smiles2NameV2(Smiles2Name):
         self.completion_hash_history_max_repetitions = self.task_kwargs.get("completion_hash_history_max_repetitions", 2)
         self.completion_size_penalty = self.task_kwargs.get("completion_size_penalty", 1.0)
         self.completion_size_minimum = self.task_kwargs.get("completion_size_minimum", 50)
+        self.accuracy_give_penalty_to_invalid_answer = self.task_kwargs.get("accuracy_give_penalty_to_invalid_answer", False)
 
     def accuracy_reward(self, completions, **kwargs):
         completions = self.preprocess_completions(completions)
@@ -365,6 +367,9 @@ class Smiles2NameV2(Smiles2Name):
                 if len(self.answer_history[solution]) >= self.answer_history_buffer_size:
                     self.answer_history[solution].pop(0)
                 self.answer_history[solution].append(answer_given)
+            else:
+                if self.accuracy_give_penalty_to_invalid_answer:
+                    reward -= self.answer_history_penalty
 
             # Parse & reward think
             think_matches = re.search(r"<think>(.*?)</think>", completion, re.DOTALL)
@@ -438,3 +443,9 @@ class Smiles2NameV2(Smiles2Name):
             rewards.append(reward)
         return rewards
 
+    def format_continuous_negative_reward(self, completions, **kwargs):
+        # Initial range: [-1, 1]
+        rewards = super().format_continuous_reward(completions, **kwargs)
+        # Final range: [-1, -0.5]
+        rewards = [(r - 3) / 4 for r in rewards]
+        return rewards
