@@ -411,8 +411,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
     def answer_covered_in_reasoning_traces_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer is covered in the reasoning traces"""
         rewards = []
-        for completion in completions:
-            if solution in completion:
+        for sol, completion in zip(solution, completions):
+            if sol in completion:
                 rewards.append(0.1)
             else:
                 rewards.append(0)
