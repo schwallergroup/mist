@@ -120,7 +120,7 @@ class Iupac2Smiles(SMILESBasedTask):
                 tanimoto_score(answer_smiles, ref) if answer_smiles else 0
             )
             if answer_score == 1.0:
-                answer_reward += 1.0  # massive bonus for truly correct answer
+                answer_reward = 1.0  # massive bonus for truly correct answer
             elif answer_score < 0:
                 answer_reward = -1
             else:
