@@ -22,10 +22,10 @@ class Iupac2Smiles(SMILESBasedTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if self.task_mode == 'base':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
         
         elif self.task_mode == 'tagged':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
             
         elif self.task_mode == 'no_instruct':
             self.question_template = (
