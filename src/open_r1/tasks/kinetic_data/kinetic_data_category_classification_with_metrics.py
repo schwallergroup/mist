@@ -322,9 +322,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             },
         }
 
-    def format_continuous_reward(
-        self, completions, **kwargs
-    ):
+    def format_continuous_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
         Args:
@@ -408,7 +406,9 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
         return rewards
 
-    def answer_covered_in_reasoning_traces_reward(self, completions, solution, **kwargs):
+    def answer_covered_in_reasoning_traces_reward(
+        self, completions, solution, **kwargs
+    ):
         """Reward function - check that the answer is covered in the reasoning traces"""
         rewards = []
         for sol, completion in zip(solution, completions):

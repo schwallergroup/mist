@@ -139,8 +139,10 @@ class TestAccuracyReward:
 
     def test_answer_covered_in_reasoning_traces_reward(self):
         responses = [response_wrong_format, response_correct_format]
-        rewards = self.classification_task.answer_covered_in_reasoning_traces_reward(
-            responses, ["Core Mechanism", "Core Mechanism"]
+        rewards = (
+            self.classification_task.answer_covered_in_reasoning_traces_reward(
+                responses, ["Core Mechanism", "Core Mechanism"]
+            )
         )
         assert rewards == [float(0), float(0.1)]
 
