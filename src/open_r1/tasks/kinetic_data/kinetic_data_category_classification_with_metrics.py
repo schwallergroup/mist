@@ -67,6 +67,57 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         <think>
         """
 
+        self.question_template = ("""
+            <|im_start|>assistant
+            You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
+            
+            <|im_start|>user
+            Analyze the reaction behaviour and catalyst performance, then estimate the reaction categories based on the following metrics.
+            Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. Do not provide final answer different than what it provided in this list. 
+
+            # Possible reaction categories
+            All reactions are conversion from substrate S to product P with catalyst.
+
+            1. Core mechanism
+            Core mechanism is represented by the following reaction.
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2
+
+            2. Mechanism with bicatalytic steps
+            Examples:
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>cat2;k3,k-3
+            - S+cat2<=>((cat)2S);k1,k-1|((cat)2S)<=>P+cat2;k2,k-2|2cat<=>cat2;k3,k-3
+            - X+catS<=>S+cat;k1,k-1|X+catS<=>P+cat;k2,k-2
+            - S+cat<=>catS;k1,k-1|catS+cat<=>catP;k2,k-2|catP<=>P+cat;k3,k-3
+
+            3 Mechanism with catalyst activation steps
+            Examples:
+            - cat<=>cat*;k1,0|S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2
+            - S+cat<=>catS;k1,k-1|S+catS<=>catS2;k3,k-3|catS<=>P+cat;k2,k-2
+            - S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2|cat+L<=>cat*;k3,k-3
+
+            4. Mechanism with catalyst deactivation steps
+            Examples:
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+cat<=>inactive catI;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+cat<=>inactive catS;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+cat<=>inactive catP;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>inactive cat2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|catS<=>inactive catS;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+catS<=>inactive catSI;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+catS<=>inactive catS2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+catS<=>inactive catSP;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2catS<=>inactive cat2S2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat+catS<=>inactive cat2S;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
+            
+            {}
+
+            <|im_end|>
+
+            <|im_start|>assistant
+            <think>"""
+        )
+
     def load(self) -> DatasetDict:
         """
         Load and prepare the dataset for the task.
