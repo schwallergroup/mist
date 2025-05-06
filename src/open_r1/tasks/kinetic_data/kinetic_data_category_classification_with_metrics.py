@@ -69,7 +69,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             <|im_end|>
 
             <|im_start|>assistant
-            <think>"""
+            <think> Okay"""
         )
 
     def load(self) -> DatasetDict:
@@ -208,7 +208,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         for i in range(self.x1_train.shape[0]):
             data = self.generate_data_pass_to_prompt(i, is_test=False)
             calculator = KineticMetricsCalculator(data)
-            calculator.process_sample()
+            # calculator.process_sample()
             metrics = calculator.summarize_minimum_important_value()
             prompt = prompt_template_data.format(**metrics)
             prompts_train.append(prompt)
