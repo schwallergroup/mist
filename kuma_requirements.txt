@@ -7,10 +7,10 @@
 # trl==0.14.0
 # numpy==1.26.4
 
-vllm==0.7.1
-torch==2.5.1
-torchvision==0.20.1
-torchaudio==2.5.1
+vllm
+torch==2.7.0
+torchvision
+torchaudio
 transformers==4.48.2
 pandas==2.0.0
 trl==0.15.0
