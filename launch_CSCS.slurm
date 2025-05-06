@@ -102,9 +102,7 @@ export LAUNCHER="conda deactivate;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
-pip uninstall trl -y;
-pip install -U transformers==4.48.2 pandas==2.0.0;
-pip install -U git+https://github.com/schwallergroup/trl.git@v0.14-release;
+pip install -U trl==0.15.0 transformers==4.48.2 pandas==2.0.0;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
