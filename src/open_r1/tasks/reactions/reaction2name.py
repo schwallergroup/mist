@@ -43,6 +43,11 @@ class Smiles2Name(RLTask):
         train_test_split = train_dataset.train_test_split(test_size=0.1)
         train_dataset = train_test_split['train']
         test_dataset = train_test_split['test']
+        # Print hash of the first train example
+        first_train_problem_hash = hashlib.sha256(train_dataset[0]['problem'].encode()).hexdigest()[:8]
+        first_test_problem_hash = hashlib.sha256(test_dataset[0]['problem'].encode()).hexdigest()[:8]
+        print(f"First train problem hash: {first_train_problem_hash}")
+        print(f"First test problem hash: {first_test_problem_hash}")
         
         # Combine into DatasetDict
         self.dataset = DatasetDict({
