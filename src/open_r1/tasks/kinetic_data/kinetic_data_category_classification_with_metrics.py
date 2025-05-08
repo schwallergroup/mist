@@ -425,16 +425,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         return rewards
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
-        r1_prefix = [
-            {
-                "role": "user",
-                "content": self.question_template.format(problem),
-            },
-        ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": self.question_template.format(problem),
             "problem": problem,
         }
 
