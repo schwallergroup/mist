@@ -10,6 +10,157 @@ from open_r1.tasks.base import RLTask
 from open_r1.tasks.kinetic_data.calculation_metrics import KineticMetricsCalculator
 
 
+prompt_template_data = f"""
+        # Metrics that calculated from the data
+        The following metrics were calculated from the experimental data in advance.
+
+        ## Run 1
+        - Initial concentration of catalyst: {{run_1[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_1[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_1[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_1[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_1[final_concentration_of_product]}}
+        - Mass balance gap: {{run_1[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_1[mass_gap_mid]}}
+        - Catalyst stability: {{run_1[catalyst_stability]}}
+        - Induction period: {{run_1[induction_period]}}
+
+        ## Run 2
+        - Initial concentration of catalyst: {{run_2[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_2[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_2[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_2[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_2[final_concentration_of_product]}}
+        - Mass balance gap: {{run_2[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_2[mass_gap_mid]}}
+        - Catalyst stability: {{run_2[catalyst_stability]}}
+        - Induction period: {{run_2[induction_period]}}
+
+        ## Run 3
+        - Initial concentration of catalyst: {{run_3[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_3[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_3[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_3[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_3[final_concentration_of_product]}}
+        - Mass balance gap: {{run_3[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_3[mass_gap_mid]}}
+        - Catalyst stability: {{run_3[catalyst_stability]}}
+        - Induction period: {{run_3[induction_period]}}
+
+        ## Run 4
+        - Initial concentration of catalyst: {{run_4[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_4[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_4[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_4[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_4[final_concentration_of_product]}}
+        - Mass balance gap: {{run_4[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_4[mass_gap_mid]}}
+        - Catalyst stability: {{run_4[catalyst_stability]}}
+        - Induction period: {{run_4[induction_period]}}
+        
+        ## Explanation of the metrics
+        Mass balance gap:
+        This metrics indicates how much mass is "missing" from expected total. High gaps my suggest side reactions or deactivation.
+        This metrics measures the absolute difference between the substrate loss and the product gain.
+
+        Mass balance gap at midpoint:
+        This metrics indicates how much mass is "missing" from expected total at midpoint of the reaction. Can singal mid-reaction instabilities.
+        This metrics measures the absolute difference between the substrate loss and the product gain at the midpoint of the reaction.
+
+        Catalyst stability:
+        This metrics indicates how stable the catalyst is. If the value is close to 1, the catalyst is stable. Much less than 1 means that the catalyst is unstable.
+        This metrics is calculated by the final reaction rate devided by the initial reaction rate.
+
+        Induction period:
+        Indicates the time before the reaction rate becomes significant. A long period may suggest catalyst activation delays. 
+        This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
+        """
+
+
+prompt_template_with_raw_data = f"""
+        # Raw data and Metrics
+        ## Run 1
+        - Initial concentration of catalyst (normalized to [S]0): {{run_1[initial_concentration_of_catalyst]}}
+        - Time_data (normalized, unitless): {{run_1[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_1[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_1[product_data]}}
+
+        The following metrics were calculated from the above data.
+        - The initial concentration of substrate: {{run_1[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_1[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_1[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_1[final_concentration_of_product]}}
+        - Mass balance gap: {{run_1[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_1[mass_gap_mid]}}
+        - Catalyst stability: {{run_1[catalyst_stability]}}
+        - Induction period: {{run_1[induction_period]}}
+
+        ## Run 2
+        - Initial concentration of catalyst (normalized to [S]0): {{run_2[initial_concentration_of_catalyst]}}
+        - Time_data (normalized, unitless): {{run_2[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_2[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_2[product_data]}}
+
+        The following metrics were calculated from the above data.
+        - The initial concentration of substrate: {{run_2[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_2[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_2[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_2[final_concentration_of_product]}}
+        - Mass balance gap: {{run_2[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_2[mass_gap_mid]}}
+        - Catalyst stability: {{run_2[catalyst_stability]}}
+        - Induction period: {{run_2[induction_period]}}
+
+        ## Run 3
+        - Initial concentration of catalyst (normalized to [S]0): {{run_3[initial_concentration_of_catalyst]}}
+        - Time_data (normalized, unitless): {{run_3[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_3[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_3[product_data]}}
+
+        The following metrics were calculated from the above data.
+        - The initial concentration of substrate: {{run_3[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_3[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_3[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_3[final_concentration_of_product]}}
+        - Mass balance gap: {{run_3[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_3[mass_gap_mid]}}
+        - Catalyst stability: {{run_3[catalyst_stability]}}
+        - Induction period: {{run_3[induction_period]}}
+
+        ## Run 4
+        - Initial concentration of catalyst (normalized to [S]0): {{run_4[initial_concentration_of_catalyst]}}
+        - Time_data (normalized, unitless): {{run_4[time_data]}}
+        - Substrate_data (normalized to [S]0): {{run_4[substrate_data]}}
+        - Product_data (normalized to [S]0): {{run_4[product_data]}}
+
+        The following metrics were calculated from the above data.
+        - The initial concentration of substrate: {{run_4[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_4[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_4[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_4[final_concentration_of_product]}}
+        - Mass balance gap: {{run_4[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_4[mass_gap_mid]}}
+        - Catalyst stability: {{run_4[catalyst_stability]}}
+        - Induction period: {{run_4[induction_period]}}
+        
+        ## Explanation of the metrics
+        Mass balance gap:
+        This metrics indicates how much mass is "missing" from expected total. High gaps my suggest side reactions or deactivation.
+        This metrics measures the absolute difference between the substrate loss and the product gain.
+
+        Mass balance gap at midpoint:
+        This metrics indicates how much mass is "missing" from expected total at midpoint of the reaction. Can singal mid-reaction instabilities.
+        This metrics measures the absolute difference between the substrate loss and the product gain at the midpoint of the reaction.
+
+        Catalyst stability:
+        This metrics indicates how stable the catalyst is. If the value is close to 1, the catalyst is stable. Much less than 1 means that the catalyst is unstable.
+        This metrics is calculated by the final reaction rate devided by the initial reaction rate.
+
+        Induction period:
+        Indicates the time before the reaction rate becomes significant. A long period may suggest catalyst activation delays. 
+        This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
+"""
+
 class KineticDataCategoryClassificationWithMetrics(RLTask):
     question_template: str = ""
     x1_train: List = None
@@ -137,72 +288,6 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             )
 
         self.y_test = self.y_test.reshape(-1, 1)[: self.x1_test.shape[0]]
-
-        prompt_template_data = f"""
-        # Metrics that calculated from the data
-        The following metrics were calculated from the experimental data in advance.
-
-        ## Run 1
-        - Initial concentration of catalyst: {{run_1[initial_concentration_of_catalyst]}}
-        - The initial concentration of substrate: {{run_1[initial_concentration_of_substrate]}}
-        - The final concentration of substrate: {{run_1[final_concentration_of_substrate]}}
-        - The initial concentration of product: {{run_1[initial_concentration_of_product]}}
-        - The final concentration of product: {{run_1[final_concentration_of_product]}}
-        - Mass balance gap: {{run_1[mass_balance_gap]}}
-        - Mass balance gap at midpoint: {{run_1[mass_gap_mid]}}
-        - Catalyst stability: {{run_1[catalyst_stability]}}
-        - Induction period: {{run_1[induction_period]}}
-
-        ## Run 2
-        - Initial concentration of catalyst: {{run_2[initial_concentration_of_catalyst]}}
-        - The initial concentration of substrate: {{run_2[initial_concentration_of_substrate]}}
-        - The final concentration of substrate: {{run_2[final_concentration_of_substrate]}}
-        - The initial concentration of product: {{run_2[initial_concentration_of_product]}}
-        - The final concentration of product: {{run_2[final_concentration_of_product]}}
-        - Mass balance gap: {{run_2[mass_balance_gap]}}
-        - Mass balance gap at midpoint: {{run_2[mass_gap_mid]}}
-        - Catalyst stability: {{run_2[catalyst_stability]}}
-        - Induction period: {{run_2[induction_period]}}
-
-        ## Run 3
-        - Initial concentration of catalyst: {{run_3[initial_concentration_of_catalyst]}}
-        - The initial concentration of substrate: {{run_3[initial_concentration_of_substrate]}}
-        - The final concentration of substrate: {{run_3[final_concentration_of_substrate]}}
-        - The initial concentration of product: {{run_3[initial_concentration_of_product]}}
-        - The final concentration of product: {{run_3[final_concentration_of_product]}}
-        - Mass balance gap: {{run_3[mass_balance_gap]}}
-        - Mass balance gap at midpoint: {{run_3[mass_gap_mid]}}
-        - Catalyst stability: {{run_3[catalyst_stability]}}
-        - Induction period: {{run_3[induction_period]}}
-
-        ## Run 4
-        - Initial concentration of catalyst: {{run_4[initial_concentration_of_catalyst]}}
-        - The initial concentration of substrate: {{run_4[initial_concentration_of_substrate]}}
-        - The final concentration of substrate: {{run_4[final_concentration_of_substrate]}}
-        - The initial concentration of product: {{run_4[initial_concentration_of_product]}}
-        - The final concentration of product: {{run_4[final_concentration_of_product]}}
-        - Mass balance gap: {{run_4[mass_balance_gap]}}
-        - Mass balance gap at midpoint: {{run_4[mass_gap_mid]}}
-        - Catalyst stability: {{run_4[catalyst_stability]}}
-        - Induction period: {{run_4[induction_period]}}
-        
-        ## Explanation of the metrics
-        Mass balance gap:
-        This metrics indicates how much mass is "missing" from expected total. High gaps my suggest side reactions or deactivation.
-        This metrics measures the absolute difference between the substrate loss and the product gain.
-
-        Mass balance gap at midpoint:
-        This metrics indicates how much mass is "missing" from expected total at midpoint of the reaction. Can singal mid-reaction instabilities.
-        This metrics measures the absolute difference between the substrate loss and the product gain at the midpoint of the reaction.
-
-        Catalyst stability:
-        This metrics indicates how stable the catalyst is. If the value is close to 1, the catalyst is stable. Much less than 1 means that the catalyst is unstable.
-        This metrics is calculated by the final reaction rate devided by the initial reaction rate.
-
-        Induction period:
-        Indicates the time before the reaction rate becomes significant. A long period may suggest catalyst activation delays. 
-        This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
-        """
 
         prompts_train = []
         for i in range(self.x1_train.shape[0]):
@@ -504,3 +589,217 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             return ans
         else:
             return "NONE"
+
+
+class KineticDataCategoryClassificationWithRawDataMetrics(KineticDataCategoryClassificationWithMetrics):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.question_template = ("""
+            <|im_start|>assistant
+            You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
+            
+            <|im_start|>user
+            Analyze the reaction behaviour and catalyst performance, then estimate the reaction categories based on the following data and metrics.
+            Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. Do not provide final answer different than what it provided in this list. 
+
+            # Possible reaction categories
+            All reactions are conversion from substrate S to product P with catalyst.
+
+            1. Core mechanism
+            Core mechanism is represented by the following reaction.
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2
+
+            2. Mechanism with bicatalytic steps
+            Examples:
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>cat2;k3,k-3
+            - S+cat2<=>((cat)2S);k1,k-1|((cat)2S)<=>P+cat2;k2,k-2|2cat<=>cat2;k3,k-3
+            - X+catS<=>S+cat;k1,k-1|X+catS<=>P+cat;k2,k-2
+            - S+cat<=>catS;k1,k-1|catS+cat<=>catP;k2,k-2|catP<=>P+cat;k3,k-3
+
+            3 Mechanism with catalyst activation steps
+            Examples:
+            - cat<=>cat*;k1,0|S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2
+            - S+cat<=>catS;k1,k-1|S+catS<=>catS2;k3,k-3|catS<=>P+cat;k2,k-2
+            - S+cat*<=>cat*S;k1,k-1|cat*S<=>P+cat*;k2,k-2|cat+L<=>cat*;k3,k-3
+
+            4. Mechanism with catalyst deactivation steps
+            Examples:
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+cat<=>inactive catI;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+cat<=>inactive catS;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+cat<=>inactive catP;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2cat<=>inactive cat2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|catS<=>inactive catS;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|inhibitor+catS<=>inactive catSI;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|S+catS<=>inactive catS2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|P+catS<=>inactive catSP;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|2catS<=>inactive cat2S2;k-3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat+catS<=>inactive cat2S;k3,0
+            - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
+            
+            {}
+
+            <|im_end|>
+
+            <|im_start|>assistant
+            <think> Okay"""
+        )
+
+    def load(self) -> DatasetDict:
+        """
+        Load and prepare the dataset for the task.
+
+        Returns:
+            DatasetDict: Dataset with 'train' and 'test' splits
+        """
+
+        # Assume the dataset is in the same directory as the script
+        x1_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "x1_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        x2_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "x2_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        y_train_path = os.path.join(
+            self.dataset_id_or_path,
+            "y_train_M1_M20_train_val_test_set_part_0.pkl",
+        )
+
+        x1_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "x1_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        x2_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "x2_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
+        y_test_path = os.path.join(
+            self.dataset_id_or_path,
+            "y_val_M1_M20_train_val_test_set_part_0.pkl",
+        )
+
+        # Implement dataset loading logic
+        with open(x1_train_path, "rb") as f:
+            self.x1_train = pickle.load(f)
+        with open(x2_train_path, "rb") as f:
+            self.x2_train = pickle.load(f)
+        with open(y_train_path, "rb") as f:
+            self.y_train = pickle.load(f)
+
+        # Validate data shapes
+        if not (len(self.x1_train) == len(self.x2_train) == len(self.y_train)):
+            raise ValueError(
+                f"Data shapes mismatch: x1_train={len(self.x1_train)}, "
+                f"x2_train={len(self.x2_train)}, y_train={len(self.y_train)}"
+            )
+
+        with open(x1_test_path, "rb") as f:
+            self.x1_test = pickle.load(f)
+        with open(x2_test_path, "rb") as f:
+            self.x2_test = pickle.load(f)
+        with open(y_test_path, "rb") as f:
+            self.y_test = pickle.load(f)
+
+        # Validate test data shapes
+        if not (len(self.x1_test) == len(self.x2_test) == len(self.y_test)):
+            raise ValueError(
+                f"Test data shapes mismatch: x1_test={len(self.x1_test)}, "
+                f"x2_test={len(self.x2_test)}, y_test={len(self.y_test)}"
+            )
+
+        self.y_test = self.y_test.reshape(-1, 1)[: self.x1_test.shape[0]]
+
+        prompts_train = []
+        for i in range(self.x1_train.shape[0]):
+            data = self.generate_data_pass_to_prompt(i, is_test=False)
+            calculator = KineticMetricsCalculator(data)
+            # calculator.process_sample()
+            metrics = calculator.summarize_minimum_important_value()
+
+            for key, value in metrics.items():
+                for k, v in value.items():
+                    data[key][k] = v
+
+            prompt = prompt_template_with_raw_data.format(**data)
+            prompts_train.append(prompt)
+
+        convert_from_class_to_category = {
+            0: "Core mechanism",
+            1: "Mechanism with bicatalytic steps",
+            2: "Mechanism with bicatalytic steps",
+            3: "Mechanism with bicatalytic steps",
+            4: "Mechanism with bicatalytic steps",
+            5: "Mechanism with catalyst activation steps",
+            6: "Mechanism with catalyst activation steps",
+            7: "Mechanism with catalyst activation steps",
+            8: "Mechanism with catalyst deactivation steps",
+            9: "Mechanism with catalyst deactivation steps",
+            10: "Mechanism with catalyst deactivation steps",
+            11: "Mechanism with catalyst deactivation steps",
+            12: "Mechanism with catalyst deactivation steps",
+            13: "Mechanism with catalyst deactivation steps",
+            14: "Mechanism with catalyst deactivation steps",
+            15: "Mechanism with catalyst deactivation steps",
+            16: "Mechanism with catalyst deactivation steps",
+            17: "Mechanism with catalyst deactivation steps",
+            18: "Mechanism with catalyst deactivation steps",
+            19: "Mechanism with catalyst deactivation steps",
+        }
+
+        train_dict = {
+            "problem": prompts_train,
+            "solution": [
+                convert_from_class_to_category[y]
+                for y in self.y_train.flatten().tolist()
+            ],
+            "options": [
+                [
+                    "Core mechanism",
+                    "Mechanism with bicatalytic steps",
+                    "Mechanism with catalyst activation steps",
+                    "Mechanism with catalyst deactivation steps",
+                ]
+                for _ in range(self.x1_train.shape[0])
+            ],
+        }
+
+        prompts_test = []
+        for i in range(self.x1_test.shape[0]):
+            data = self.generate_data_pass_to_prompt(i, is_test=True)
+            calculator = KineticMetricsCalculator(data)
+            metrics = calculator.summarize_minimum_important_value()
+
+            for key, value in metrics.items():
+                for k, v in value.items():
+                    data[key][k] = v
+
+            prompt = prompt_template_with_raw_data.format(**data)
+            prompts_test.append(prompt)
+
+        test_dict = {
+            "problem": prompts_test,
+            "solution": [
+                convert_from_class_to_category[y]
+                for y in self.y_test.flatten().tolist()
+            ],
+            "options": [
+                [
+                    "Core mechanism",
+                    "Mechanism with bicatalytic steps",
+                    "Mechanism with catalyst activation steps",
+                    "Mechanism with catalyst deactivation steps",
+                ]
+                for _ in range(self.x1_test.shape[0])
+            ],
+        }
+
+        self.dataset = DatasetDict(
+            {
+                "train": Dataset.from_dict(train_dict),
+                "test": Dataset.from_dict(test_dict),
+            }
+        )
+        return self.dataset

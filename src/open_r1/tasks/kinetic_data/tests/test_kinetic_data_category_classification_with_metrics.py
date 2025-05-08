@@ -5,8 +5,9 @@ import pytest
 from transformers import AutoTokenizer
 
 import yaml
-from kinetic_data_category_classification_with_metrics import KineticDataCategoryClassificationWithMetrics
+from kinetic_data_category_classification_with_metrics import KineticDataCategoryClassificationWithMetrics, KineticDataCategoryClassificationWithRawDataMetrics
 from calculation_metrics import KineticMetricsCalculator
+
 
 def load_config(config_path: str) -> dict:
     """Load configuration from YAML file"""
@@ -54,7 +55,7 @@ response_correct_format = """
 """
 
 
-class TestAccuracyReward:
+class TestKineticDataCategoryClassificationWithMetrics:
     def setup_method(self):
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
@@ -116,6 +117,10 @@ class TestAccuracyReward:
             for run in ["run_1", "run_2", "run_3", "run_4"]:
                 assert metrics[run]["final_concentration_of_substrate"] >= 0
 
+    def test_load_data(self):
+        self.classification_task.load()
+        # import pdb; pdb.set_trace()
+
     def test_format_reward(self):
         responses = [response_wrong_format, response_correct_format]
         regex = r"<think>(.*?)</think>.*?<answer>(.*?)</answer>"
@@ -172,3 +177,27 @@ class TestAccuracyReward:
             response_wrong_format
         )
         assert ans == "NONE"
+
+
+class TestKineticDataCategoryClassificationWithRawDataMetrics(TestKineticDataCategoryClassificationWithMetrics):
+    def setup_method(self):
+        # Load configuration
+        config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
+        config = load_config(config_path)
+
+        self.classification_task = (
+            KineticDataCategoryClassificationWithRawDataMetrics(
+                dataset_id_or_path=config["dataset_id_or_path"],
+                model_revision=config["model_revision"],
+                torch_dtype=config["torch_dtype"],
+                attn_implementation=config["attn_implementation"],
+                bf16=config["bf16"],
+                tf32=config["tf32"],
+            )
+        )
+
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "/work/liac/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa",
+            revision=config["model_revision"],
+            trust_remote_code=False,
+        )
