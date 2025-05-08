@@ -21,6 +21,7 @@
 # Note: task_mode should not be defined in the recipe! It should be used in the sbatch command
 
 set -x -e
+ulimit -c 0
 
 source ~/.bashrc
 cd /Documents/sink
@@ -104,6 +105,7 @@ cd /Documents/sink;
 pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip install -U trl==0.15.0 transformers==4.48.2 pandas==2.0.0 torch==2.7.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126;
+pip show vllm numpy pandas;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
