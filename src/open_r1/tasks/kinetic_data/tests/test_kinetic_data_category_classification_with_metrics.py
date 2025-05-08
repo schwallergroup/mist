@@ -5,8 +5,11 @@ import pytest
 from transformers import AutoTokenizer
 
 import yaml
-from kinetic_data_category_classification_with_metrics import KineticDataCategoryClassificationWithMetrics, KineticDataCategoryClassificationWithRawDataMetrics
 from calculation_metrics import KineticMetricsCalculator
+from kinetic_data_category_classification_with_metrics import (
+    KineticDataCategoryClassificationWithMetrics,
+    KineticDataCategoryClassificationWithRawDataMetrics,
+)
 
 
 def load_config(config_path: str) -> dict:
@@ -110,7 +113,9 @@ class TestKineticDataCategoryClassificationWithMetrics:
     def test_data(self):
         self.classification_task.load()
         for i in range(self.classification_task.x1_train.shape[0]):
-            data = self.classification_task.generate_data_pass_to_prompt(i, is_test=False)
+            data = self.classification_task.generate_data_pass_to_prompt(
+                i, is_test=False
+            )
             calculator = KineticMetricsCalculator(data)
             # calculator.process_sample()
             metrics = calculator.summarize_minimum_important_value()
@@ -179,7 +184,9 @@ class TestKineticDataCategoryClassificationWithMetrics:
         assert ans == "NONE"
 
 
-class TestKineticDataCategoryClassificationWithRawDataMetrics(TestKineticDataCategoryClassificationWithMetrics):
+class TestKineticDataCategoryClassificationWithRawDataMetrics(
+    TestKineticDataCategoryClassificationWithMetrics
+):
     def setup_method(self):
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"

@@ -161,6 +161,7 @@ prompt_template_with_raw_data = f"""
         This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
 """
 
+
 class KineticDataCategoryClassificationWithMetrics(RLTask):
     question_template: str = ""
     x1_train: List = None
@@ -172,7 +173,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = ("""
+        self.question_template = """
             <|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
             
@@ -221,7 +222,6 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
             <|im_start|>assistant
             <think> Okay"""
-        )
 
     def load(self) -> DatasetDict:
         """
@@ -591,11 +591,13 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             return "NONE"
 
 
-class KineticDataCategoryClassificationWithRawDataMetrics(KineticDataCategoryClassificationWithMetrics):
+class KineticDataCategoryClassificationWithRawDataMetrics(
+    KineticDataCategoryClassificationWithMetrics
+):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
-        self.question_template = ("""
+
+        self.question_template = """
             <|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
             
@@ -644,7 +646,6 @@ class KineticDataCategoryClassificationWithRawDataMetrics(KineticDataCategoryCla
 
             <|im_start|>assistant
             <think> Okay"""
-        )
 
     def load(self) -> DatasetDict:
         """
