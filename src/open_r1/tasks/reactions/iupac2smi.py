@@ -117,7 +117,7 @@ class Iupac2Smiles(SMILESBasedTask):
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer)
             answer_score = (
-                tanimoto_score(answer_smiles, ref) if answer_smiles else 0
+                tanimoto_score(answer_smiles, ref) if answer_smiles else -0.5
             )
             if answer_score == 1.0:
                 answer_reward = 1.0  # massive bonus for truly correct answer
