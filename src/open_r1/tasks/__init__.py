@@ -2,7 +2,7 @@ from .kinetic_data.kinetic_data_category_classification_with_metrics import (
     KineticDataCategoryClassificationWithMetrics,
 )
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
-from .kinetic_data.kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics
+from .kinetic_data.kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics, KineticDataClassificationWithRawDataMetrics
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.forward import ForwardReaction, ForwardReactionWithTags
@@ -26,6 +26,7 @@ CHEMTASKS = {
     "kinetic": KineticDataClassification,
     "kinetic_metrics": KineticDataClassificationWithMetrics,
     "kinetic_metrics_category": KineticDataCategoryClassificationWithMetrics,
+    "kinetic_metrics_raw_data_category": KineticDataCategoryClassificationWithRawDataMetrics,
     "rxn_inversion": SmilesInversion,
     "rxn_replacement": SmilesReplacement,
     "rxn_naming": Smiles2Name,
