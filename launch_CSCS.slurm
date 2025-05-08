@@ -7,7 +7,7 @@
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
 #SBATCH --environment=vllm071
-#SBATCH -A a-a05
+#SBATCH -A a-a131
 
 # Run like:
 # Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
