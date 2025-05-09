@@ -597,18 +597,23 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 class KineticDataCategoryClassificationWithRawDataMetrics(
     KineticDataCategoryClassificationWithMetrics
 ):
+    question_template: str = ""
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.question_template = """
+        self.question_template = ("""
             <|im_start|>assistant
-            You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
+            You are a useful Chemistry assistant and you will answer the following class prediction question. 
+            Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process.
+            Then end with </think>, and finally put your final answer within <answer>...</answer> tags, for example <answer>Core Mechanism</answer>.
             
             <|im_start|>user
-            Analyze the reaction behaviour and catalyst performance, then estimate the reaction categories based on the following data and metrics.
-            Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. Do not provide final answer different than what it provided in this list. 
+            Estimate the reaction categories based on the following data and metrics.
+            Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. 
+            Do not provide final answer different than what it provided in this list. 
 
-            # Possible reaction categories
+            # Reaction Categories Options
             All reactions are conversion from substrate S to product P with catalyst.
 
             1. Core mechanism
@@ -644,11 +649,11 @@ class KineticDataCategoryClassificationWithRawDataMetrics(
             - S+cat<=>catS;k1,k-1|catS<=>P+cat;k2,k-2|cat<=>inactive cat;k3,0|catS<=>inactive catS;k4,0
             
             {}
-
             <|im_end|>
 
             <|im_start|>assistant
-            <think> Okay"""
+            <think>"""
+        )
 
     def load(self) -> DatasetDict:
         """
