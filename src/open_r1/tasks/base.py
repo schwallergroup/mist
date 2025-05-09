@@ -241,8 +241,8 @@ class RLTaskForDeepSeekDistill(RLTask):
 
         rewards = []
 
+        completions = self.preprocess_completions(completions)
         for completion in completions:
-            completion = "<think>" + completion
             try:
                 if random.random() < 0.01:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
@@ -258,7 +258,72 @@ class RLTaskForDeepSeekDistill(RLTask):
                 rewards.append(0.0)
         return rewards
 
-    def preprocess_response(self, response: str):
+    def format_continuous_reward(self, completions: list[str], **kwargs):
+        """
+        Format: <think>...</think>\boxed{}
+        """
+        rewards = []
+
+        completions = self.preprocess_completions(completions)
+
+        for completion_id, completion in enumerate(completions):
+            current_reward = 0.0
+            try:
+                if random.random() < 0.01:  # 1% chance to print a completion
+                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+                    
+                # 0.2 reward if each tag is present once
+                for tag_word in [
+                    "<think>",
+                    "</think>",
+                    "<box>",
+                    "</box>",
+                ]:
+                    if completion.count(tag_word) == 1:
+                        current_reward += 0.05
+                    else:
+                        current_reward -= 0.05
+                # 0.1 reward if the completion starts with <think> and ends with </answer>
+                if completion.startswith("<think>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                if completion.endswith("</box>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                # 0.1 reward if the thinking is followed by an answer
+                if completion.count("</think>\n<box>") == 1:
+                    current_reward += 0.1
+                else:
+                    current_reward -= 0.1
+                # 0.2 reward is the answer is present
+                pattern = r"<box>(.*)<\/box>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.2
+                elif len(match.groups()) != 1:
+                    current_reward -= 0.05
+                else:
+                    current_reward += 0.2
+                # 0.4 reward is the format is correct
+                pattern = r"<think>(.*)<\/think>\n<box>(.*)<\/box>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.4
+                elif len(match.groups()) != 2:
+                    current_reward -= 0.1
+                else:
+                    current_reward += 0.4
+            except:
+                pass
+            rewards.append(current_reward)
+
+        return rewards
+        
+
+    def preprocess_completions(self, completions: list[str]) -> list[str]:
+        """Add <think> tags to the completions."""
         processed_completions = []
         for completion in completions:
             processed_completions.append(f"<think>{completion}")
