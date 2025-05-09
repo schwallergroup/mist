@@ -14,6 +14,7 @@ rewards:
 - answer_covered_in_reasoning_traces
 
 save_completions: true
+save_completions_dir: /Documents/sink_good_completions_0509
 
 # Training arguments
 max_steps: 2000

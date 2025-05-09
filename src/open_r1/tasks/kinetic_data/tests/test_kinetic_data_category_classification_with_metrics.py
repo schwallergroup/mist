@@ -173,15 +173,11 @@ class TestKineticDataCategoryClassificationWithMetrics:
         )
         assert rewards == [float(0), float(1)]
 
-    def test_preprocess_response(self):
-        ans = self.classification_task.preprocess_response(
-            response_correct_format
+    def test_extract_answer(self):
+        ans = self.classification_task.extract_answer(
+            [response_correct_format, response_wrong_format]
         )
-        assert ans == "Core Mechanism"
-        ans = self.classification_task.preprocess_response(
-            response_wrong_format
-        )
-        assert ans == "NONE"
+        assert ans == ["Core Mechanism", "NONE"]
 
 
 class TestKineticDataCategoryClassificationWithRawDataMetrics(

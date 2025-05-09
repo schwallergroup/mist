@@ -429,11 +429,14 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         # Reward range: -1 to 1
 
         rewards = []
-        completions = [self.preprocess_response(c) for c in completions]
+        completions = self.preprocess_completions(completions)
 
         for completion_id, completion in enumerate(completions):
             current_reward = 0.0
             try:
+                if random.random() < 0.01:  # 1% chance to print a completion
+                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+                    
                 # 0.2 reward if each tag is present once
                 for tag_word in [
                     "<think>",
@@ -485,7 +488,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer is same as ground truth"""
-        answers = [self.preprocess_response(c) for c in completions]
+        completions = self.preprocess_completions(completions)
+        answers = self.extract_answer(completions)
         rewards = []
 
         for i in range(len(solution)):
@@ -583,15 +587,24 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         )
         return self.dataset
 
-    def preprocess_response(self, response):
+    def extract_answer(self, completions: list[str]) -> list[str]:
         """Preprocess the response before checking for accuracy."""
-        pattern = r"<answer>(.*)<\/answer>"
-        m = re.search(pattern, response, re.DOTALL)
-        if m:
-            ans = m.groups()[-1]
-            return ans
-        else:
-            return "NONE"
+        answers = []
+        for completion in completions:
+            pattern = r"<answer>(.*)<\/answer>"
+            m = re.search(pattern, completion, re.DOTALL)
+            if m:
+                ans = m.groups()[-1]
+                answers.append(ans)
+            else:
+                answers.append("NONE")
+        return answers
+
+    def preprocess_completions(self, completions: list[str]) -> list[str]:
+        processed_completions = []
+        for completion in completions:
+            processed_completions.append(f"<think>{completion}")
+        return processed_completions
 
 
 class KineticDataCategoryClassificationWithRawDataMetrics(

@@ -128,7 +128,7 @@ class RLTask(BaseModel):
 
         for completion in completions:
             try:
-                if random.random() < 0.05:
+                if random.random() < 0.00:  # 0% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
                 if not completion.startswith("<think>"):
                     completion = "<think>" + completion
@@ -228,3 +228,51 @@ class SMILESBasedTask(RLTask):
             return m.groups()[1]
         else:
             return "NONE"
+
+
+class RLTaskForDeepSeekDistill(RLTask):
+    def format_reward(self, completions: list[str], **kwargs):
+        """
+        Format: <think>...</think>\boxed{}
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+        """
+
+        rewards = []
+
+        for completion in completions:
+            completion = "<think>" + completion
+            try:
+                if random.random() < 0.01:  # 1% chance to print a completion
+                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+
+                regex = r"<think>(.*?)</think>.*?\\boxed{(.*?)}"
+                match = re.search(regex, completion, re.DOTALL)
+                # if the format is not correct, reward is 0
+                if match is None or len(match.groups()) != 2:
+                    rewards.append(0.0)
+                else:
+                    rewards.append(1.0)
+            except Exception:
+                rewards.append(0.0)
+        return rewards
+
+    def preprocess_response(self, response: str):
+        processed_completions = []
+        for completion in completions:
+            processed_completions.append(f"<think>{completion}")
+        return processed_completions
+    
+    def extract_answer(self, completions: list[str]) -> list[str]:
+        """Extract the answer from the completion."""
+        answers = []
+        for completion in completions:
+            pattern = r"<answer>(.*)<\/answer>"
+            m = re.search(pattern, completion, re.DOTALL)
+            if m:
+                ans = m.groups()[-1]
+                answers.append(ans)
+            else:
+                answers.append("NONE")
+        return answers
