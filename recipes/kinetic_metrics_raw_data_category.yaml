@@ -6,7 +6,7 @@ bf16: true
 tf32: true
 
 # Chemical Task arguments
-chem_task: kinetic_metrics_category
+chem_task: kinetic_metrics_raw_data_category
 dataset_id_or_path: /work/liac/kinetic
 rewards:
 - format_continuous

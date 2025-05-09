@@ -5,7 +5,6 @@ from .kinetic_data.kinetic_data_category_classification_with_metrics import (
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
 from .kinetic_data.kinetic_data_classification_with_metrics import (
     KineticDataClassificationWithMetrics,
-    KineticDataClassificationWithRawDataMetrics,
 )
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
