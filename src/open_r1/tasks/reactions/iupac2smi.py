@@ -26,6 +26,9 @@ class Iupac2Smiles(SMILESBasedTask):
         
         elif self.task_mode == 'tagged':
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
+        
+        elif self.task_mode == 'tagged_no_okay':
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
             
         elif self.task_mode == 'no_instruct':
             self.question_template = (
@@ -79,6 +82,7 @@ class Iupac2Smiles(SMILESBasedTask):
             {"train": train_dataset, "test": test_dataset}
         )
         return self.dataset
+    
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -185,56 +189,6 @@ class Iupac2Smiles(SMILESBasedTask):
             self.custom_metrics["reasoning_tanimoto"].append(reasoning_score)
             
             rewards.append(reasoning_reward)
-
-        return rewards
-
-    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
-        """Reward function using Tanimoto similarity between prediction and ground truth."""
-        answers = [self.preprocess_response(c) for c in completions]
-
-        rewards = []
-        for content, sol in zip(answers, solution):
-            if content == "NONE":
-                rewards.append(-1)
-                continue
-
-            try:
-                # Convert ground truth SMILES to molecule and fingerprint
-                gold_mol = Chem.MolFromSmiles(sol)
-                if gold_mol is None:
-                    rewards.append(-1)
-                    continue
-                gold_fp = AllChem.GetMorganFingerprintAsBitVect(gold_mol, 2)
-
-                # Convert prediction SMILES to molecule and fingerprint
-                pred_mol = Chem.MolFromSmiles(content)
-                if pred_mol is None:
-                    rewards.append(-1)
-                    continue
-                pred_fp = AllChem.GetMorganFingerprintAsBitVect(pred_mol, 2)
-
-                # Calculate Tanimoto similarity
-                tanimoto = DataStructs.TanimotoSimilarity(gold_fp, pred_fp)
-
-                # Scale the reward:
-                # 1.0 for perfect match
-                # Proportional to similarity for partial matches
-                # Still penalize very poor predictions
-                if tanimoto == 1.0:
-                    reward = 1.0
-                    self.log_correct(content)
-                elif tanimoto < 0.3:  # You can adjust this threshold
-                    reward = -0.5
-                else:
-                    reward = (
-                        tanimoto - 0.3
-                    )  # Shifts the reward to be negative for very low similarities
-
-                rewards.append(reward)
-
-            except Exception as e:
-                rewards.append(-1)
-                continue
 
         return rewards
 
