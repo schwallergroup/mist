@@ -143,7 +143,7 @@ class Iupac2Smiles(SMILESBasedTask):
                 "answer_tanimoto_score [0, 1]": answer_score,
                 # "reasoning_reward [-0.5, 1]": reasoning_reward,
                 # "answer_reward [-0.5, 1]": answer_reward,
-                "accuracy_reward [-1, 2]": reward,
+                "accuracy_reward [-1, 1]": reward,
                 "full_completion": completion,
             }
 
