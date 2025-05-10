@@ -30,6 +30,9 @@ class Iupac2Smiles(SMILESBasedTask):
         elif self.task_mode == 'tagged_no_okay':
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
             
+        elif self.task_mode == 'tagged_no_okay_short':
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags. Keep the total length of your response, both reasoning and answer, no more than 4000 words.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+            
         elif self.task_mode == 'no_instruct':
             self.question_template = (
                 "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
