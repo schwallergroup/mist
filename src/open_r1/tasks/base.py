@@ -229,10 +229,14 @@ class RLTask(BaseModel):
 
         return rewards
     
-    def preprocess_completions(self, completions):
-        if not completions.startswith("<think>"):
-            completions = "<think>" + completions
-        return completions
+    def preprocess_completions(self, completions: list[str]):
+        res = []
+        for completion in completions:
+            if not completion.startswith("<think>"):
+                completion = "<think>" + completion
+                
+            res.append(completion)
+        return res
 
     def reasoning_steps_reward(self, completions, **kwargs):
         r"""Reward function that checks for clear step-by-step reasoning.
