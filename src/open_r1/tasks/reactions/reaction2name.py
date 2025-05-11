@@ -304,6 +304,9 @@ class Smiles2NameV2(Smiles2Name):
     completion_hash_history_max_repetitions: int = 2
     completion_size_penalty: float = 1.0
     completion_size_minimum: int = 50
+    completion_shortening_penalty: float = 10.0
+    completion_shortening_interval_high: int = 25000
+    completion_shortening_interval_low: int = 1000
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -318,6 +321,9 @@ class Smiles2NameV2(Smiles2Name):
         self.completion_size_penalty = self.task_kwargs.get("completion_size_penalty", 1.0)
         self.completion_size_minimum = self.task_kwargs.get("completion_size_minimum", 50)
         self.accuracy_give_penalty_to_invalid_answer = self.task_kwargs.get("accuracy_give_penalty_to_invalid_answer", False)
+        self.completion_shortening_penalty = self.task_kwargs.get("completion_shortening_penalty", 10.0)
+        self.completion_shortening_interval_high = self.task_kwargs.get("completion_shortening_interval_high", 25000)
+        self.completion_shortening_interval_low = self.task_kwargs.get("completion_shortening_interval_low", 1000)
 
     def accuracy_reward(self, completions, **kwargs):
         completions = self.preprocess_completions(completions)
@@ -456,3 +462,16 @@ class Smiles2NameV2(Smiles2Name):
         # Final range: [-1, -0.5]
         rewards = [(r - 3) / 4 for r in rewards]
         return rewards
+
+    def completion_shortening_reward(self, completions, **kwargs):
+        rewards = []
+        for completion in completions:
+            reward = 0.0
+            size = len(completion)
+            if size > self.completion_shortening_interval_high:
+                reward = -self.completion_shortening_penalty
+            elif size > self.completion_shortening_interval_low:
+                reward = -self.completion_shortening_penalty * (size - self.completion_shortening_interval_low) / (self.completion_shortening_interval_high - self.completion_shortening_interval_low)
+            rewards.append(reward)
+        return rewards
+
