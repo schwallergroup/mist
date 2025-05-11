@@ -249,7 +249,9 @@ class RLTask(BaseModel):
         
         for completion in completions:
             length = len(tokenizer.tokenize(completion))
-            if length < min_length:
+            if not completion.strip().endswith("</answer>"):
+                reward = 0.0
+            elif length < min_length:
                 reward = np.exp(-(min_length - length)**2 / (2 * var))
             elif length > max_length:
                 reward = np.exp(-(length - max_length)**2 / (2 * var))
