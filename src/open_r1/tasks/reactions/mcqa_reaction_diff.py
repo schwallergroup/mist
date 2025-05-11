@@ -296,10 +296,10 @@ class SmilesReplacementV2(SmilesReplacement):
         incorrect_solutions = [s for s in possible_solutions if s not in correct_solutions]
         return correct_solutions, incorrect_solutions
 
-    def accuracy_reward(self, prompt, completions, solution, options, **kwargs):
+    def accuracy_reward(self, prompts, completions, solution, options, **kwargs):
         completions = self.preprocess_completions(completions)
         rewards = []
-        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompt, completions, solution, options)):
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
             reward = 0.0
             # Parse answer
             answer = self.preprocess_response(completion).strip()
@@ -332,10 +332,10 @@ class SmilesReplacementV2(SmilesReplacement):
 
         return rewards
 
-    def accuracy_percentage_reward(self, prompt, completions, solution, options, **kwargs):
+    def accuracy_percentage_reward(self, prompts, completions, solution, options, **kwargs):
         completions = self.preprocess_completions(completions)
         rewards = []
-        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompt, completions, solution, options)):
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
             reward = 0.0
             # Parse answer
             answer = self.preprocess_response(completion).strip()
@@ -348,10 +348,10 @@ class SmilesReplacementV2(SmilesReplacement):
             rewards.append(reward)
         return rewards
 
-    def accuracy_sol_reward(self, prompt, completions, solution, options, **kwargs):
+    def accuracy_sol_reward(self, prompts, completions, solution, options, **kwargs):
         completions = self.preprocess_completions(completions)
         rewards = []
-        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompt, completions, solution, options)):
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
             reward = 0.0
             # Parse answer
             answer = self.preprocess_response(completion).strip()
@@ -364,10 +364,10 @@ class SmilesReplacementV2(SmilesReplacement):
             rewards.append(reward)
         return rewards
 
-    def accuracy_let_reward(self, prompt, completions, solution, options, **kwargs):
+    def accuracy_let_reward(self, prompts, completions, solution, options, **kwargs):
         completions = self.preprocess_completions(completions)
         rewards = []
-        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompt, completions, solution, options)):
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
             reward = 0.0
             # Parse answer
             answer = self.preprocess_response(completion).strip()
@@ -380,10 +380,10 @@ class SmilesReplacementV2(SmilesReplacement):
             rewards.append(reward)
         return rewards
 
-    def accuracy_letsol_reward(self, prompt, completions, solution, options, **kwargs):
+    def accuracy_letsol_reward(self, prompts, completions, solution, options, **kwargs):
         completions = self.preprocess_completions(completions)
         rewards = []
-        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompt, completions, solution, options)):
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
             reward = 0.0
             # Parse answer
             answer = self.preprocess_response(completion).strip()
