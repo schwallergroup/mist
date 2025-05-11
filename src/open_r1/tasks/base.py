@@ -7,6 +7,7 @@ format_reward, accuracy_reward
 import os
 import random
 import re
+import hashlib
 from dataclasses import field
 from typing import Any, Dict, Optional
 
@@ -74,6 +75,28 @@ class RLTask(BaseModel):
     response_print: str = "\n\n======<CORRECT_RESPONSE>========\n{}"
     begin_smiles_tag: str = "[BEGIN_SMILES]"
     end_smiles_tag: str = "[END_SMILES]"
+
+    completion_hash_history: list = field(default_factory=list)
+    completion_hash_history_buffer_size: int = 1024
+    completion_hash_history_penalty: float = 2.0
+    completion_hash_history_max_repetitions: int = 2
+    completion_size_penalty: float = 1.0
+    completion_size_minimum: int = 50
+    completion_shortening_penalty: float = 10.0
+    completion_shortening_interval_high: int = 25000
+    completion_shortening_interval_low: int = 1000
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.completion_hash_history = []
+        self.completion_hash_history_buffer_size = self.task_kwargs.get("completion_hash_history_buffer_size", 1024)
+        self.completion_hash_history_penalty = self.task_kwargs.get("completion_hash_history_penalty", 2.0)
+        self.completion_hash_history_max_repetitions = self.task_kwargs.get("completion_hash_history_max_repetitions", 2)
+        self.completion_size_penalty = self.task_kwargs.get("completion_size_penalty", 1.0)
+        self.completion_size_minimum = self.task_kwargs.get("completion_size_minimum", 50)
+        self.completion_shortening_penalty = self.task_kwargs.get("completion_shortening_penalty", 10.0)
+        self.completion_shortening_interval_high = self.task_kwargs.get("completion_shortening_interval_high", 25000)
+        self.completion_shortening_interval_low = self.task_kwargs.get("completion_shortening_interval_low", 1000)
 
     def load(self) -> Any:
         """Define load method if not hf dataset."""
@@ -200,6 +223,134 @@ class RLTask(BaseModel):
 
     def count_waits(self, completion: str):
         return completion.lower().count("wait")
+
+    def preprocess_completions(self, completions: list[str]) -> list[str]:
+        """
+        Ensure each completion string starts with a <think> tag.
+        If it already does, leave it as-is; otherwise prepend '<think>'.
+        """
+        processed_completions = []
+        for completion in completions:
+            if completion.startswith("<think>") is False:
+                processed_completions.append(f"<think>{completion}")
+            else:
+                processed_completions.append(completion)
+        return processed_completions
+
+    def format_continuous_reward(
+        self, completions, **kwargs
+    ):
+        """
+        Format: <think>...</think><answer>...</answer>
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+
+        Returns:
+            list[float]: Reward scores
+        """
+        # Reward goal: ensure a good format
+        # Reward range: -1 to 1
+
+        completions = self.preprocess_completions(completions)
+        rewards = []
+
+        for completion_id, completion in enumerate(completions):
+            current_reward = 0.0
+            try:
+                # 0.2 reward if each tag is present once
+                for tag_word in [
+                    "<think>",
+                    "</think>",
+                    "<answer>",
+                    "</answer>",
+                ]:
+                    if completion.count(tag_word) == 1:
+                        current_reward += 0.05
+                    else:
+                        current_reward -= 0.05
+                # 0.1 reward if the completion starts with <think> and ends with </answer>
+                if completion.startswith("<think>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                if completion.endswith("</answer>"):
+                    current_reward += 0.05
+                else:
+                    current_reward -= 0.05
+                # 0.1 reward if the thinking is followed by an answer
+                if completion.count("</think>\n<answer>") == 1:
+                    current_reward += 0.1
+                else:
+                    current_reward -= 0.1
+                # 0.2 reward is the answer is present
+                pattern = r"<answer>(.*)<\/answer>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.2
+                elif len(match.groups()) != 1:
+                    current_reward -= 0.05
+                else:
+                    current_reward += 0.2
+                # 0.4 reward is the format is correct
+                pattern = r"<think>(.*)<\/think>\n<answer>(.*)<\/answer>"
+                match = re.search(pattern, completion, re.DOTALL)
+                if match is None:
+                    current_reward -= 0.4
+                elif len(match.groups()) != 2:
+                    current_reward -= 0.1
+                else:
+                    current_reward += 0.4
+            except:
+                pass
+            rewards.append(current_reward)
+
+        return rewards
+
+    def completion_difference_reward(self, completions, **kwargs):
+        rewards = []
+
+        for completion_id, completion in enumerate(completions):
+            reward = 0.0
+            completion_hash = hashlib.sha256(completion.encode()).hexdigest()[:8]
+
+            # Give penalty if the completion is a repetition
+            if self.completion_hash_history.count(completion_hash) >= self.completion_hash_history_max_repetitions:
+                reward = -self.completion_hash_history_penalty
+
+            # Update hash history
+            self.completion_hash_history.append(completion_hash)
+            if len(self.completion_hash_history) > self.completion_hash_history_buffer_size:
+                self.completion_hash_history.pop(0)
+
+            rewards.append(reward)
+
+        return rewards
+
+    def completion_size_reward(self, completions, **kwargs):
+        rewards = []
+        for completion in completions:
+            reward = 0.0
+            size = len(completion)
+            if size < self.completion_size_minimum:
+                reward = -self.completion_size_penalty * (self.completion_size_minimum - size) / self.completion_size_minimum
+            rewards.append(reward)
+        return rewards
+
+    def completion_shortening_reward(self, completions, **kwargs):
+        rewards = []
+        for completion in completions:
+            reward = 0.0
+            size = len(completion)
+            if size > self.completion_shortening_interval_high:
+                reward = -self.completion_shortening_penalty
+            elif size > self.completion_shortening_interval_low:
+                reward = -self.completion_shortening_penalty * (size - self.completion_shortening_interval_low) / (self.completion_shortening_interval_high - self.completion_shortening_interval_low)
+            rewards.append(reward)
+        return rewards
+
+
+
 
 
 class SMILESBasedTask(RLTask):
