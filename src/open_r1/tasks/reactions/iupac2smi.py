@@ -22,16 +22,30 @@ class Iupac2Smiles(SMILESBasedTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if self.task_mode == 'base':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
         
         elif self.task_mode == 'tagged':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
         
         elif self.task_mode == 'tagged_no_okay':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
             
         elif self.task_mode == 'tagged_no_okay_short':
-            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags. Keep the total length of your response, both reasoning and answer, no more than 4000 words.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+            self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags. Keep the total length of your response, both reasoning and answer, no more than 4000 words.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
+        
+        elif self.task_mode == 'qwen_base':
+            
+            self.question_template = ("""
+                <|im_start|>assistant
+                You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>
+                
+                <|im_start|>user
+                Please write the SMILES representation of the molecule: {}. 
+                <|im_end|>
+
+                <|im_start|>assistant
+                <think>"""
+            )
             
         elif self.task_mode == 'no_instruct':
             self.question_template = (
