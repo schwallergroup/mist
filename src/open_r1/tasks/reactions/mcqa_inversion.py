@@ -2,6 +2,7 @@
 from ..base import RLTask
 import numpy as np
 import re
+import hashlib
 from random import random
 from datasets import Dataset, DatasetDict
 import pandas as pd
@@ -36,19 +37,27 @@ class SmilesInversion(RLTask):
     def load(self) -> DatasetDict:
 
         "loading & preping the dataset"
-        
+
         df = pd.read_csv(self.dataset_id_or_path)
+        np.random.seed(42)
         shuffled = [np.random.permutation(row).tolist() for row in df[['true_reaction', 'fake1', 'fake2', 'fake3']].values]
         train_dict = {
             'solution': df['true_reaction'].tolist(),
             'options': shuffled
         }
-        
+
         train_dataset = Dataset.from_dict(train_dict)
-        train_test_split = train_dataset.train_test_split(test_size=0.1)
+        train_test_split_seed = 42
+        train_test_split = train_dataset.train_test_split(test_size=0.1, seed=train_test_split_seed)
         train_dataset = train_test_split['train']
         test_dataset = train_test_split['test']
-        
+        # Print hash of the first train example
+        first_train_problem_hash = hashlib.sha256(train_dataset[0]['solution'].encode()).hexdigest()[:8]
+        first_test_problem_hash = hashlib.sha256(test_dataset[0]['solution'].encode()).hexdigest()[:8]
+        print(f"SmilesReplacement train_test_split shuffling seed: {train_test_split_seed}")
+        print(f"First train solution hash: {first_train_problem_hash}")
+        print(f"First test solution hash: {first_test_problem_hash}")
+
         # Combine into DatasetDict
         self.dataset = DatasetDict({
             'train': train_dataset,
@@ -245,3 +254,139 @@ class SmilesInversion(RLTask):
                 rewards.append(current_reward)
 
             return rewards
+
+class SmilesInversionV2(SmilesInversion):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def generate_prompt(self, tokenizer, **kwargs):
+        """Prompt for the MC task"""
+        options = kwargs.get("options", [])
+        return {
+            "prompt": self.question_template.format(*options),
+            "options": options
+        }
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
+        self.dataset["test"] = self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
+
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(tokenizer, options=x["options"]))
+
+        return self.dataset
+
+    def _build_solutions(self, solution, options):
+        # Build correct and incorrect solutions
+        assert len(options) == 4, "Options should be of length 4"
+        letters = "ABCD"
+        correct_solution_index = options.index(solution)
+        possible_solutions = [
+            [
+                options[i],
+                letters[i],
+                f"{letters[i]}. {options[i]}"
+            ] for i in range(len(options))
+        ]
+        correct_solutions = possible_solutions[correct_solution_index]
+        incorrect_solutions = [s for s in possible_solutions if s not in correct_solutions]
+        return correct_solutions, incorrect_solutions
+
+    def accuracy_reward(self, prompts, completions, solution, options, **kwargs):
+        completions = self.preprocess_completions(completions)
+        rewards = []
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
+            reward = 0.0
+            # Parse answer
+            answer = self.preprocess_response(completion).strip()
+            # Build correct and incorrect solutions
+            correct_solutions, incorrect_solutions = self._build_solutions(solution=sol, options=opts)
+
+            if answer in correct_solutions:
+                reward = 1.0
+            elif answer in incorrect_solutions:
+                reward = 0.2
+
+            rewards.append(reward)
+
+            # Print
+            print_proba = 0.01
+            if reward >= 1.0:
+                print_proba = print_proba * 5
+            elif reward >= 0.2:
+                print_proba = print_proba * 2
+            if random() < print_proba:
+                print("======= RANDOM_COMPLETION =======")
+                print(f"Solution: {correct_solutions[2]}")
+                answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
+                print(f"Answer:   {answer_formatted}")
+                print(f"Accuray reward: {reward:.4f}")
+                print(f"Options:")
+                for letter, opt in zip("ABCD", opts):
+                    print(f"\t{letter}. {opt}{' [CORRECT]' if opt == sol else ''}")
+                print(f"Completion:\n{completion}\n")
+
+        return rewards
+
+    def accuracy_percentage_reward(self, prompts, completions, solution, options, **kwargs):
+        completions = self.preprocess_completions(completions)
+        rewards = []
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
+            reward = 0.0
+            # Parse answer
+            answer = self.preprocess_response(completion).strip()
+            # Build correct and incorrect solutions
+            correct_solutions, incorrect_solutions = self._build_solutions(solution=sol, options=opts)
+
+            if answer in correct_solutions:
+                reward = 1.0
+
+            rewards.append(reward)
+        return rewards
+
+    def accuracy_sol_reward(self, prompts, completions, solution, options, **kwargs):
+        completions = self.preprocess_completions(completions)
+        rewards = []
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
+            reward = 0.0
+            # Parse answer
+            answer = self.preprocess_response(completion).strip()
+            # Build correct and incorrect solutions
+            correct_solutions, incorrect_solutions = self._build_solutions(solution=sol, options=opts)
+
+            if answer == correct_solutions[0]:
+                reward = 0.1
+
+            rewards.append(reward)
+        return rewards
+
+    def accuracy_let_reward(self, prompts, completions, solution, options, **kwargs):
+        completions = self.preprocess_completions(completions)
+        rewards = []
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
+            reward = 0.0
+            # Parse answer
+            answer = self.preprocess_response(completion).strip()
+            # Build correct and incorrect solutions
+            correct_solutions, incorrect_solutions = self._build_solutions(solution=sol, options=opts)
+
+            if answer == correct_solutions[1]:
+                reward = 0.1
+
+            rewards.append(reward)
+        return rewards
+
+    def accuracy_letsol_reward(self, prompts, completions, solution, options, **kwargs):
+        completions = self.preprocess_completions(completions)
+        rewards = []
+        for i, (_prompt, completion, sol, opts) in enumerate(zip(prompts, completions, solution, options)):
+            reward = 0.0
+            # Parse answer
+            answer = self.preprocess_response(completion).strip()
+            # Build correct and incorrect solutions
+            correct_solutions, incorrect_solutions = self._build_solutions(solution=sol, options=opts)
+
+            if answer == correct_solutions[2]:
+                reward = 0.1
+
+            rewards.append(reward)
+        return rewards
