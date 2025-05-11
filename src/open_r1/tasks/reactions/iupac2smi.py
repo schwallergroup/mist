@@ -35,16 +35,14 @@ class Iupac2Smiles(SMILESBasedTask):
         
         elif self.task_mode == 'qwen_base':
             
-            self.question_template = ("""
-                <|im_start|>assistant
-                You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>
-                
-                <|im_start|>user
-                Please write the SMILES representation of the molecule: {}. 
-                <|im_end|>
-
-                <|im_start|>assistant
-                <think>"""
+            self.question_template = (
+                "<|im_start|>assistant\n"
+                "You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Please write the SMILES representation of the molecule: {}.\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<think>"
             )
             
         elif self.task_mode == 'no_instruct':
