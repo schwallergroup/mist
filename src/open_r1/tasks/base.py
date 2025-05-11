@@ -11,9 +11,11 @@ from dataclasses import field
 from typing import Any, Dict, Optional
 
 from datasets import load_dataset
+import numpy as np
 from rdkit import Chem, RDLogger
 
 from pydantic import BaseModel, Field
+from transformers import AutoTokenizer
 
 RDLogger.DisableLog("rdApp.*")
 
@@ -225,6 +227,35 @@ class RLTask(BaseModel):
                 completion = "<think>" + completion
                 
             res.append(completion)
+        return res
+    
+    def length_control_reward(self, completions, **kwargs):
+        r"""Reward function that checks for length of the completion.
+        Args:
+            completions (list[str]): Generated outputs
+            min_length (int): Minimum length of the completion
+            max_length (int): Maximum length of the completion
+
+        Returns:
+            list[float]: Reward scores
+        """
+        min_length=2000
+        max_length=4000
+        std=500
+        
+        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
+        var = std ** 2
+        res = []
+        
+        for completion in completions:
+            length = len(tokenizer.tokenize(completion))
+            if length < min_length:
+                reward = np.exp(-(min_length - length)**2 / (2 * var))
+            elif length > max_length:
+                reward = np.exp(-(length - max_length)**2 / (2 * var))
+            else:
+                reward = 1.0
+            res.append(reward)
         return res
 
     def reasoning_steps_reward(self, completions, **kwargs):
