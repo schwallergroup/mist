@@ -252,6 +252,15 @@ class Iupac2SmilesV2(RLTask):
                 "<|im_start|>assistant\n"
                 "<think>"
             )
+        elif self.task_mode == 'promptNFT': # No Format Tagged
+            self.question_template = (
+                "<|im_start|>assistant\n"
+                "You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures and then give your final answer at the end of the answer.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<think>"
+            )
         elif self.task_mode == 'promptP2': # Vu's prompt
             self.question_template = (
                 "<|im_start|>assistant"
