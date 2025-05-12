@@ -658,7 +658,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         rewards = []
         for sol, completion in zip(solution, completions):
             if sol in completion:
-                rewards.append(0.1)
+                rewards.append(0.2)
             else:
                 rewards.append(0)
 
