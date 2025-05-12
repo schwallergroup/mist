@@ -34,7 +34,7 @@ fi
 
 MODEL_ARGS="model_name=$MODEL_PATH,dtype=bfloat16,max_num_batched_tokens=16384,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=$NUM_GPUS,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}"
 
-OUTPUT_DIR=evals/${MODEL}_${JOB_ID}
+OUTPUT_DIR=evals/${MODEL_ID}_${JOB_ID}
 
 
 export NCCL_TIMEOUT=3600
@@ -49,9 +49,9 @@ export NCCL_SOCKET_TIMEOUT=23
 export NCCL_TREE_THRESHOLD=0
 export CUDA_LAUNCH_BLOCKING=1
 export SSL_CERT_FILE="cacert.pem"
+export LD_LIBRARY_PATH="/usr/local/cuda/lib64"
 
 export LAUNCHER="conda deactivate;
-nvcc --version;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -U git+https://github.com/XuanVuNguyen/lighteval;
@@ -60,8 +60,7 @@ pip install -e . --no-deps;
 pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0 vllm==0.7.1;
 pip install -U torch==2.7.0 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu126;
 pip show torch vllm;
-nvcc --version;
-LD_LIBRARY_PATH=/usr/local/cuda/lib64 lighteval vllm \"$MODEL_ARGS\" \"custom|iupacsm|0|0\" \
+lighteval vllm \"$MODEL_ARGS\" \"custom|iupacsm|0|0\" \
     --custom-tasks src/open_r1/chem_evaluate/iupacsm.py \
     --output-dir $OUTPUT_DIR \
 "
