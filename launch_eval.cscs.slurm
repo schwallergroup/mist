@@ -26,15 +26,15 @@ export NUM_GPUS=1 # Set to 8 for 32B and 70B models
 export MODEL_ID='Qwen2.5-3B_pretrained-v6-1'
 export JOB_ID=0
 
-if [ $MODEL_PATH = 0 ]; then
+if [ $JOB_ID = 0 ]; then
     MODEL_PATH=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 else
     MODEL_PATH=/cache/checkpoints/${MODEL_ID}/${JOB_ID}
 fi
 
-MODEL_ARGS="pretrained=$MODEL_PATH,dtype=bfloat16,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=$NUM_GPUS,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}"
+MODEL_ARGS="model_name=$MODEL_PATH,dtype=bfloat16,max_num_batched_tokens=16384,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=$NUM_GPUS,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}"
 
-OUTPUT_DIR=evals/$MODEL_$JOB_ID
+OUTPUT_DIR=evals/${MODEL}_${JOB_ID}
 
 
 export NCCL_TIMEOUT=3600
@@ -54,13 +54,21 @@ export LAUNCHER="conda deactivate;
 nvcc --version;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein rdkit wandb exmol;
-pip install -e . --no-deps;
-pip install -U trl==0.15.0 transformers==4.48.2 pandas==2.0.0 torch==2.7.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126;
 pip install -U git+https://github.com/XuanVuNguyen/lighteval;
-lighteval vllm $MODEL_ARGS 'custom|iupacsm|0|0' \
+pip install lighteval[math];
+pip install -e . --no-deps;
+pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0 vllm==0.7.1;
+pip install -U torch==2.7.0 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu126;
+pip show torch vllm;
+nvcc --version;
+LD_LIBRARY_PATH=/usr/local/cuda/lib64 lighteval vllm \"$MODEL_ARGS\" \"custom|iupacsm|0|0\" \
     --custom-tasks src/open_r1/chem_evaluate/iupacsm.py \
     --output-dir $OUTPUT_DIR \
 "
+
+echo $LAUNCHER
+echo $OUTPUT_DIR
+
 SRUN_ARGS=" \
     --wait=60 \
     --kill-on-bad-exit=1 \
