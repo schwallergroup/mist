@@ -389,7 +389,7 @@ class Iupac2SmilesV2(RLTask):
                 print_proba = print_proba * 2
             if random() < print_proba:
                 print("======= RANDOM_COMPLETION =======")
-                print(f"Solution: {solution}")
+                print(f"Solution: {sol}")
                 answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
                 print(f"Answer:   {answer_formatted}")
                 if isinstance(tanimoto_similarity, (float, int)):
