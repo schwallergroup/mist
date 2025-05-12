@@ -350,7 +350,8 @@ class Iupac2SmilesV2(RLTask):
             reward = 0.0
             try:
                 tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
-                reward = tanimoto_similarity / 10
+                if tanimoto_similarity is not None:
+                    reward = tanimoto_similarity / 10
             except:
                 pass
             rewards.append(reward)
@@ -367,14 +368,15 @@ class Iupac2SmilesV2(RLTask):
         rewards = []
         for answer, sol, completion in zip(answers, solution, completions):
             reward = 0.0
-            tanimoto_similarity = "None"
+            tanimoto_similarity = "Error"
             try:
                 tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
-                if self.tanimoto_coeff != 0.0:
-                    base_coeff = math.e ** self.tanimoto_coeff
-                    reward = (base_coeff ** tanimoto_similarity - 1) / (base_coeff - 1)
-                else:
-                    reward = tanimoto_similarity
+                if tanimoto_similarity is not None:
+                    if self.tanimoto_coeff != 0.0:
+                        base_coeff = math.e ** self.tanimoto_coeff
+                        reward = (base_coeff ** tanimoto_similarity - 1) / (base_coeff - 1)
+                    else:
+                        reward = tanimoto_similarity
             except:
                 pass
             rewards.append(reward)
@@ -390,7 +392,7 @@ class Iupac2SmilesV2(RLTask):
                 print(f"Solution: {solution}")
                 answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
                 print(f"Answer:   {answer_formatted}")
-                if tanimoto_similarity != "None":
+                if isinstance(tanimoto_similarity, (float, int)):
                     print(f"Tanimoto similarity: {tanimoto_similarity:.4f}")
                 else:
                     print(f"Tanimoto similarity: {tanimoto_similarity}")
@@ -407,18 +409,74 @@ class Iupac2SmilesV2(RLTask):
             reward = 0.0
             try:
                 tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
-                if tanimoto_similarity == 1.0:
-                    reward = 1.0
-                else:
-                    reward = 0.0
+                if tanimoto_similarity is not None:
+                    if tanimoto_similarity == 1.0:
+                        reward = 1.0
+                    else:
+                        reward = 0.0
             except:
                 pass
             rewards.append(reward)
 
         return rewards
 
-    # def extract_smiles(self, completion: str):
-    #     smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
-    #     smiles = [s.replace(" ", "") for s in smiles]
-    #     return smiles
+    def preprocess_completion_before_answer(self, completion):
+        if '<answer>' in completion:
+            completion = completion.split('<answer>')[0]
+        return completion
+
+    def extract_smiles(self, text: str):
+        smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", text)
+        smiles = [s.replace(" ", "").strip() for s in smiles]
+        return smiles
+
+    def completion_tanimoto_tenth_reward(self, completions, solution, **kwargs):
+        """Reward function - compute Tanimoto similarity reward between completion smiles and solution."""
+        # Reward goal: logging purpose
+        # Reward range: 0 to 0.1
+
+        completions_smiles = [self.extract_smiles(self.preprocess_completion_before_answer(c)) for c in completions]
+
+        rewards = []
+        for completion_smiles, sol in zip(completions_smiles, solution):
+            rewards_local = [0.0]
+            for smiles in completion_smiles:
+                try:
+                    tanimoto_similarity = compute_tanimoto_similarity(sol, smiles)
+                    if tanimoto_similarity is not None:
+                        reward = tanimoto_similarity / 10
+                        rewards_local.append(reward)
+                except:
+                    pass
+            reward = max(rewards_local)
+            rewards.append(reward)
+
+        return rewards
+
+    def completion_tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function - compute Tanimoto similarity reward between completion smiles and solution."""
+        # Reward goal: foster completions containing smiles with high Tanimoto similarity to the solution
+        # Reward range: 0 to 0.5
+
+        completions_smiles = [self.extract_smiles(self.preprocess_completion_before_answer(c)) for c in completions]
+
+        rewards = []
+        for completion_smiles, sol in zip(completions_smiles, solution):
+            rewards_local = [0.0]
+            for smiles in completion_smiles:
+                try:
+                    tanimoto_similarity = compute_tanimoto_similarity(sol, smiles)
+                    if tanimoto_similarity is not None:
+                        if self.tanimoto_coeff != 0.0:
+                            base_coeff = math.e ** self.tanimoto_coeff
+                            reward = (base_coeff ** tanimoto_similarity - 1) / (base_coeff - 1)
+                        else:
+                            reward = tanimoto_similarity
+                        rewards_local.append(reward)
+                except:
+                    pass
+            reward = max(rewards_local)
+            rewards.append(reward)
+
+        return rewards
 

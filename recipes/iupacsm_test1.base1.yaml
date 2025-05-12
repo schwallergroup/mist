@@ -13,6 +13,8 @@ rewards:
 - accuracy_percentage
 - tanimoto_accuracy
 - tanimoto_tenth
+- completion_tanimoto_accuracy
+- completion_tanimoto_tenth
 - completion_difference
 - completion_size
 task_kwargs:
