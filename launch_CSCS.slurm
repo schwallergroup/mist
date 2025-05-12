@@ -7,7 +7,7 @@
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --environment=vllm071
-#SBATCH -A a-a05
+#SBATCH -A a-a131
 
 # Run like:
 # Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
@@ -75,7 +75,7 @@ export TORCH_DISTRIBUTED_TIMEOUT=3600
 export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
 export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
 export NCCL_ASYNC_ERROR_HANDLING=1
-export NCCL_DEBUG=WARN
+export NCCL_DEBUG=ERROR
 export NCCL_IB_TIMEOUT=23
 export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL
@@ -102,7 +102,7 @@ export LAUNCHER="conda deactivate;
 cd /Documents/sink;
 pip install hf_transfer gdown levenshtein;
 pip install -e . --no-deps;
-HF_HUB_ENABLE_HF_TRANSFER=1 NCCL_DEBUG=WARN ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
+HF_HUB_ENABLE_HF_TRANSFER=1 NCCL_DEBUG=ERROR ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
    --config_file configs/deepspeed_zero3.yaml \
    --num_machines $NUM_NODES \
    --num_processes $NUM_GPUS_FOR_TRAINING \

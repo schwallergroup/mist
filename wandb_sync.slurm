@@ -7,7 +7,7 @@
 #SBATCH --output=../sink_wandb_logs/%x-%j.out
 #SBATCH --err=../sink_wandb_logs/%x-%j.err
 #SBATCH --environment=vllm071
-#SBATCH -A a-a05
+#SBATCH -A a-a131
 #SBATCH --partition=debug
 
 set -x -e
