@@ -1,0 +1,100 @@
+{"problem": "(4-benzhydrylpiperazin-1-yl)-[1-(4-chlorophenyl)-3-methylthieno[2,3-c]pyrazol-5-yl]methanone", "solution": "Cc1nn(-c2ccc(Cl)cc2)c2sc(C(=O)N3CCN(C(c4ccccc4)c4ccccc4)CC3)cc12"}
+{"problem": "N-[4-(4-methoxy-3-methylphenyl)-1,3-thiazol-2-yl]-4-methylbenzamide", "solution": "COc1ccc(-c2csc(NC(=O)c3ccc(C)cc3)n2)cc1C"}
+{"problem": "methyl 4-[2-(8-methoxyquinolin-2-yl)ethenyl]benzoate", "solution": "COC(=O)c1ccc(C=Cc2ccc3cccc(OC)c3n2)cc1"}
+{"problem": "5-(4-chlorophenyl)-2-[[(4-methoxyphenyl)methyl-methylamino]methyl]-4-(2-methylphenyl)-1,2,4-triazole-3-thione", "solution": "COc1ccc(CN(C)Cn2nc(-c3ccc(Cl)cc3)n(-c3ccccc3C)c2=S)cc1"}
+{"problem": "(7S)-7-methyl-2-[(6-nitro-4H-1,3-benzodioxin-8-yl)methylsulfanyl]-3-prop-2-enyl-5,6,7,8-tetrahydro-[1]benzothiolo[2,3-d]pyrimidin-4-one", "solution": "C=CCn1c(SCc2cc([N+](=O)[O-])cc3c2OCOC3)nc2sc3c(c2c1=O)CC[C@H](C)C3"}
+{"problem": "5,7-dimethyl-N-(2-phenylethyl)-[1,2,4]triazolo[1,5-a]pyrimidine-2-carboxamide", "solution": "Cc1cc(C)n2nc(C(=O)NCCc3ccccc3)nc2n1"}
+{"problem": "5-acetyl-2-[2-(2,4-dichlorophenyl)-2-oxoethyl]sulfanyl-6-methyl-4-phenyl-1,4-dihydropyridine-3-carbonitrile", "solution": "CC(=O)C1=C(C)NC(SCC(=O)c2ccc(Cl)cc2Cl)=C(C#N)C1c1ccccc1"}
+{"problem": "(5Z)-5-[(2-bromophenyl)methylidene]-3-(2,4-dichlorophenyl)-2-sulfanylidene-1,3-thiazolidin-4-one", "solution": "O=C1/C(=C/c2ccccc2Br)SC(=S)N1c1ccc(Cl)cc1Cl"}
+{"problem": "(3S)-3-(4-fluorophenyl)-3-[(2,3,4-trifluorophenyl)sulfonylamino]propanoate", "solution": "O=C([O-])C[C@H](NS(=O)(=O)c1ccc(F)c(F)c1F)c1ccc(F)cc1"}
+{"problem": "1-[5-(5-methylfuran-2-yl)-3-(4-nitrophenyl)-3,4-dihydropyrazol-2-yl]ethanone", "solution": "CC(=O)N1N=C(c2ccc(C)o2)CC1c1ccc([N+](=O)[O-])cc1"}
+{"problem": "(4-chloro-3,5-dimethylphenyl) 1,2-oxazole-5-carboxylate", "solution": "Cc1cc(OC(=O)c2ccno2)cc(C)c1Cl"}
+{"problem": "4-[(4-ethoxyphenyl)sulfonylamino]benzenesulfonamide", "solution": "CCOc1ccc(S(=O)(=O)Nc2ccc(S(N)(=O)=O)cc2)cc1"}
+{"problem": "7-methyl-5-phenyl-1-piperidin-1-yl-3-(3,4,5-trimethoxyphenyl)pyrazolo[4,3-c][1,5,2]oxazaphosphinine 1-oxide", "solution": "COc1cc(C2=Nc3c(c(C)nn3-c3ccccc3)P(=O)(N3CCCCC3)O2)cc(OC)c1OC"}
+{"problem": "3-[(4-ethoxyphenyl)methylideneamino]-N-ethyl-4-[3-(trifluoromethyl)phenyl]-1,3-thiazol-2-imine", "solution": "CCN=c1scc(-c2cccc(C(F)(F)F)c2)n1N=Cc1ccc(OCC)cc1"}
+{"problem": "(4R,5R)-5-(4-chlorophenyl)-4-[(Z)-3-phenylprop-2-enoyl]-1-(1,3-thiazol-2-yl)pyrrolidine-2,3-dione", "solution": "O=C(/C=C\\c1ccccc1)[C@@H]1C(=O)C(=O)N(c2nccs2)[C@H]1c1ccc(Cl)cc1"}
+{"problem": "4-[2-(2-methoxy-4-prop-1-enylphenoxy)ethoxy]benzaldehyde", "solution": "CC=Cc1ccc(OCCOc2ccc(C=O)cc2)c(OC)c1"}
+{"problem": "(4-methoxyphenyl)-[6-(3-methoxyphenyl)-2-(4-methylphenyl)-1,4-diazatricyclo[5.4.1.04,12]dodeca-2,5,7(12)-trien-5-yl]methanone", "solution": "COc1ccc(C(=O)c2c(-c3cccc(OC)c3)c3c4n(c(-c5ccc(C)cc5)cn24)CCCC3)cc1"}
+{"problem": "ethyl 2-[(3-bromo-4-methoxyphenyl)methylidene]-5-(3,4-dimethoxyphenyl)-7-methyl-3-oxo-5H-[1,3]thiazolo[3,2-a]pyrimidine-6-carboxylate", "solution": "CCOC(=O)C1=C(C)N=c2sc(=Cc3ccc(OC)c(Br)c3)c(=O)n2C1c1ccc(OC)c(OC)c1"}
+{"problem": "[2-[[(3S)-1,1-dioxothiolan-3-yl]-ethylamino]-2-oxoethyl] (E)-3-(3,5-dimethyl-1-phenylpyrazol-4-yl)prop-2-enoate", "solution": "CCN(C(=O)COC(=O)/C=C/c1c(C)nn(-c2ccccc2)c1C)[C@H]1CCS(=O)(=O)C1"}
+{"problem": "ethyl 2-[2-[(Z)-(2-benzylsulfanyl-5-oxo-1,3-thiazol-4-ylidene)methyl]phenoxy]acetate", "solution": "CCOC(=O)COc1ccccc1/C=C1\\N=C(SCc2ccccc2)SC1=O"}
+{"problem": "5-acetyl-4-(2-chlorophenyl)-6-methyl-2-methylsulfanyl-1,4-dihydropyridine-3-carbonitrile", "solution": "CSC1=C(C#N)C(c2ccccc2Cl)C(C(C)=O)=C(C)N1"}
+{"problem": "2-methyl-3,5-bis(trifluoromethyl)aniline", "solution": "Cc1c(N)cc(C(F)(F)F)cc1C(F)(F)F"}
+{"problem": "[2-(4-bromophenyl)-2-oxoethyl] 4-(3,5-dioxo-4-azatricyclo[5.2.1.02,6]dec-8-en-4-yl)cyclohexane-1-carboxylate", "solution": "O=C(COC(=O)C1CCC(N2C(=O)C3C4C=CC(C4)C3C2=O)CC1)c1ccc(Br)cc1"}
+{"problem": "(3Z)-1-methyl-3-[(1,3,5-trimethylpyrazol-4-yl)methylidene]indol-2-one", "solution": "Cc1nn(C)c(C)c1/C=C1\\C(=O)N(C)c2ccccc21"}
+{"problem": "(4R)-2-amino-7,7-dimethyl-5-oxo-4-(4-propoxyphenyl)-6,8-dihydro-4H-chromene-3-carbonitrile", "solution": "CCCOc1ccc([C@@H]2C(C#N)=C(N)OC3=C2C(=O)CC(C)(C)C3)cc1"}
+{"problem": "5-bromo-2-[2-methyl-5-(trifluoromethyl)pyrazol-3-yl]sulfanylbenzaldehyde", "solution": "Cn1nc(C(F)(F)F)cc1Sc1ccc(Br)cc1C=O"}
+{"problem": "(2R)-1-[(2-fluorophenyl)methoxy]-3-[[(1S)-1,2,3,4-tetrahydronaphthalen-1-yl]amino]propan-2-ol", "solution": "O[C@H](CN[C@H]1CCCc2ccccc21)COCc1ccccc1F"}
+{"problem": "5-tert-butyl-2-[(4-fluorophenyl)methyl]pyrazole-3-carboxylic acid", "solution": "CC(C)(C)c1cc(C(=O)O)n(Cc2ccc(F)cc2)n1"}
+{"problem": "[(2S)-1-(N-methylanilino)-1-oxopropan-2-yl] (Z)-3-(4-methoxyphenyl)prop-2-enoate", "solution": "COc1ccc(/C=C\\C(=O)O[C@@H](C)C(=O)N(C)c2ccccc2)cc1"}
+{"problem": "methyl 4-[[2-(4-oxo-3-phenylquinazolin-2-yl)sulfanylacetyl]amino]benzoate", "solution": "COC(=O)c1ccc(NC(=O)CSc2nc3ccccc3c(=O)n2-c2ccccc2)cc1"}
+{"problem": "3-(furan-2-ylmethyl)-2-[4-(2-oxochromen-3-yl)-1-phenylpyrazol-3-yl]-1,3-thiazolidin-4-one", "solution": "O=C1CSC(c2nn(-c3ccccc3)cc2-c2cc3ccccc3oc2=O)N1Cc1ccco1"}
+{"problem": "[(2R)-1-(4-bromoanilino)-1-oxopropan-2-yl] (Z)-3-(3-propoxyphenyl)prop-2-enoate", "solution": "CCCOc1cccc(/C=C\\C(=O)O[C@H](C)C(=O)Nc2ccc(Br)cc2)c1"}
+{"problem": "5-[(3,5-dichloro-2-methoxyphenyl)methylamino]-2-morpholin-4-ylbenzoic acid", "solution": "COc1c(Cl)cc(Cl)cc1CNc1ccc(N2CCOCC2)c(C(=O)O)c1"}
+{"problem": "ethyl 4-(2-chlorophenyl)-7-(4-chlorophenyl)-2-methyl-5-oxo-4,6,7,8-tetrahydro-1H-quinoline-3-carboxylate", "solution": "CCOC(=O)C1=C(C)NC2=C(C(=O)CC(c3ccc(Cl)cc3)C2)C1c1ccccc1Cl"}
+{"problem": "1-(4-fluorophenyl)-N-(4-methoxyphenyl)-5-methyltriazole-4-carboxamide", "solution": "COc1ccc(NC(=O)c2nnn(-c3ccc(F)cc3)c2C)cc1"}
+{"problem": "N-(4-fluorophenyl)-2-[1-(furan-2-yl)ethylimino]pyridine-1-carboxamide", "solution": "CC(N=c1ccccn1C(=O)Nc1ccc(F)cc1)c1ccco1"}
+{"problem": "(4R,5S)-1-[3-(diethylamino)propyl]-4-[(2R)-2-methyl-2,3-dihydro-1-benzofuran-5-carbonyl]-5-phenylpyrrolidine-2,3-dione", "solution": "CCN(CC)CCCN1C(=O)C(=O)[C@@H](C(=O)c2ccc3c(c2)C[C@@H](C)O3)[C@H]1c1ccccc1"}
+{"problem": "N-[[5-bromo-3-[hydroxy(oxido)amino]-6-oxocyclohexa-2,4-dien-1-ylidene]methylimino]benzenesulfonamide", "solution": "O=C1C(Br)=CC(N([O-])O)=CC1=CN=NS(=O)(=O)c1ccccc1"}
+{"problem": "[1-(1,3-dithiolan-2-yl)naphthalen-2-yl] 2,4-dichlorobenzoate", "solution": "O=C(Oc1ccc2ccccc2c1C1SCCS1)c1ccc(Cl)cc1Cl"}
+{"problem": "(Z)-3-[4-(difluoromethoxy)-3-methoxyphenyl]-N-(4-piperidin-1-ylphenyl)prop-2-enamide", "solution": "COc1cc(/C=C\\C(=O)Nc2ccc(N3CCCCC3)cc2)ccc1OC(F)F"}
+{"problem": "2-[1-(2-chlorophenyl)imidazol-2-yl]sulfanyl-3-nitropyridine", "solution": "O=[N+]([O-])c1cccnc1Sc1nccn1-c1ccccc1Cl"}
+{"problem": "N,4-dimethyl-N-[[4-[[[(5S,7R)-2-tricyclo[3.3.1.13,7]dec-1-enyl]amino]carbamoyl]phenyl]methyl]benzenesulfonamide", "solution": "Cc1ccc(S(=O)(=O)N(C)Cc2ccc(C(=O)NNC3=C4C[C@@H]5CC3C[C@H](C4)C5)cc2)cc1"}
+{"problem": "ethyl 2-[(4-acetyloxy-3-methoxyphenyl)methylidene]-5-(3,4-dimethoxyphenyl)-7-methyl-3-oxo-5H-[1,3]thiazolo[3,2-a]pyrimidine-6-carboxylate", "solution": "CCOC(=O)C1=C(C)N=c2sc(=Cc3ccc(OC(C)=O)c(OC)c3)c(=O)n2C1c1ccc(OC)c(OC)c1"}
+{"problem": "(3,3-dimethyl-2-oxobutyl) 3-[(4-bromophenyl)sulfonylamino]benzoate", "solution": "CC(C)(C)C(=O)COC(=O)c1cccc(NS(=O)(=O)c2ccc(Br)cc2)c1"}
+{"problem": "7-methoxy-N-(2,4,6-trimethylphenyl)thieno[2,3-b]quinoline-2-carboxamide", "solution": "COc1ccc2cc3cc(C(=O)Nc4c(C)cc(C)cc4C)sc3nc2c1"}
+{"problem": "3-[(4-butoxyphenyl)methylidene]-5-(6-methylnaphthalen-2-yl)furan-2-one", "solution": "CCCCOc1ccc(C=C2C=C(c3ccc4cc(C)ccc4c3)OC2=O)cc1"}
+{"problem": "(3S)-1-[4-(3-bromophenoxy)butyl]-3-methylpiperidine", "solution": "C[C@H]1CCCN(CCCCOc2cccc(Br)c2)C1"}
+{"problem": "(2R)-2-[[2-(benzotriazol-1-yl)acetyl]-[(4-fluorophenyl)methyl]amino]-N-[4-(dimethylamino)phenyl]-2-(1H-indol-3-yl)acetamide", "solution": "CN(C)c1ccc(NC(=O)[C@@H](c2c[nH]c3ccccc23)N(Cc2ccc(F)cc2)C(=O)Cn2nnc3ccccc32)cc1"}
+{"problem": "(2S)-N,N,2-trimethyl-2,3-dihydroindole-1-sulfonamide", "solution": "C[C@H]1Cc2ccccc2N1S(=O)(=O)N(C)C"}
+{"problem": "N-(3-carbazol-9-yl-2-hydroxypropyl)-N-(furan-2-ylmethyl)methanesulfonamide", "solution": "CS(=O)(=O)N(Cc1ccco1)CC(O)Cn1c2ccccc2c2ccccc21"}
+{"problem": "[2-(3,4-dimethoxyphenyl)-2-oxoethyl] 3-(methylsulfamoyl)benzoate", "solution": "CNS(=O)(=O)c1cccc(C(=O)OCC(=O)c2ccc(OC)c(OC)c2)c1"}
+{"problem": "5-(4-chlorophenyl)-4-[4-[(4-ethoxyphenyl)methyl]piperazin-1-yl]thieno[2,3-d]pyrimidine", "solution": "CCOc1ccc(CN2CCN(c3ncnc4scc(-c5ccc(Cl)cc5)c34)CC2)cc1"}
+{"problem": "[2-[2,5-dimethyl-1-[[(2S)-oxolan-2-yl]methyl]pyrrol-3-yl]-2-oxoethyl] 3-cyanobenzoate", "solution": "Cc1cc(C(=O)COC(=O)c2cccc(C#N)c2)c(C)n1C[C@@H]1CCCO1"}
+{"problem": "2-(2-bromo-4-methylphenoxy)-N-(4-butan-2-ylphenyl)acetamide", "solution": "CCC(C)c1ccc(NC(=O)COc2ccc(C)cc2Br)cc1"}
+{"problem": "5-[(2-chlorophenyl)methylidene]-3-[3-(2-ethylpiperidin-1-yl)-3-oxopropyl]-2-sulfanylidene-1,3-thiazolidin-4-one", "solution": "CCC1CCCCN1C(=O)CCN1C(=O)C(=Cc2ccccc2Cl)SC1=S"}
+{"problem": "3-(4-chlorophenyl)-2-(4-hydroxyphenyl)-1,2-dihydroquinazolin-4-one", "solution": "O=C1c2ccccc2NC(c2ccc(O)cc2)N1c1ccc(Cl)cc1"}
+{"problem": "(4R,5R)-5-(4-fluorophenyl)-4-(2-methyl-4-propoxybenzoyl)-1-(2-morpholin-4-ium-4-ylethyl)pyrrolidine-2,3-dione", "solution": "CCCOc1ccc(C(=O)[C@@H]2C(=O)C(=O)N(CC[NH+]3CCOCC3)[C@H]2c2ccc(F)cc2)c(C)c1"}
+{"problem": "methyl 2-[5-[[4-oxo-2-sulfanylidene-3-[3-(trifluoromethyl)phenyl]-1,3-thiazolidin-5-ylidene]methyl]furan-2-yl]benzoate", "solution": "COC(=O)c1ccccc1-c1ccc(C=C2SC(=S)N(c3cccc(C(F)(F)F)c3)C2=O)o1"}
+{"problem": "5-[(2R)-2-hydroxy-3-piperidin-1-ylpropyl]-3-methyl-1-oxopyrido[1,2-a]benzimidazole-4-carbonitrile", "solution": "Cc1cc(=O)n2c3ccccc3n(C[C@H](O)CN3CCCCC3)c2c1C#N"}
+{"problem": "[3,5-dimethyl-2-(morpholin-4-ylmethyl)phenyl] 4-methoxybenzenesulfonate", "solution": "COc1ccc(S(=O)(=O)Oc2cc(C)cc(C)c2CN2CCOCC2)cc1"}
+{"problem": "ethyl (2Z,5R)-2-[(2-ethoxynaphthalen-1-yl)methylidene]-5-(4-methoxyphenyl)-7-methyl-3-oxo-5H-[1,3]thiazolo[3,2-a]pyrimidine-6-carboxylate", "solution": "CCOC(=O)C1=C(C)N=c2s/c(=C\\c3c(OCC)ccc4ccccc34)c(=O)n2[C@@H]1c1ccc(OC)cc1"}
+{"problem": "furan-2-yl-[4-(8-methoxy-5H-pyrimido[5,4-b]indol-4-yl)piperazin-1-yl]methanone", "solution": "COc1ccc2[nH]c3c(N4CCN(C(=O)c5ccco5)CC4)ncnc3c2c1"}
+{"problem": "N-(4-methylphenyl)-2-[(5-phenyl-1,3,4-oxadiazol-2-yl)sulfanyl]acetamide", "solution": "Cc1ccc(NC(=O)CSc2nnc(-c3ccccc3)o2)cc1"}
+{"problem": "3-[(R)-1H-benzimidazol-2-ylsulfanyl(phenyl)methyl]-1H-quinoxalin-2-one", "solution": "O=c1[nH]c2ccccc2nc1[C@H](Sc1nc2ccccc2[nH]1)c1ccccc1"}
+{"problem": "2-[(3S,6R)-6-ethyl-3-(4-fluorophenyl)-6-methyloxan-3-yl]ethylazanium", "solution": "CC[C@]1(C)CC[C@](CC[NH3+])(c2ccc(F)cc2)CO1"}
+{"problem": "10',13'-dimethylspiro[1,3-dioxolane-2,17'-2,4,5,6,7,8,9,11,12,14,15,16-dodecahydro-1H-cyclopenta[a]phenanthrene]-3'-one", "solution": "CC12CCC(=O)CC1CCC1C2CCC2(C)C1CCC21OCCO1"}
+{"problem": "(4-methoxycarbonylphenyl)methyl 2-[methyl(phenyl)carbamoyl]benzoate", "solution": "COC(=O)c1ccc(COC(=O)c2ccccc2C(=O)N(C)c2ccccc2)cc1"}
+{"problem": "2-nitro-N-[4-(trifluoromethyl)phenyl]benzamide", "solution": "O=C(Nc1ccc(C(F)(F)F)cc1)c1ccccc1[N+](=O)[O-]"}
+{"problem": "methyl 3-(methanesulfonamido)benzoate", "solution": "COC(=O)c1cccc(NS(C)(=O)=O)c1"}
+{"problem": "5-[(4-bromo-2-chlorophenoxy)methyl]-3-pyridin-3-yl-1,2,4-oxadiazole", "solution": "Clc1cc(Br)ccc1OCc1nc(-c2cccnc2)no1"}
+{"problem": "(7-methyl-2-oxochromen-4-yl)methyl 3-methyl-4-nitrobenzoate", "solution": "Cc1ccc2c(COC(=O)c3ccc([N+](=O)[O-])c(C)c3)cc(=O)oc2c1"}
+{"problem": "1-(prop-2-enylamino)-3-thiophen-2-ylsulfanylpropan-2-ol", "solution": "C=CCNCC(O)CSc1cccs1"}
+{"problem": "N-[bis[4-(dimethylamino)phenyl]methylideneamino]-4,6-dimethylpyrimidin-2-amine", "solution": "Cc1cc(C)nc(NN=C(c2ccc(N(C)C)cc2)c2ccc(N(C)C)cc2)n1"}
+{"problem": "4-[[4-(dimethylamino)phenyl]methylidene]-5-oxo-1-phenylpyrazole-3-carboxylic acid", "solution": "CN(C)c1ccc(C=C2C(=O)N(c3ccccc3)N=C2C(=O)O)cc1"}
+{"problem": "ethyl 7-(furan-2-ylmethyl)-6-(2-naphthalen-2-yloxyacetyl)imino-2-oxo-1,7,9-triazatricyclo[8.4.0.03,8]tetradeca-3(8),4,9,11,13-pentaene-5-carboxylate", "solution": "CCOC(=O)c1cc2c(=O)n3ccccc3nc2n(Cc2ccco2)c1=NC(=O)COc1ccc2ccccc2c1"}
+{"problem": "[2-(furan-2-yl)-2-oxoethyl] 1,3-benzothiazole-6-carboxylate", "solution": "O=C(OCC(=O)c1ccco1)c1ccc2ncsc2c1"}
+{"problem": "diethyl 2-[[4-[(3-ethoxy-2-ethoxycarbonyl-3-oxoprop-1-enyl)amino]anilino]methylidene]propanedioate", "solution": "CCOC(=O)C(=CNc1ccc(NC=C(C(=O)OCC)C(=O)OCC)cc1)C(=O)OCC"}
+{"problem": "methyl 2-[(2-fluorophenyl)methyl]-3-oxobutanoate", "solution": "COC(=O)C(Cc1ccccc1F)C(C)=O"}
+{"problem": "[2-[1-[4-(difluoromethoxy)phenyl]-2,5-dimethylpyrrol-3-yl]-2-oxoethyl] 2,5-dichlorobenzoate", "solution": "Cc1cc(C(=O)COC(=O)c2cc(Cl)ccc2Cl)c(C)n1-c1ccc(OC(F)F)cc1"}
+{"problem": "(E)-N-(4-ethylphenyl)-3-(3-fluorophenyl)prop-2-enamide", "solution": "CCc1ccc(NC(=O)/C=C/c2cccc(F)c2)cc1"}
+{"problem": "5-(3-chlorophenyl)-N-[2-methyl-5-([1,3]oxazolo[4,5-b]pyridin-4-ium-2-yl)phenyl]furan-2-carboxamide", "solution": "Cc1ccc(-c2nc3[nH+]cccc3o2)cc1NC(=O)c1ccc(-c2cccc(Cl)c2)o1"}
+{"problem": "ethyl 2-(N-benzoyl-2-methylanilino)acetate", "solution": "CCOC(=O)CN(C(=O)c1ccccc1)c1ccccc1C"}
+{"problem": "(3R)-3-[[4-(4-ethoxyphenyl)-5-(2-methoxyphenyl)-1,2,4-triazol-3-yl]sulfanyl]oxolan-2-one", "solution": "CCOc1ccc(-n2c(S[C@@H]3CCOC3=O)nnc2-c2ccccc2OC)cc1"}
+{"problem": "methyl (2E,5S)-5-(5-chloro-2-methoxyphenyl)-2-(1H-indol-3-ylmethylidene)-7-methyl-3-oxo-5H-[1,3]thiazolo[3,2-a]pyrimidine-6-carboxylate", "solution": "COC(=O)C1=C(C)N=c2s/c(=C/c3c[nH]c4ccccc34)c(=O)n2[C@H]1c1cc(Cl)ccc1OC"}
+{"problem": "(3,3-dimethyl-2-oxobutyl) 4-(phenylsulfamoyl)benzoate", "solution": "CC(C)(C)C(=O)COC(=O)c1ccc(S(=O)(=O)Nc2ccccc2)cc1"}
+{"problem": "3-[4-[(1R)-1-(4-propan-2-ylphenyl)ethyl]piperazine-1-carbonyl]benzoic acid", "solution": "CC(C)c1ccc([C@@H](C)N2CCN(C(=O)c3cccc(C(=O)O)c3)CC2)cc1"}
+{"problem": "4-[[(2S,3R)-3-(4-carboxylatophenoxy)-1,4-dioxan-2-yl]oxy]benzoate", "solution": "O=C([O-])c1ccc(O[C@H]2OCCO[C@H]2Oc2ccc(C(=O)[O-])cc2)cc1"}
+{"problem": "3-[4-(3,4-dimethylphenyl)piperazine-1-carbonyl]benzoic acid", "solution": "Cc1ccc(N2CCN(C(=O)c3cccc(C(=O)O)c3)CC2)cc1C"}
+{"problem": "(6R)-3-[[2-chloro-5-(trifluoromethyl)phenyl]hydrazinylidene]-4-ethyl-6-(3-hydroxyphenyl)morpholin-2-one", "solution": "CCN1C[C@@H](c2cccc(O)c2)OC(=O)C1=NNc1cc(C(F)(F)F)ccc1Cl"}
+{"problem": "[4-[(3-benzyl-4-oxo-2-sulfanylidene-1,3-thiazolidin-5-ylidene)methyl]-2-methoxyphenyl] 4-methylbenzoate", "solution": "COc1cc(C=C2SC(=S)N(Cc3ccccc3)C2=O)ccc1OC(=O)c1ccc(C)cc1"}
+{"problem": "methyl (2S,7S)-5-amino-6-cyano-2-methyl-3-oxo-7-(3,4,5-trimethoxyphenyl)-7H-[1,3]thiazolo[3,2-a]pyridine-8-carboxylate", "solution": "COC(=O)C1=C2S[C@@H](C)C(=O)N2C(N)=C(C#N)[C@@H]1c1cc(OC)c(OC)c(OC)c1"}
+{"problem": "N-(3,5-dichlorophenyl)-3-(trifluoromethyl)benzenesulfonamide", "solution": "O=S(=O)(Nc1cc(Cl)cc(Cl)c1)c1cccc(C(F)(F)F)c1"}
+{"problem": "N-[(6-chloro-5,7-dimethyl-2-phenylchromen-4-ylidene)amino]-1H-benzimidazol-2-amine", "solution": "Cc1cc2oc(-c3ccccc3)cc(=NNc3nc4ccccc4[nH]3)c2c(C)c1Cl"}
+{"problem": "4-[(4-fluorophenyl)-hydroxymethylidene]-5-(furan-2-yl)-1-(2-morpholin-4-ylethyl)pyrrolidine-2,3-dione", "solution": "O=C1C(=O)N(CCN2CCOCC2)C(c2ccco2)C1=C(O)c1ccc(F)cc1"}
+{"problem": "N-(4-chlorophenyl)-3-(3,4-dihydro-2H-quinolin-1-ylsulfonyl)-4-methoxybenzamide", "solution": "COc1ccc(C(=O)Nc2ccc(Cl)cc2)cc1S(=O)(=O)N1CCCc2ccccc21"}
+{"problem": "4-[2-(2-prop-2-enoxyphenoxy)ethyl]morpholine", "solution": "C=CCOc1ccccc1OCCN1CCOCC1"}
+{"problem": "3-(methylamino)quinazolin-4-one", "solution": "CNn1cnc2ccccc2c1=O"}
+{"problem": "N-(4-bromophenyl)-3-(4-ethoxyphenoxy)propanamide", "solution": "CCOc1ccc(OCCC(=O)Nc2ccc(Br)cc2)cc1"}
+{"problem": "[2-(2,4-dimethylphenyl)-2-oxoethyl] 2-quinolin-8-ylsulfanylacetate", "solution": "Cc1ccc(C(=O)COC(=O)CSc2cccc3cccnc23)c(C)c1"}
+{"problem": "[2-(2,4-dimethylphenyl)-2-oxoethyl] 3-(2,3-dihydroindol-1-ylsulfonyl)benzoate", "solution": "Cc1ccc(C(=O)COC(=O)c2cccc(S(=O)(=O)N3CCc4ccccc43)c2)c(C)c1"}
