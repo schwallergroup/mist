@@ -2,7 +2,7 @@ from .kinetic_data.kinetic_data_classification import KineticDataClassification
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.forward import ForwardReaction, ForwardReactionWithTags
-from .reactions.iupac2smi import Iupac2Smiles, Iupac2SmilesWithTags
+from .reactions.iupac2smi import Iupac2Smiles, Iupac2SmilesWithTags, Iupac2SmilesV2
 from .reactions.smi_permute import PermuteSmiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 from .reactions.mcqa_inversion import SmilesInversion, SmilesInversionV2
@@ -19,6 +19,7 @@ CHEMTASKS = {
     "canonic": CanonicalizeSmiles,
     "canonmc": CanonicalizeSmilesMCQA,
     "iupacsm": Iupac2Smiles,
+    "iupacsm_v2": Iupac2SmilesV2,
     "smhydrogen": SmilesHydrogen,
     "kinetic": KineticDataClassification,
     "rxn_inversion": SmilesInversion,

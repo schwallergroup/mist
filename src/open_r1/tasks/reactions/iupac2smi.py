@@ -1,5 +1,7 @@
 import os
 import re
+import hashlib
+import math
 from random import random
 from typing import Any, Dict
 
@@ -10,6 +12,7 @@ from rdkit.Chem import AllChem
 
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_sim
+from ..task_utils import compute_tanimoto_similarity
 
 
 class Iupac2Smiles(SMILESBasedTask):
@@ -221,3 +224,200 @@ class Iupac2SmilesWithTags(Iupac2Smiles):
         smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
         smiles = [s.replace(" ", "") for s in smiles]
         return smiles
+
+class Iupac2SmilesV2(RLTask):
+    printed_sample_prompt: bool = False
+    tanimoto_coeff: float = 0.0
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.tanimoto_coeff = self.task_kwargs.get("tanimoto_coeff", 0.0)
+
+        if self.task_mode == 'base':
+            self.question_template = (
+                "<|im_start|>assistant\n"
+                "You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Please write the SMILES representation of the molecule: {}.<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<think>"
+            )
+        elif self.task_mode == 'promptBT':
+            self.question_template = (
+                "<|im_start|>assistant\n"
+                "You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<think>"
+            )
+        elif self.task_mode == 'promptP2': # Vu's prompt
+            self.question_template = (
+                "<|im_start|>assistant"
+                "\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user"
+                "\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n"
+                "<|im_start|>assistant"
+                "\<think>"
+            )
+        elif self.task_mode == 'promptP3': # Shai's prompt
+            self.question_template = (
+                "<|im_start|>assistant\You are a useful chemistry assistant and answer the question to change IUPAC to SMILES. Reason out your answer inside <think> tags and give your confident final answer inside the answer tags.<|im_end|>\n"
+                "<|im_start|>user\What is the SMILES of [START_MOL] {} [END_MOL] ?\n"
+                "Do only the necessary reasoning and backtracking to get to the final answer<|im_end|>\n"
+                "<|im_start|>assistant\<think>"
+            )
+        else:
+            raise ValueError(f"Unknown task mode: {self.task_mode}")
+
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        prompt = {
+            "prompt": self.question_template.format(problem),
+            "problem": problem,
+        }
+
+        if not self.printed_sample_prompt:  # print sample prompt once
+            print(f"***SAMPLE PROMPT:\n{prompt['prompt']}")
+            self.printed_sample_prompt = True
+
+        return prompt
+
+    def load(self) -> DatasetDict:
+        """Load and return the complete dataset."""
+        df = pd.read_csv(self.dataset_id_or_path)
+        df = df.drop_duplicates(subset=["SMILES"])
+        train_dict = {
+            "problem": df["IUPAC"].tolist(),
+            "solution": df["SMILES"].tolist(),
+        }
+        train_dataset = Dataset.from_dict(train_dict)
+
+        train_test_split_seed = 42
+        train_test_split = train_dataset.train_test_split(test_size=0.1, seed=train_test_split_seed)
+        train_dataset = train_test_split['train']
+        test_dataset = train_test_split['test']
+        # Print hash of the first train example
+        first_train_problem_hash = hashlib.sha256(train_dataset[0]['problem'].encode()).hexdigest()[:8]
+        first_test_problem_hash = hashlib.sha256(test_dataset[0]['problem'].encode()).hexdigest()[:8]
+        print(f"Iupac2SmilesV2 train_test_split shuffling seed: {train_test_split_seed}")
+        print(f"First train problem hash: {first_train_problem_hash}")
+        print(f"First test problem hash: {first_test_problem_hash}")
+
+        # Combine into DatasetDict
+        self.dataset = DatasetDict(
+            {"train": train_dataset, "test": test_dataset}
+        )
+        return self.dataset
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset["train"] = (
+            self.dataset["train"]
+            .shuffle(seed=42)
+            .select(range(min(100000, len(self.dataset["train"]))))
+        )
+        self.dataset["test"] = (
+            self.dataset["test"]
+            .shuffle(seed=42)
+            .select(range(min(10000, len(self.dataset["test"]))))
+        )
+
+        self.dataset = self.dataset.map(
+            lambda x: self.generate_prompt(x["problem"], tokenizer)
+        )
+        return self.dataset
+
+    def preprocess_response(self, response):
+        """Preprocess the response before checking for accuracy."""
+        if not response.startswith("<think>"):
+            response = "<think>" + response
+        pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+        m = re.search(pattern, response, re.DOTALL)
+        if m and len(m.groups()) == 2:
+            return m.groups()[1]
+        else:
+            return "NONE"
+
+    def tanimoto_tenth_reward(self, completions, solution, **kwargs):
+        """Reward function - compute Tanimoto similarity reward between answer and solution."""
+        # Reward goal: logging purpose
+        # Reward range: 0 to 0.1
+
+        answers = [self.preprocess_response(c).strip() for c in completions]
+
+        rewards = []
+        for answer, sol in zip(answers, solution):
+            reward = 0.0
+            try:
+                tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
+                reward = tanimoto_similarity / 10
+            except:
+                pass
+            rewards.append(reward)
+
+        return rewards
+
+    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function - compute Tanimoto similarity reward between answer and solution."""
+        # Reward goal: foster answers with high Tanimoto similarity to the solution
+        # Reward range: 0 to 1
+
+        answers = [self.preprocess_response(c).strip() for c in completions]
+
+        rewards = []
+        for answer, sol, completion in zip(answers, solution, completions):
+            reward = 0.0
+            tanimoto_similarity = "None"
+            try:
+                tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
+                if self.tanimoto_coeff != 0.0:
+                    base_coeff = math.e ** self.tanimoto_coeff
+                    reward = (base_coeff ** tanimoto_similarity - 1) / (base_coeff - 1)
+                else:
+                    reward = tanimoto_similarity
+            except:
+                pass
+            rewards.append(reward)
+
+            # Print
+            print_proba = 0.01
+            if reward >= 0.9:
+                print_proba = print_proba * 5
+            elif reward >= 0.5:
+                print_proba = print_proba * 2
+            if random() < print_proba:
+                print("======= RANDOM_COMPLETION =======")
+                print(f"Solution: {solution}")
+                answer_formatted = answer.replace('\n',' ').replace('\t', ' ').replace('\r', '')[:128]
+                print(f"Answer:   {answer_formatted}")
+                if tanimoto_similarity != "None":
+                    print(f"Tanimoto similarity: {tanimoto_similarity:.4f}")
+                else:
+                    print(f"Tanimoto similarity: {tanimoto_similarity}")
+                print(f"Tanimoto reward:     {reward:.4f}")
+                print(f"Completion:\n{completion}\n")
+
+        return rewards
+
+    def accuracy_percentage_reward(self, completions, solution, **kwargs):
+        answers = [self.preprocess_response(c).strip() for c in completions]
+
+        rewards = []
+        for answer, sol in zip(answers, solution):
+            reward = 0.0
+            try:
+                tanimoto_similarity = compute_tanimoto_similarity(sol, answer)
+                if tanimoto_similarity == 1.0:
+                    reward = 1.0
+                else:
+                    reward = 0.0
+            except:
+                pass
+            rewards.append(reward)
+
+        return rewards
+
+    # def extract_smiles(self, completion: str):
+    #     smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
+    #     smiles = [s.replace(" ", "") for s in smiles]
+    #     return smiles
+
