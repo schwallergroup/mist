@@ -294,7 +294,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             <|im_end|>
 
             <|im_start|>assistant
-            <think>"""
+            """
         )
 
     def load(self) -> DatasetDict:
@@ -750,10 +750,12 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def preprocess_completions(self, completions: list[str]) -> list[str]:
         """Add <think> tags to the completions."""
-        processed_completions = []
-        for completion in completions:
-            processed_completions.append(f"<think>{completion}")
-        return processed_completions
+        # processed_completions = []
+        # for completion in completions:
+        #     processed_completions.append(f"<think>{completion}")
+        # return processed_completions
+        # Do nothing
+        return completions
 
 
 class KineticDataCategoryClassificationWithRawDataMetrics(

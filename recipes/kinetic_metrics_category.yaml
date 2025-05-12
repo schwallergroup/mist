@@ -12,9 +12,13 @@ rewards:
 - format_continuous
 - accuracy
 - answer_covered_in_reasoning_traces
+- correct_option
+- run_coverage
+- category_coverage
+- metrics_coverage
 
 save_completions: true
-save_completions_dir: /Documents/sink_good_completions_0509
+save_completions_dir: /Documents/sink_good_completions_0512
 
 # Training arguments
 max_steps: 2000
@@ -29,7 +33,7 @@ warmup_ratio: 0.03
 # GRPO specific parameters
 beta: 0.001 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
 max_prompt_length: 1500
-max_completion_length: 8192
+max_completion_length: 5000
 num_generations: 6
 use_vllm: true
 vllm_device: "cuda:3"
