@@ -480,3 +480,75 @@ class Iupac2SmilesV2(RLTask):
 
         return rewards
 
+    def no_format_tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Reward function - compute Tanimoto similarity reward between last completion smiles and solution."""
+        # Reward goal: foster completion last smiles with high Tanimoto similarity to the solution
+        # Reward range: 0 to 1.0
+
+        completions_smiles = [self.extract_smiles(c) for c in completions]
+
+        rewards = []
+        for completion_smiles, sol, completion in zip(completions_smiles, solution, completions):
+            if len(completion_smiles) > 0:
+                completion_last_smiles = completion_smiles[-1]
+            else:
+                completion_last_smiles = "NONE"
+
+            reward = 0.0
+            tanimoto_similarity = "Error"
+            try:
+                tanimoto_similarity = compute_tanimoto_similarity(sol, completion_last_smiles)
+                if tanimoto_similarity is not None:
+                    if self.tanimoto_coeff != 0.0:
+                        base_coeff = math.e ** self.tanimoto_coeff
+                        reward = (base_coeff ** tanimoto_similarity - 1) / (base_coeff - 1)
+                    else:
+                        reward = tanimoto_similarity
+            except:
+                pass
+            rewards.append(reward)
+
+            # Print
+            print_proba = 0.01
+            if reward >= 0.9:
+                print_proba = print_proba * 5
+            elif reward >= 0.5:
+                print_proba = print_proba * 2
+            if random() < print_proba:
+                print("======= RANDOM_COMPLETION [no_format] =======")
+                print(f"Solution:    {sol}")
+                completion_last_smiles_formatted = completion_last_smiles.replace('\n', ' ').replace('\t', ' ').replace('\r', '')[:128]
+                print(f"Last SMILES: {completion_last_smiles_formatted}")
+                if isinstance(tanimoto_similarity, (float, int)):
+                    print(f"Tanimoto similarity: {tanimoto_similarity:.4f}")
+                else:
+                    print(f"Tanimoto similarity: {tanimoto_similarity}")
+                print(f"Tanimoto reward:     {reward:.4f}")
+                print(f"Completion:\n{completion}\n")
+
+        return rewards
+
+    def no_format_accuracy_percentage_reward(self, completions, solution, **kwargs):
+        completions_smiles = [self.extract_smiles(c) for c in completions]
+
+        rewards = []
+        for completion_smiles, sol, completion in zip(completions_smiles, solution, completions):
+            if len(completion_smiles) > 0:
+                completion_last_smiles = completion_smiles[-1]
+            else:
+                completion_last_smiles = "NONE"
+
+            reward = 0.0
+            try:
+                tanimoto_similarity = compute_tanimoto_similarity(sol, completion_last_smiles)
+                if tanimoto_similarity is not None:
+                    if tanimoto_similarity == 1.0:
+                        reward = 1.0
+                    else:
+                        reward = 0.0
+            except:
+                pass
+            rewards.append(reward)
+
+        return rewards
+
