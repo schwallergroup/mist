@@ -175,6 +175,7 @@ cython_debug/
 data/
 wandb/
 logs/
+eval_logs/
 docs/build/
 
 # Others

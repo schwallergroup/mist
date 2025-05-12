@@ -56,9 +56,7 @@ cd /Documents/sink;
 pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip install -U trl==0.15.0 transformers==4.48.2 pandas==2.0.0 torch==2.7.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126;
-cd lighteval;
-pip install -e .[dev];
-cd ..;
+pip install -U git+https://github.com/XuanVuNguyen/lighteval;
 lighteval vllm $MODEL_ARGS 'custom|iupacsm|0|0' \
     --custom-tasks src/open_r1/chem_evaluate/iupacsm.py \
     --output-dir $OUTPUT_DIR \
