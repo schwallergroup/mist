@@ -367,9 +367,8 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         for i in range(self.x1_train.shape[0]):
             data = self.generate_data_pass_to_prompt(i, is_test=False)
             calculator = KineticMetricsCalculator(data)
-            # calculator.process_sample()
             metrics = calculator.summarize_minimum_important_value()
-            prompt = prompt_template_data.format(**metrics)
+            prompt = prompt_template_data_improved.format(**metrics)
             prompts_train.append(prompt)
 
         convert_from_class_to_category = {
@@ -417,7 +416,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             data = self.generate_data_pass_to_prompt(i, is_test=True)
             calculator = KineticMetricsCalculator(data)
             metrics = calculator.summarize_minimum_important_value()
-            prompt = prompt_template_data.format(**metrics)
+            prompt = prompt_template_data_improved.format(**metrics)
             prompts_test.append(prompt)
 
         test_dict = {
@@ -579,16 +578,17 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         completions = self.preprocess_completions(completions)
         answers = self.extract_answer(completions)
 
-        options = [
+        options = (
             "Core mechanism",
             "Mechanism with bicatalytic steps",
             "Mechanism with catalyst activation steps",
             "Mechanism with catalyst deactivation steps",
-        ]
+        )
+        options = [option.lower() for option in options]
         
         rewards = []
         for ans in answers:
-            if ans in options:
+            if ans.lower() in options:
                 rewards.append(1)
             else:
                 rewards.append(0)
@@ -600,7 +600,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         """Reward function - check that the answer considers the four experimental runs"""
         rewards = []
         for completion, sol in zip(completions, solution):
-            data_mentioned = set(re.findall(r"Run\s*([1-4])", completion))
+            data_mentioned = set(re.findall(r"run\s*([1-4])", completion.lower()))
             score_data_coverage = len(data_mentioned) / 4
             rewards.append(score_data_coverage)
         
@@ -610,12 +610,12 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
     def category_coverage_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer considers the four categories"""
         rewards = []
-        categories = {
+        categories = (
             "Core mechanism",
             "Mechanism with bicatalytic steps",
             "Mechanism with catalyst activation steps",
             "Mechanism with catalyst deactivation steps",
-        }
+        )
 
         for completion in completions:
             categories_mentioned = {
@@ -629,7 +629,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def metrics_coverage_reward(self, completions, solution, **kwargs):
         rewards = []
-        metrics = {
+        metrics = (
             "Initial concentration of catalyst",
             "The initial concentration of substrate",
             "The final concentration of substrate",
@@ -639,7 +639,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             "Mass balance gap at midpoint",
             "Catalyst stability",
             "Induction period",
-        }
+        )
 
         for completion in completions:
             metrics_mentioned = {

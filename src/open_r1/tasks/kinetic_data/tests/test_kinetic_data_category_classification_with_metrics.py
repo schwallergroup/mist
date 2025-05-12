@@ -124,7 +124,6 @@ class TestKineticDataCategoryClassificationWithMetrics:
 
     def test_load_data(self):
         self.classification_task.load()
-        # import pdb; pdb.set_trace()
 
     def test_format_reward(self):
         responses = [response_wrong_format, response_correct_format]
@@ -133,8 +132,6 @@ class TestKineticDataCategoryClassificationWithMetrics:
 
         regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         match = re.search(regex, response_correct_format, re.DOTALL)
-        print("----match groups----")
-        print(match.groups())
 
         assert [
             round(r, 1)
@@ -151,8 +148,6 @@ class TestKineticDataCategoryClassificationWithMetrics:
 
         regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         match = re.search(regex, response_correct_format, re.DOTALL)
-        print("----match groups----")
-        print(match.groups())
 
         for r in self.classification_task.format_continuous_reward(responses):
             assert r >= -1.0 and r <= 1.0
@@ -178,6 +173,46 @@ class TestKineticDataCategoryClassificationWithMetrics:
             [response_correct_format, response_wrong_format]
         )
         assert ans == ["Core Mechanism", "NONE"]
+
+    def test_correct_option_reward(self):
+        responses = [
+            "<think>...</think><answer>Core Mechanism</answer>",
+            "<think>...</think><answer>Mechanism with inccorect steps</answer>",
+        ]
+        rewards = self.classification_task.correct_option_reward(
+            responses, ["Core Mechanism", "Mechanism with catalyst activation steps"]
+        )
+        assert rewards == [float(0.2), float(0)]
+    
+    def test_run_coverage_reward(self):
+        responses = [
+            "Looking run 1, the reaction is a core mechanism. However, looking run 2, the reaction might be a mechanism with catalyst activation steps because the catalyst is not stable.",
+            "Looking Run 1, the reaction is a core mechanism. However, looking Run 3, the reaction might be a mechanism with catalyst deactivation steps because the catalyst is not stable.",
+        ]
+        rewards = self.classification_task.run_coverage_reward(
+            responses, ["Core Mechanism", "Mechanism with catalyst activation steps"]
+        )
+        assert rewards == [float(0.1), float(0.1)]
+    
+    def test_category_coverage_reward(self):
+        responses = [
+            "The reaction is a core mechanism because the catalyst is stable and the mass balance gap is small. However, the reaction might be mechanism with catalyst activation steps because the catalyst is not stable.",
+            "The reaction is a core mechanism",
+            "The reaction is a mechanism with catalyst activation steps. However, the reaction might be a core mechanism because the catalyst is stable. Wait, the reaction might be a mechanism with catalyst deactivation steps because the catalyst is not stable.",
+        ]
+        rewards = self.classification_task.category_coverage_reward(
+            responses, ["Core Mechanism", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
+        )
+        assert rewards == pytest.approx([float(0.1), float(0.05), float(0.15)])
+    
+    def test_metrics_coverage_reward(self):
+        responses = [
+            "Looking run 1, the initial concentration of catalyst is 1.0, and the initial concentration of substrate is 1.0"
+        ]
+        rewards = self.classification_task.metrics_coverage_reward(
+            responses, ["Core Mechanism"]
+        )
+        assert rewards == [float(2/9*0.2)]
 
 
 class TestKineticDataCategoryClassificationWithRawDataMetrics(
