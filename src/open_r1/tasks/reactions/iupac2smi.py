@@ -226,6 +226,7 @@ class Iupac2SmilesWithTags(Iupac2Smiles):
         return smiles
 
 class Iupac2SmilesV2(RLTask):
+    question_template: str = ""
     printed_sample_prompt: bool = False
     tanimoto_coeff: float = 0.0
 
