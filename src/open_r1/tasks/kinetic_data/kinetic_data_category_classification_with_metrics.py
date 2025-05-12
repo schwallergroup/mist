@@ -77,6 +77,75 @@ prompt_template_data = f"""
         """
 
 
+prompt_template_data_improved = f"""
+        # Metrics that calculated from the data
+        The following metrics were calculated from the experimental data in advance.
+        The following data correspond to four experimental runs conducted under the same reaction system. 
+        Runs 1–3 share the same initial substrate concentration ([S]₀) but differ in the initial catalyst concentration ([cat]₀), which ranges from 1–10 mol%. Run 4 is a 'same-excess' experiment, in which the initial substrate concentration is reduced and product ([P]₀) is added.
+
+        ## Run 1
+        - Initial concentration of catalyst: {{run_1[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_1[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_1[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_1[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_1[final_concentration_of_product]}}
+        - Mass balance gap: {{run_1[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_1[mass_gap_mid]}}
+        - Catalyst stability: {{run_1[catalyst_stability]}}
+        - Induction period: {{run_1[induction_period]}}
+
+        ## Run 2
+        - Initial concentration of catalyst: {{run_2[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_2[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_2[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_2[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_2[final_concentration_of_product]}}
+        - Mass balance gap: {{run_2[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_2[mass_gap_mid]}}
+        - Catalyst stability: {{run_2[catalyst_stability]}}
+        - Induction period: {{run_2[induction_period]}}
+
+        ## Run 3
+        - Initial concentration of catalyst: {{run_3[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_3[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_3[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_3[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_3[final_concentration_of_product]}}
+        - Mass balance gap: {{run_3[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_3[mass_gap_mid]}}
+        - Catalyst stability: {{run_3[catalyst_stability]}}
+        - Induction period: {{run_3[induction_period]}}
+
+        ## Run 4
+        - Initial concentration of catalyst: {{run_4[initial_concentration_of_catalyst]}}
+        - The initial concentration of substrate: {{run_4[initial_concentration_of_substrate]}}
+        - The final concentration of substrate: {{run_4[final_concentration_of_substrate]}}
+        - The initial concentration of product: {{run_4[initial_concentration_of_product]}}
+        - The final concentration of product: {{run_4[final_concentration_of_product]}}
+        - Mass balance gap: {{run_4[mass_balance_gap]}}
+        - Mass balance gap at midpoint: {{run_4[mass_gap_mid]}}
+        - Catalyst stability: {{run_4[catalyst_stability]}}
+        - Induction period: {{run_4[induction_period]}}
+        
+        ## Explanation of the metrics
+        Mass balance gap:
+        This metrics indicates how much mass is "missing" from expected total. High gaps my suggest side reactions or deactivation.
+        This metrics measures the absolute difference between the substrate loss and the product gain.
+
+        Mass balance gap at midpoint:
+        This metrics indicates how much mass is "missing" from expected total at midpoint of the reaction. Can singal mid-reaction instabilities.
+        This metrics measures the absolute difference between the substrate loss and the product gain at the midpoint of the reaction.
+
+        Catalyst stability:
+        This metrics indicates how stable the catalyst is. If the value is close to 1, the catalyst is stable. Much less than 1 means that the catalyst is unstable.
+        This metrics is calculated by the final reaction rate devided by the initial reaction rate.
+
+        Induction period:
+        Indicates the time before the reaction rate becomes significant. A long period may suggest catalyst activation delays. 
+        This metrics is calculated by detecting the first time point where product exceeds 5% of total growth.
+        """
+
+
 prompt_template_with_raw_data = f"""
         # Raw data and Metrics
         ## Run 1
@@ -180,7 +249,9 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             Then end with </think>, and finally put your final answer within <answer>...</answer> tags, for example <answer>Core Mechanism</answer>.
             
             <|im_start|>user
-            Estimate the reaction categories based on the following metrics.
+            Estimate the reaction category by interpreting the metrics shown below for runs 1-4 collectively.
+            Observe all four runs and evaluate all possible categories.
+            Then, choose the most likely one based on your observation.
             Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. 
             Do not provide final answer different than what it provided in this list. 
 
@@ -503,6 +574,83 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
         return rewards
 
+    def correct_option_reward(self, completions, solution, **kwargs):
+        """Reward function - check that the answer is one of the correct options"""
+        completions = self.preprocess_completions(completions)
+        answers = self.extract_answer(completions)
+
+        options = [
+            "Core mechanism",
+            "Mechanism with bicatalytic steps",
+            "Mechanism with catalyst activation steps",
+            "Mechanism with catalyst deactivation steps",
+        ]
+        
+        rewards = []
+        for ans in answers:
+            if ans in options:
+                rewards.append(1)
+            else:
+                rewards.append(0)
+
+        rewards = [reward * 0.2 for reward in rewards]
+        return rewards
+                
+    def run_coverage_reward(self, completions, solution, **kwargs):
+        """Reward function - check that the answer considers the four experimental runs"""
+        rewards = []
+        for completion, sol in zip(completions, solution):
+            data_mentioned = set(re.findall(r"Run\s*([1-4])", completion))
+            score_data_coverage = len(data_mentioned) / 4
+            rewards.append(score_data_coverage)
+        
+        rewards = [reward * 0.2 for reward in rewards]
+        return rewards
+    
+    def category_coverage_reward(self, completions, solution, **kwargs):
+        """Reward function - check that the answer considers the four categories"""
+        rewards = []
+        categories = {
+            "Core mechanism",
+            "Mechanism with bicatalytic steps",
+            "Mechanism with catalyst activation steps",
+            "Mechanism with catalyst deactivation steps",
+        }
+
+        for completion in completions:
+            categories_mentioned = {
+                category for category in categories if category.lower() in completion.lower()
+            }
+            score_class_coverage = len(categories_mentioned) / len(categories)
+            rewards.append(score_class_coverage)
+        
+        rewards = [reward * 0.2 for reward in rewards]
+        return rewards
+
+    def metrics_coverage_reward(self, completions, solution, **kwargs):
+        rewards = []
+        metrics = {
+            "Initial concentration of catalyst",
+            "The initial concentration of substrate",
+            "The final concentration of substrate",
+            "The initial concentration of product",
+            "The final concentration of product",
+            "Mass balance gap",
+            "Mass balance gap at midpoint",
+            "Catalyst stability",
+            "Induction period",
+        }
+
+        for completion in completions:
+            metrics_mentioned = {
+                m for m in metrics if m.lower() in completion.lower()
+            }
+            score_metrics_coverage = len(metrics_mentioned) / len(metrics)
+            rewards.append(score_metrics_coverage)
+        
+        rewards = [reward * 0.2 for reward in rewards]
+        return rewards
+
     def answer_covered_in_reasoning_traces_reward(
         self, completions, solution, **kwargs
     ):
@@ -588,7 +736,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         return self.dataset
 
     def extract_answer(self, completions: list[str]) -> list[str]:
-        """Preprocess the response before checking for accuracy."""
+        """Extract the answer from the completion."""
         answers = []
         for completion in completions:
             pattern = r"<answer>(.*)<\/answer>"
@@ -601,6 +749,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         return answers
 
     def preprocess_completions(self, completions: list[str]) -> list[str]:
+        """Add <think> tags to the completions."""
         processed_completions = []
         for completion in completions:
             processed_completions.append(f"<think>{completion}")
