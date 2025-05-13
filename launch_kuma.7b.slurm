@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=2:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
@@ -95,7 +95,7 @@ export CMD=" \
     --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --base_model_id=$MODEL_ID \
-    --task_recipe=${TASK}.yaml \
+    --task_recipe=${TASK}.7b.yaml \
     --task_recipe_suffix=$TASK_SUFFIX \
     --task_mode=$TASK_MODE \
     --slurm_job_id=$SLURM_JOB_ID \

@@ -244,14 +244,11 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         super().__init__(**kwargs)
         self.question_template = ("""
             <|im_start|>assistant
-            You are a useful Chemistry assistant and you will answer the following class prediction question. 
-            Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process.
-            Then end with </think>, and finally put your final answer within <answer>...</answer> tags, for example <answer>Core Mechanism</answer>.
-            
+            You are a useful Chemistry assistant and you will answer the following category prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags,
+            think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
+
             <|im_start|>user
-            Estimate the reaction category by interpreting the metrics shown below for runs 1-4 collectively.
-            Observe all four runs and evaluate all possible categories.
-            Then, choose the most likely one based on your observation.
+            Observe all four runs and evaluate all possible categories. Then choose the most likely one based on your observation.
             Choose ONLY from the following options and write your response choice inside <answer>...</answer>: [Core mechanism, Mechanism with bicatalytic steps, Mechanism with catalyst activation steps, Mechanism with catalyst deactivation steps]. 
             Do not provide final answer different than what it provided in this list. 
 
@@ -294,6 +291,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             <|im_end|>
 
             <|im_start|>assistant
+            <think>
             """
         )
 
@@ -485,7 +483,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             },
         }
 
-    def format_continuous_reward(self, completions, **kwargs):
+    def format_continuous_reward(self, completions, prompts, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
         Args:
@@ -501,11 +499,14 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         rewards = []
         completions = self.preprocess_completions(completions)
 
-        for completion_id, completion in enumerate(completions):
+        for completion, prompt in zip(completions, prompts):
             current_reward = 0.0
             try:
                 if random.random() < 0.01:  # 1% chance to print a completion
-                    print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
+                    print("===========prompt===========")
+                    print(prompt)
+                    print("===========completion===========")
+                    print(completion)
                     
                 # 0.2 reward if each tag is present once
                 for tag_word in [
@@ -750,12 +751,10 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def preprocess_completions(self, completions: list[str]) -> list[str]:
         """Add <think> tags to the completions."""
-        # processed_completions = []
-        # for completion in completions:
-        #     processed_completions.append(f"<think>{completion}")
-        # return processed_completions
-        # Do nothing
-        return completions
+        processed_completions = []
+        for completion in completions:
+            processed_completions.append(f"<think>{completion}")
+        return processed_completions
 
 
 class KineticDataCategoryClassificationWithRawDataMetrics(
