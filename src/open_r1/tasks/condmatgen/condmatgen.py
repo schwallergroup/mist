@@ -71,7 +71,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         seed = 42
         random.seed(seed)
-        # print(f"\n\n\nproblems size: {len(problems)} data size: {len(data)}\n\n\n")
+        print(f"\n\n\nproblems size: {len(problems)} solutions size: {len(solutions)}\n\n\n")
         problems = random.sample(problems, 2200)
         solutions = random.sample(solutions, 2200)
         return {
@@ -88,7 +88,7 @@ class ConditionalMaterialGeneration(RLTask):
         train_test_split = train_dataset.train_test_split(test_size=0.1, seed=seed)
         train_dataset = train_test_split["train"].unique(column="solution")
         test_dataset = train_test_split["test"]
-
+    
         # Combine into DatasetDict
         self.dataset = DatasetDict(
             {"train": train_dataset, "test": test_dataset}
