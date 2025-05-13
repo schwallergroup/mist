@@ -75,8 +75,8 @@ class ConditionalMaterialGeneration(RLTask):
         problems = random.sample(problems, 2200)
         solutions = random.sample(solutions, 2200)
         return {
-            "problem": problems,
-            "solution": solutions,
+            "problem": Dataset.from_list(problems),
+            "solution": Dataset.from_list(solutions),
         }
 
     def load(self) -> DatasetDict:
