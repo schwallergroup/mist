@@ -6,7 +6,8 @@ transformers==4.48.2
 pandas==2.0.0
 trl==0.15.0
 numpy==1.26.4
-git+https://github.com/huggingface/lighteval.git@ed084813e0bd12d82a06d9f913291fdbee774905#egg=lighteval[math]
+git+https://github.com/XuanVuNguyen/lighteval.git@local_data#egg=lighteval[math]
+# git+https://github.com/huggingface/lighteval.git@ed084813e0bd12d82a06d9f913291fdbee774905#egg=lighteval[math]
 
 # vllm==0.8.4
 # # -i https://download.pytorch.org/whl/cu126
