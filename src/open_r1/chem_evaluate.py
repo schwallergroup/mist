@@ -29,6 +29,7 @@ def mol_exact_match(predictions: list[str], formatted_doc: Doc, **kwargs) -> boo
     Check if the predicted SMILES is exactly the same as the gold standard.
     """
     pred = predictions[0] # top-1 only
+    pred = task.extract_smiles_from_answer(task.preprocess_response(pred))
     tanimoto_sim = compute_tanimoto_similarity(formatted_doc.get_golds()[0], pred)
     if tanimoto_sim is None:
         acc = 0
@@ -36,7 +37,7 @@ def mol_exact_match(predictions: list[str], formatted_doc: Doc, **kwargs) -> boo
         acc = 1
     else:
         acc = 0
-    
+    tanimoto_sim = 0 if tanimoto_sim is None else tanimoto_sim
     return {"acc": acc, "tanimoto_sim": tanimoto_sim}
 
 # def aggregate_fn(results: list[dict], **kwargs) -> dict:

@@ -177,6 +177,7 @@ data/
 wandb/
 logs/
 eval_logs/
+eval_results/
 docs/build/
 
 # Others
