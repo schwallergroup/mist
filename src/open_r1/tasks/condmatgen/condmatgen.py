@@ -79,12 +79,11 @@ class ConditionalMaterialGeneration(RLTask):
         """Load and return the complete dataset."""
         # Load training data
         train_dict = self.read_files()
-        full_dataset = Dataset.from_dict(train_dict)
+        train_dataset = Dataset.from_dict(train_dict)
         seed = 42
-        full_dataset = full_dataset.shuffle(seed=seed)
+        train_dataset = train_dataset.shuffle(seed=seed)
         max_examples = 2200
-        full_dataset = full_dataset.select(range(max_examples))
-        train_dataset = Dataset.from_dict(full_dataset)
+        train_dataset = train_dataset.select(range(max_examples))
 
         train_test_split = train_dataset.train_test_split(test_size=0.1, seed=seed)
         train_dataset = train_test_split["train"].unique(column="solution")
