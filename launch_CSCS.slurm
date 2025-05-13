@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:30:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=4
 #SBATCH --gres=gpu:4
 #SBATCH --output=../sink_logs/%x-%j.out
