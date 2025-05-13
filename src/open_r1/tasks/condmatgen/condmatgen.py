@@ -1,6 +1,6 @@
 import os
 import re
-from random import random
+import random
 from typing import Dict, Optional
 from open_r1.download_data import download_data
 import pandas as pd
