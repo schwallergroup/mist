@@ -75,8 +75,8 @@ class ConditionalMaterialGeneration(RLTask):
         problems = random.sample(problems, 2200)
         solutions = random.sample(solutions, 2200)
         return {
-            "problem": Dataset.from_list(problems),
-            "solution": Dataset.from_list(solutions),
+            "problem": problems,
+            "solution": solutions,
         }
 
     def load(self) -> DatasetDict:
@@ -94,6 +94,12 @@ class ConditionalMaterialGeneration(RLTask):
             {"train": train_dataset, "test": test_dataset}
         )
 
+        return self.dataset
+
+    def dataset_preprocess(self, tokenizer):
+        self.dataset = self.dataset.map(
+            lambda x: self.generate_prompt(x["problem"], tokenizer)
+        )
         return self.dataset
     
     def accuracy_reward(self, completions, solution, **kwargs):
