@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 from transformers import PreTrainedModel
 from transformers.trainer_utils import get_last_checkpoint
+from transformers.integrations.deepspeed import is_deepspeed_zero3_enabled
 
 from pydantic import Field
 from trl import GRPOConfig, GRPOTrainer
@@ -27,6 +28,10 @@ class ExtendedGRPOTrainer(GRPOTrainer):
     ):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args_, args=args, **kwargs_)
+
+        # Logging
+        if is_deepspeed_zero3_enabled():
+            print("[ExtendedGRPOTrainer.__init__] Deepspeed ZeRO3 is enabled")
 
         # Set up logging of good completions
         self.logging_completions = {
