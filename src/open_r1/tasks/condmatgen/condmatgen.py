@@ -63,7 +63,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         for pt in data:
             try:
-                problems.append({'instruction': self.question_template.format(instruction=pt.get('instruction'))})
+                problems.append(self.question_template.format(instruction=pt.get('instruction')))
                 solutions.append("")
             except KeyError as e:
                 print(pt.keys())
@@ -77,6 +77,20 @@ class ConditionalMaterialGeneration(RLTask):
         return {
             "problem": problems,
             "solution": solutions,
+        }
+    
+    def generate_prompt(self, problem, tokenizer, **kwargs):
+        r1_prefix = [
+            {
+                "role": "user",
+                "content": problem,
+            },
+        ]
+        return {
+            "prompt": tokenizer.apply_chat_template(
+                r1_prefix, tokenize=False, continue_final_message=True
+            ),
+            "problem": problem,
         }
 
     def load(self) -> DatasetDict:
