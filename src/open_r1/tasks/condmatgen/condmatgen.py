@@ -88,7 +88,8 @@ class ConditionalMaterialGeneration(RLTask):
         print(f"{type(train_dataset)}")
         seed = 42
         train_test_split = train_dataset.train_test_split(test_size=0.1, seed=seed)
-        train_dataset = train_test_split["train"].unique(column="solution")
+        # train_dataset = train_test_split["train"].unique(column="solution")
+        train_dataset = train_test_split["train"]
         test_dataset = train_test_split["test"]
         print(f"{type(test_dataset)} {type(train_dataset)}")
     
