@@ -20,11 +20,15 @@ def main():
     args = arg_parse()
     os.makedirs(args.save_dir, exist_ok=True)
 
-    task = ForwardReaction(task_mode=args.task_mode, dataset_id_or_path="/work/liac/GRPO_training/data/USPTO/USPTO_480k_clean_no_sft/")
+    task = ForwardReaction(task_mode=args.task_mode, dataset_id_or_path="/data/USPTO/USPTO_480k_clean_no_sft/")
     # Sample data list
     data = task.load()['test']
     # randomly select 100 samples
-    data = random.sample(data, 100)
+    # random.seed(42)
+    print("Seed set to 42")
+    # data = random.sample(data, 100)
+    
+    data = data.shuffle(seed=42).select(range(100))
     # Load vLLM model
     llm = LLM(model=args.model)  # replace with your actual model
 
