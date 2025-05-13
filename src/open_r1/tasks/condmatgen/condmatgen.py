@@ -66,12 +66,12 @@ class ConditionalMaterialGeneration(RLTask):
                 problems.append(self.question_template.format(pt["instruction"]))
                 solutions.append("")
             except KeyError as e:
-                # print(pt)
+                print(pt.keys())
                 print(f"Missing expected key in data: {e}")
 
         seed = 42
         random.seed(seed)
-        print(f"\n\n\nproblems size: {len(problems)} data size: {len(data)}\n\n\n")
+        # print(f"\n\n\nproblems size: {len(problems)} data size: {len(data)}\n\n\n")
         problems = random.sample(problems, 2200)
         solutions = random.sample(solutions, 2200)
         return {
