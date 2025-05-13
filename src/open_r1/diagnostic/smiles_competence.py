@@ -1,14 +1,17 @@
 
+import os
+import re
 import random
 import pandas as pd
 from vllm import LLM, SamplingParams
+import numpy as np
 
 def load_llm(model):
     llm = LLM(
         model=model,
         max_num_seqs=12,
         max_model_len=512,
-        tensor_parallel_size=4,
+        tensor_parallel_size=1,
     )
     params = SamplingParams(
         temperature=0.0,
@@ -59,20 +62,39 @@ def load_dataset(data_dir):
     df['prompt_corrupt'] = df['corrupt'].apply(prompt_template)
     return df
 
+
+from pydantic import BaseModel
+
+class LogprobStat(BaseModel):
+    mean_logprob: float
+    mean_rank: float
+    n_tokens: int
+    smiles: str
+
+
 def run_column(col, llm, params, data):
     def process_out(out):
-        lps = out.prompt_logprobs #[12:][:-5]
+        smiles_tokens = out.prompt_token_ids[12:][:-5]
+        lps = out.prompt_logprobs[12:][:-5]
 
-        print(len(lps))
-        print(lps)
+        # vllm gives you logprobs for your token, and for rank1 token
+        smi_lps = [v[x].logprob for v,x in zip(lps, smiles_tokens)]
+        smi_rank = [v[x].rank for v,x in zip(lps, smiles_tokens)]
 
-        # lps = [v.logprob for v in list(lps.items())]
-        return lps
+        smiles = "".join([v[x].decoded_token for v,x in zip(lps, smiles_tokens)])
+        smiles = re.sub('Ġ',"","".join(smiles))
+
+        return LogprobStat(
+            mean_logprob=np.mean(smi_lps),
+            mean_rank=np.mean(smi_rank),
+            n_tokens=len(smiles_tokens),
+            smiles=smiles
+        ).__dict__
 
     out = llm.generate(data[col], params)
     lps = [process_out(o) for o in out]
 
-    return lps
+    return pd.DataFrame(lps)
 
 def main(model, data_dir):
     llm, params = load_llm(model)
@@ -82,11 +104,30 @@ def main(model, data_dir):
     out_random = run_column('prompt_random', llm, params, data)
     out_corrupt = run_column('prompt_corrupt', llm, params, data)
 
-    print(pd.DataFrame(out_canon))
-    print(pd.DataFrame(out_random))
+    write_dir = os.path.dirname(data_dir)
+
+    out_canon.to_csv(os.path.join(write_dir, "lps_canonical.csv"), index=False)
+    out_random.to_csv(os.path.join(write_dir, "lps_random.csv"), index=False)
+    out_corrupt.to_csv(os.path.join(write_dir, "lps_corrup.csv"), index=False)
+
+    # Report some metrics here (e.g. avg difference, diff of averages, relative to canon)
+    print("Means:")
+    print("CANON", out_canon[['mean_logprob','mean_rank']].mean())
+    print("RANDOM", out_random[['mean_logprob','mean_rank']].mean())
+    print("CORRUPT", out_corrupt[['mean_logprob','mean_rank']].mean())
+    print("----------")
+
+    print("Mean distribution diff:")
+    print("Canon to Random", (out_canon[['mean_logprob','mean_rank']]- out_random[['mean_logprob','mean_rank']]).mean())
+    print("Canon to Corrupt", (out_canon[['mean_logprob','mean_rank']]- out_corrupt[['mean_logprob','mean_rank']]).mean())
+    print("----------")
+
+    print("Diff of means:")
+    print("Canon to Random", out_canon[['mean_logprob','mean_rank']].mean() - out_random[['mean_logprob','mean_rank']].mean())
+    print("Canon to Corrupt", out_canon[['mean_logprob','mean_rank']].mean() - out_corrupt[['mean_logprob','mean_rank']].mean())
 
 
 if __name__=="__main__":
-    model = "/LLM_models/models--Qwen--Qwen2.5-3B/snapshots/3aab1f1954e9cc14eb9509a215f9e5ca08227a9b"
-    data_dir = "/iopsstor/store/cscs/swissai/a05/LIAC/data/CRLLM-PubChem/CRLLM-PubChem-compounds1M.csv"
+    model = "Qwen/Qwen2.5-0.5B"
+    data_dir = "src/open_r1/diagnostic/data.csv"
     main(model, data_dir)
