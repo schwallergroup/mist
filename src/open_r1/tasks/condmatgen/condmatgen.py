@@ -68,8 +68,8 @@ class ConditionalMaterialGeneration(RLTask):
             print(pt)
             print(f"Missing expected key in data: {e}")
         seed = 42
-        problems = random.sample(problems, seed=seed)
-        solutions = random.sample(solutions, seed=seed)
+        problems = random.sample(problems, 2200, seed=seed)
+        solutions = random.sample(solutions, 2200, seed=seed)
         return {
             "problem": problems,
             "solution": solutions,
