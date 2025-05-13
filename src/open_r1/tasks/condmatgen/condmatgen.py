@@ -38,7 +38,7 @@ class ConditionalMaterialGeneration(RLTask):
         self.custom_metrics = {
             'val/rewards': [],
         }
-        with open("../comps_used_in_sft.json", "r") as file:
+        with open("/iopsstor/store/cscs/swissai/a05/chem/comps_used_in_sft.json", "r") as file:
             seen_comps = json.load(file)
         self.seen_comps_set = set() 
         for comp in seen_comps:
