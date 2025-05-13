@@ -29,9 +29,6 @@ class ConditionalMaterialGeneration(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not os.path.exists(self.dataset_id_or_path):
-            os.makedirs(self.dataset_id_or_path)
-        download_data(self.dataset_id_or_path)
 
         self.question_template = f"""<|im_start|>assistant\You are a material science expert, and I have a task for you. Given the following elements, please generate valid and novel material from these elements. Show your reasoning in <think>...</think> tags and return the final answer in <material>...</material> tags.<|im_end|>\n<|im_start|>user\{{instruction}}. Please keep your reasoning as concise as possible. For example <material> A A B B B <sg12></material> where A, B refer to elements and <sg12> denotes the space group for example: \n<material> Pa In Tc Tc <sg225></material>.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"""
         self.log_custom_metrics = True
