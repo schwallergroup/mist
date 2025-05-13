@@ -1,15 +1,17 @@
+"""Custom evaluation tasks for Chemical Reasoning."""
+
 from lighteval.tasks.requests import Doc
 from lighteval.metrics.utils.metric_utils import MetricCategory, MetricUseCase, SampleLevelMetric, SampleLevelMetricGrouping
 from lighteval.tasks.lighteval_task import LightevalTaskConfig, LightevalTask
 
 import numpy as np
-from src.open_r1.tasks.task_utils import compute_tanimoto_similarity
-from src.open_r1.tasks import Iupac2Smiles
+from open_r1.tasks.task_utils import compute_tanimoto_similarity
+from open_r1.tasks import Iupac2Smiles
 
 task_mode = "tagged"
 test_data_path = "test_data.iupacsm.jsonl"
 generation_size = 4096
-num_samples = 1
+num_samples = 10
 
 task = Iupac2Smiles(task_mode=task_mode)
 
@@ -48,6 +50,7 @@ def mol_exact_match(predictions: list[str], formatted_doc: Doc, **kwargs) -> boo
 sample_level_metric = SampleLevelMetricGrouping(
     metric_name="mol_exact_match",
     category=MetricCategory.GENERATIVE,
+    use_case=MetricUseCase.ACCURACY,
     sample_level_fn=mol_exact_match,
     corpus_level_fn={"acc": np.mean, "taniomoto_sim": np.mean},
     higher_is_better={"acc": True, "tanimoto_sim": True},
@@ -65,9 +68,13 @@ iupacsm_task = LightevalTaskConfig(
     few_shots_select=None,
     generation_size=generation_size,
     num_samples=num_samples,
-    metric=["mol_exact_match"], 
+    metric=[sample_level_metric], 
 )
 
-TASK_TABLE = [
+TASKS_TABLE = [
     iupacsm_task,
 ]
+
+if __name__ == "__main__":
+    print([t["name"] for t in TASKS_TABLE])
+    print(len(TASKS_TABLE))
