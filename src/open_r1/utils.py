@@ -415,10 +415,10 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         # Logging print (once)
         if 'print_completion_mask_shape' not in self.logging_print_once:
-            print(f"[ExtendedGRPOTrainer._compute_loss_modified] completion_mask shape: {completion_mask.shape.tolist()}")
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] completion_mask shape: {completion_mask.shape}")
             self.logging_print_once.append('print_completion_mask_shape')
         if 'print_prompt_inputs_attention_mask_shape' not in self.logging_print_once:
-            print(f"[ExtendedGRPOTrainer._compute_loss_modified] prompt_inputs[\"attention_mask\"] shape: {prompt_inputs['attention_mask'].shape.tolist()}")
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] prompt_inputs[\"attention_mask\"] shape: {prompt_inputs['attention_mask'].shape}")
             self.logging_print_once.append('print_prompt_inputs_attention_mask_shape')
 
         # Log the metrics
