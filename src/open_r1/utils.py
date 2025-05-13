@@ -414,8 +414,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         completion_length = self.accelerator.gather_for_metrics(completion_mask.sum(1)).float().mean().item()
         self._metrics["completion_length"].append(completion_length)
 
-        self.state.num_input_tokens_seen += self.accelerator.gather_for_metrics(attention_mask.sum()).sum().item()
-        self._metrics["num_tokens"] = [self.state.num_input_tokens_seen]
+        # self.state.num_input_tokens_seen += self.accelerator.gather_for_metrics(attention_mask.sum()).sum().item()
+        # self._metrics["num_tokens"] = [self.state.num_input_tokens_seen]
 
         # log prompt lengths, mean, min, max
         agg_prompt_mask = self.accelerator.gather_for_metrics(prompt_inputs["attention_mask"].sum(1))
