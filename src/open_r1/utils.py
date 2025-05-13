@@ -18,8 +18,8 @@ from importlib.metadata import version
 import torch
 from trl.data_utils import apply_chat_template, is_conversational, maybe_apply_chat_template
 from accelerate.utils import broadcast_object_list, gather_object
-from trl_functions14 import unwrap_model_for_generation, pad, selective_log_softmax
-from trl17_profiling import profiling_decorator
+from .trl_functions14 import unwrap_model_for_generation, pad, selective_log_softmax
+from .trl17_profiling import profiling_decorator
 
 MetricFunc = Callable[[], dict]
 
