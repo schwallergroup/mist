@@ -67,7 +67,9 @@ class ConditionalMaterialGeneration(RLTask):
         except KeyError as e:
             print(pt)
             print(f"Missing expected key in data: {e}")
-
+        seed = 42
+        problems = random.sample(problems, seed=seed)
+        solutions = random.sample(solutions, seed=seed)
         return {
             "problem": problems,
             "solution": solutions,
@@ -79,10 +81,6 @@ class ConditionalMaterialGeneration(RLTask):
         train_dict = self.read_files()
         train_dataset = Dataset.from_dict(train_dict)
         seed = 42
-        train_dataset = train_dataset.shuffle(seed=seed)
-        max_examples = 2200
-        train_dataset = train_dataset.select(range(max_examples))
-
         train_test_split = train_dataset.train_test_split(test_size=0.1, seed=seed)
         train_dataset = train_test_split["train"].unique(column="solution")
         test_dataset = train_test_split["test"]
