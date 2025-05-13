@@ -18,8 +18,8 @@ from importlib.metadata import version
 import torch
 from trl.data_utils import apply_chat_template, is_conversational, maybe_apply_chat_template
 from accelerate.utils import broadcast_object_list, gather_object
-from trl_functions import unwrap_model_for_generation, pad
-
+from trl_functions14 import unwrap_model_for_generation, pad, selective_log_softmax
+from trl17_profiling import profiling_decorator
 
 MetricFunc = Callable[[], dict]
 
@@ -34,6 +34,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
     ):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args_, args=args, **kwargs_)
+
+        # Set up loss_type
+        self.loss_type = args.loss_type
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -220,9 +223,37 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             self.logging_completions["current_chunk_id"] += 1
             self.logging_completions["good_completions"] = []
 
+    # @profiling_decorator
+    def _get_per_token_logps(self, model, input_ids, attention_mask, logits_to_keep, batch_size=None) -> torch.Tensor:
+        """
+        Copy of _get_per_token_logps from TRL 0.17.0
+        """
+        batch_size = batch_size or input_ids.size(0)  # Chunk inputs into smaller batches to reduce memory peak
+        all_logps = []
+        for i in range(0, input_ids.size(0), batch_size):
+            input_ids_batch = input_ids[i : i + batch_size]
+            attention_mask_batch = attention_mask[i : i + batch_size]
+
+            # We add 1 to `logits_to_keep` because the last logits of the sequence is later excluded
+            logits = model(
+                input_ids=input_ids_batch, attention_mask=attention_mask_batch, logits_to_keep=logits_to_keep + 1
+            ).logits
+            logits = logits[:, :-1, :]  # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
+            input_ids_batch = input_ids_batch[:, -logits_to_keep:]
+            # For transformers<=4.48, logits_to_keep argument isn't supported, so here we drop logits ourselves.
+            # See https://github.com/huggingface/trl/issues/2770
+            logits = logits[:, -logits_to_keep:]
+            # Divide logits by sampling temperature.
+            # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
+            logits = logits / self.temperature
+            logps = selective_log_softmax(logits, input_ids_batch)  # compute logprobs for the input tokens
+            all_logps.append(logps)
+        return torch.cat(all_logps, dim=0)
+
     def _compute_loss_modified(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         """
         Modify the initial compute_loss method (TRL package version 0.14.0)
+        This version is a mix between TRL 0.14.0 & TRL 0.17.0 and additional modifications
         """
         # Check TRL version
         if version("trl") != "0.14.0":
@@ -238,7 +269,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         prompt_inputs = self.processing_class(
             prompts_text, return_tensors="pt", padding=True, padding_side="left", add_special_tokens=False
         )
-        prompt_inputs = super()._prepare_inputs(prompt_inputs)
+        prompt_inputs = super(GRPOTrainer, self)._prepare_inputs(prompt_inputs)
 
         if self.max_prompt_length is not None:
             prompt_inputs["input_ids"] = prompt_inputs["input_ids"][:, -self.max_prompt_length:]
@@ -342,7 +373,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 reward_inputs = reward_processing_class(
                     texts, return_tensors="pt", padding=True, padding_side="right", add_special_tokens=False
                 )
-                reward_inputs = super()._prepare_inputs(reward_inputs)
+                reward_inputs = super(GRPOTrainer, self)._prepare_inputs(reward_inputs)
                 with torch.inference_mode():
                     rewards_per_func[:, i] = reward_func(**reward_inputs).logits[:, 0]  # Shape (B*G,)
             else:
@@ -370,11 +401,45 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # x - x.detach() allows for preserving gradients from x
         per_token_loss = torch.exp(per_token_logps - per_token_logps.detach()) * advantages.unsqueeze(1)
         per_token_loss = -(per_token_loss - self.beta * per_token_kl)
-        loss = ((per_token_loss * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)).mean()
+        if self.loss_type == "grpo":
+            loss = ((per_token_loss * completion_mask).sum(dim=1) / completion_mask.sum(dim=1).clamp(min=1.0)).mean()
+        elif self.loss_type == "bnpo":
+            loss = (per_token_loss * completion_mask).sum() / completion_mask.sum().clamp(min=1.0)
+        elif self.loss_type == "dr_grpo":
+            loss = (per_token_loss * completion_mask).sum() / (per_token_loss.size(0) * self.max_completion_length)
+        else:
+            raise ValueError(f"Unknown loss type: {self.loss_type}")
 
         # Log the metrics
         completion_length = self.accelerator.gather_for_metrics(completion_mask.sum(1)).float().mean().item()
         self._metrics["completion_length"].append(completion_length)
+
+        self.state.num_input_tokens_seen += self.accelerator.gather_for_metrics(attention_mask.sum()).sum().item()
+        self._metrics["num_tokens"] = [self.state.num_input_tokens_seen]
+
+        # log prompt lengths, mean, min, max
+        agg_prompt_mask = self.accelerator.gather_for_metrics(prompt_inputs["attention_mask"].sum(1))
+        self._metrics["prompts/mean_length"].append(agg_prompt_mask.float().mean().item())
+        self._metrics["prompts/min_length"].append(agg_prompt_mask.float().min().item())
+        self._metrics["prompts/max_length"].append(agg_prompt_mask.float().max().item())
+
+        # log completion lengths, mean, min, max
+        agg_completion_mask = self.accelerator.gather_for_metrics(completion_mask.sum(1))
+        self._metrics["completions/mean_length"].append(agg_completion_mask.float().mean().item())
+        self._metrics["completions/min_length"].append(agg_completion_mask.float().min().item())
+        self._metrics["completions/max_length"].append(agg_completion_mask.float().max().item())
+
+        # identify sequences that terminated with EOS and log their lengths
+        agg_terminated_with_eos = self.accelerator.gather_for_metrics(is_eos.any(dim=1))
+        term_completion_mask = agg_completion_mask[agg_terminated_with_eos]
+        clipped_completions_ratio = 1 - len(term_completion_mask) / len(agg_completion_mask)
+        self._metrics["completions/clipped_ratio"].append(clipped_completions_ratio)
+        if len(term_completion_mask) == 0:
+            # edge case where no completed sequences are found
+            term_completion_mask = torch.zeros(1, device=device)
+        self._metrics["completions/mean_terminated_length"].append(term_completion_mask.float().mean().item())
+        self._metrics["completions/min_terminated_length"].append(term_completion_mask.float().min().item())
+        self._metrics["completions/max_terminated_length"].append(term_completion_mask.float().max().item())
 
         reward_per_func = self.accelerator.gather_for_metrics(rewards_per_func).mean(0)
         for i, reward_func in enumerate(self.reward_funcs):
@@ -431,6 +496,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     save_completions_min_reward_threshold: float = None
     save_completions_top_reward_percentage: float = 0.1
     save_completions_chunk_size: int = 1000
+    loss_type: str = "grpo"
 
 
 def setup_logger(name="logger"):
