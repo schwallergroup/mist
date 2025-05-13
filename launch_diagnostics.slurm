@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=logprobs
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:30:00
+#SBATCH --time=00:05:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --output=../sink_logs/%x-%j.out
@@ -16,7 +16,7 @@ echo "START TIME: $(date)"
 NUM_NODES=$SLURM_NNODES
 GPUS_PER_NODE=4
 WORLD_SIZE=$(($NUM_NODES*$GPUS_PER_NODE))
-NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
+NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE))
 
 
 MODEL_ID=$1
@@ -37,7 +37,7 @@ export TORCH_DISTRIBUTED_TIMEOUT=3600
 export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
 export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
 export NCCL_ASYNC_ERROR_HANDLING=1
-export NCCL_DEBUG=INFO
+# export NCCL_DEBUG=INFO
 export NCCL_IB_TIMEOUT=23
 export NCCL_SOCKET_TIMEOUT=23
 #export NCCL_DEBUG_SUBSYS=ALL

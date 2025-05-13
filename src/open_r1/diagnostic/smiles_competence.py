@@ -61,8 +61,12 @@ def load_dataset(data_dir):
 
 def run_column(col, llm, params, data):
     def process_out(out):
-        lps = out.prompt_logprobs[12:][:-5]
-        lps = [v.logprob for v in list(lps.items())]
+        lps = out.prompt_logprobs #[12:][:-5]
+
+        print(len(lps))
+        print(lps)
+
+        # lps = [v.logprob for v in list(lps.items())]
         return lps
 
     out = llm.generate(data[col], params)
