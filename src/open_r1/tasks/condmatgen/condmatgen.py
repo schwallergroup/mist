@@ -57,7 +57,16 @@ class ConditionalMaterialGeneration(RLTask):
             data = json.load(file)
 
         # Generate problems using the question template
-        problems = [self.question_template.format(pt["instruction"]) for pt in data]
+        # problems = [self.question_template.format(pt["instruction"]) for pt in data]
+        problems = []
+        try:
+            for pt in data:
+                problems.append(self.question_template.format(pt["instruction"]))
+        except KeyError as e:
+            print(pt)
+            print(f"Missing expected key in data: {e}")
+
+        
         # Solutions are the raw target records (assuming no further processing needed)
         solutions = []
 
