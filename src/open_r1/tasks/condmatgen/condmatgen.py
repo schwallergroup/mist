@@ -63,7 +63,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         for pt in data:
             try:
-                problems.append(self.question_template.format(pt.get('instruction')))
+                problems.append(self.question_template.format(instruction=pt.get('instruction')))
                 solutions.append("")
             except KeyError as e:
                 print(pt.keys())
