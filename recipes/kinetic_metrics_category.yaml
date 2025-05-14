@@ -7,15 +7,10 @@ tf32: true
 
 # Chemical Task arguments
 chem_task: kinetic_metrics_category
-dataset_id_or_path: /work/liac/kinetic
+dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/LIAC/data/kinetic
 rewards:
 - format
 - accuracy
-- answer_covered_in_reasoning_traces
-- correct_option
-- run_coverage
-- category_coverage
-- metrics_coverage
 
 save_completions: true
 save_completions_dir: /Documents/sink_good_completions_0514
