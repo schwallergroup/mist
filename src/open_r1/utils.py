@@ -35,8 +35,10 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args_, args=args, **kwargs_)
 
-        # Set up loss_type
+        # Set up loss_type, custom_kl_clipping, custom_kl_clipping_mean
         self.loss_type = args.loss_type
+        self.custom_kl_clipping = args.custom_kl_clipping
+        self.custom_kl_clipping_mean = args.custom_kl_clipping_mean
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -327,6 +329,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             logits = model(input_ids, num_logits_to_keep=num_logits_to_keep + 1).logits  # (B, L, V)
             logits = logits[:, :-1, :]  # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
 
+            # Divide by temperature (added in TRL 0.17.0)
+            logits = logits / self.temperature
+
             # Compute the log probabilities for the input tokens. Use a loop to reduce memory peak.
             per_token_logps = []
             for logits_row, input_ids_row in zip(logits, input_ids[:, -num_logits_to_keep:]):
@@ -354,6 +359,14 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         eos_idx[is_eos.any(dim=1)] = is_eos.int().argmax(dim=1)[is_eos.any(dim=1)]
         sequence_indices = torch.arange(is_eos.size(1), device=device).expand(is_eos.size(0), -1)
         completion_mask = (sequence_indices <= eos_idx.unsqueeze(1)).int()
+
+        # KL clipping
+        if self.custom_kl_clipping is not None:
+            per_token_kl = torch.clamp(per_token_kl, max=self.custom_kl_clipping)
+        if self.custom_kl_clipping_mean is not None:
+            mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
+            kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls).clamp(max=1.0)
+            per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
 
         # Decode the generated completions
         completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
@@ -509,6 +522,8 @@ class ExtendedGRPOConfig(GRPOConfig):
     save_completions_top_reward_percentage: float = 0.1
     save_completions_chunk_size: int = 1000
     loss_type: str = "grpo"
+    custom_kl_clipping: float = None
+    custom_kl_clipping_mean: float = None
 
 
 def setup_logger(name="logger"):
