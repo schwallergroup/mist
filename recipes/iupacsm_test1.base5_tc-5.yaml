@@ -18,7 +18,7 @@ rewards:
 - completion_difference
 - completion_size
 task_kwargs:
-  tanimoto_coeff: 0.0
+  tanimoto_coeff: -5.0
 custom_kl_clipping: 100
 custom_kl_clipping_mean: 0.2
 loss_type: dr_grpo
