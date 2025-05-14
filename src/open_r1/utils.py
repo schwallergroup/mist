@@ -47,6 +47,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.custom_clipped_surrogate_objective = args.custom_clipped_surrogate_objective
         self.custom_clipped_surrogate_objective_epsilon_high = args.custom_clipped_surrogate_objective_epsilon_high
         self.custom_clipped_surrogate_objective_epsilon_low = args.custom_clipped_surrogate_objective_epsilon_low
+        self.custom_reward_tanh = args.custom_reward_tanh
+        self.custom_reward_tanh_scale = args.custom_reward_tanh_scale
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -495,6 +497,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # Sum the rewards from all reward functions
         rewards = rewards_per_func.sum(dim=1)
 
+        # Apply tanh if needed
+        rewards_base = rewards.clone()
+        rewards_tanh = None
+        if self.custom_reward_tanh:
+            rewards = torch.tanh(rewards/self.custom_reward_tanh)
+            rewards_tanh = rewards.clone()
+
         # Compute grouped-wise rewards
         mean_grouped_rewards = rewards.view(-1, self.num_generations).mean(dim=1)
         std_grouped_rewards = rewards.view(-1, self.num_generations).std(dim=1)
@@ -565,7 +574,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 reward_func_name = reward_func.__name__
             self._metrics[f"rewards/{reward_func_name}"].append(reward_per_func[i].item())
 
-        self._metrics["reward"].append(self.accelerator.gather_for_metrics(rewards).mean().item())
+        self._metrics["reward"].append(self.accelerator.gather_for_metrics(rewards_base).mean().item())
+        if rewards_tanh is not None:
+            self._metrics["reward_tanh"].append(self.accelerator.gather_for_metrics(rewards_tanh).mean().item())
 
         self._metrics["reward_std"].append(self.accelerator.gather_for_metrics(std_grouped_rewards).mean().item())
 
@@ -622,6 +633,8 @@ class ExtendedGRPOConfig(GRPOConfig):
     custom_clipped_surrogate_objective: bool = False
     custom_clipped_surrogate_objective_epsilon_low: float = 0.1
     custom_clipped_surrogate_objective_epsilon_high: float = 0.1
+    custom_reward_tanh: bool = False
+    custom_reward_tanh_scale: float = 2
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
