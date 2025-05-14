@@ -35,7 +35,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # Note: current trl library version used in the sink repo: 0.14.0
         super().__init__(*args_, args=args, **kwargs_)
 
-        # Set up loss_type, custom_kl_clipping, custom_kl_clipping_mean
+        # Set up parameters
+        self.temperature = args.temperature
         self.loss_type = args.loss_type
         self.custom_kl_clipping = args.custom_kl_clipping
         self.custom_kl_clipping_mean = args.custom_kl_clipping_mean
