@@ -368,7 +368,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         # KL logging
         self._logging_kl_previously_logged = False
-        def _logging_kl(per_token_kl, completion_mask, preprint_message=''):
+        def _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=''):
             if self.logging_kl:
                 mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
                 mean_kl = mean_kls.mean().item()
@@ -381,10 +381,17 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 n_kl_nan = torch.isnan(per_token_kl).sum().item()
                 n_kl_inf = torch.isinf(per_token_kl).sum().item()
                 mean_kls = [f"{k:.2f}" for k in mean_kls.tolist()]
+                # Get the indices of the maximal value in per_token_kl
+                max_kl_indices = torch.nonzero(per_token_kl == per_token_kl.max(), as_tuple=False)
+                max_kl_index0 = max_kl_indices[0][0].item()
+                max_kl_index1 = max_kl_indices[0][1].item()
+                max_kl_completion_token = [completion_ids[max_kl_index0][max_kl_index1].item()]
+                if max_kl_index1 != 0:
+                    max_kl_completion_token = [completion_ids[max_kl_index0][max_kl_index1-1].item()] + max_kl_completion_token
                 print(f"[LOGGING_KL]: {preprint_message}\n"
                       f"\t[LOGGING_KL]: per_token_kl.shape={per_token_kl.shape} (used={n_kl}/{n_elements}, {100 * n_kl / n_elements:.2f}%) | nan={n_kl_nan}, inf={n_kl_inf}\n"
                       f"\t[LOGGING_KL]: mean_kls: {mean_kls}\n"
-                      f"\t[LOGGING_KL]: max_kl: {per_token_kl.max().item():.8f}\n"
+                      f"\t[LOGGING_KL]: max_kl: {per_token_kl.max().item():.8f} -> {max_kl_completion_token}\n"
                       f"\t[LOGGING_KL]: mean_kl: {mean_kl:.8f}\n"
                       f"\t[LOGGING_KL]: std_kl: {torch.masked_select(per_token_kl, completion_mask.bool()).std().item():.8f}\n"
                       f"\t[LOGGING_KL]: median_kl: {torch.masked_select(per_token_kl, completion_mask.bool()).median().item():.8f}")
@@ -407,22 +414,36 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                     else:
                         kl_threshold = kl_threshold * 10
 
+        # Logging print (once)
+        if 'print_prompt_inputs_attention_mask_shape' not in self.logging_print_once:
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] prompt_inputs[\"attention_mask\"] shape: {prompt_inputs['attention_mask'].shape}")
+            self.logging_print_once.append('print_prompt_inputs_attention_mask_shape')
+        if 'print_completion_mask_shape' not in self.logging_print_once:
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] completion_mask shape: {completion_mask.shape}")
+            self.logging_print_once.append('print_completion_mask_shape')
+        if 'print_completion_ids_shape' not in self.logging_print_once:
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] completion_ids shape: {completion_ids.shape}")
+            self.logging_print_once.append('print_completion_ids_shape')
+        if 'print_per_token_kl_shape' not in self.logging_print_once:
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] per_token_kl shape: {per_token_kl.shape}")
+            self.logging_print_once.append('print_per_token_kl_shape')
+
         # KL clipping
-        _logging_kl(per_token_kl, completion_mask)
+        _logging_kl(per_token_kl, completion_mask, completion_ids)
         if self.custom_kl_nan_to_zero:
             per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
-            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_nan_to_zero")
+            _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_nan_to_zero")
         if self.custom_kl_clipping is not None:
             per_token_kl = torch.clamp(per_token_kl, max=self.custom_kl_clipping)
-            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping={self.custom_kl_clipping}")
+            _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_clipping={self.custom_kl_clipping}")
         if self.custom_kl_clipping_mean is not None:
             mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
             kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls.clamp(min=0.1*self.custom_kl_clipping_mean)).clamp(max=1.0)
             per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
-            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
+            _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
         if self.custom_kl_nan_to_zero:
             per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
-            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_nan_to_zero")
+            _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_nan_to_zero")
 
         # Decode the generated completions
         completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
@@ -481,14 +502,6 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             loss = (per_token_loss * completion_mask).sum() / (per_token_loss.size(0) * self.max_completion_length)
         else:
             raise ValueError(f"Unknown loss type: {self.loss_type}")
-
-        # Logging print (once)
-        if 'print_completion_mask_shape' not in self.logging_print_once:
-            print(f"[ExtendedGRPOTrainer._compute_loss_modified] completion_mask shape: {completion_mask.shape}")
-            self.logging_print_once.append('print_completion_mask_shape')
-        if 'print_prompt_inputs_attention_mask_shape' not in self.logging_print_once:
-            print(f"[ExtendedGRPOTrainer._compute_loss_modified] prompt_inputs[\"attention_mask\"] shape: {prompt_inputs['attention_mask'].shape}")
-            self.logging_print_once.append('print_prompt_inputs_attention_mask_shape')
 
         # Log the metrics
         completion_length = self.accelerator.gather_for_metrics(completion_mask.sum(1)).float().mean().item()
