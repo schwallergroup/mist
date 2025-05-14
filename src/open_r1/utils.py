@@ -619,10 +619,10 @@ class ExtendedGRPOConfig(GRPOConfig):
     sampling_params_config_name: str = "default"
     sampling_params_config: Dict[str, Any] = field(default_factory=dict)
     save_completions: bool = True
-    save_completions_dir: str = "/Documents/sink_good_completions"
-    save_completions_min_reward_threshold: float = None
+    save_completions_dir: str = "/cache/sink_good_completions" # temporary instead of  "/Documents/sink_good_completions"
+    save_completions_min_reward_threshold: float = -1e6 # temporary instead of None
     save_completions_top_reward_percentage: float = 0.1
-    save_completions_chunk_size: int = 1000
+    save_completions_chunk_size: int = 10000 # temporary instead of 1000
     loss_type: str = "grpo"
     custom_kl_clipping: float = None
     custom_kl_clipping_mean: float = None
