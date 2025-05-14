@@ -25,11 +25,11 @@ gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-learning_rate: 5.0e-5 # 1.0e-6 as in the deepseek math paper 5-e7 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
+learning_rate: 5.0e-6 # 1.0e-6 as in the deepseek math paper 5-e7 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
 lr_scheduler_type: cosine
 warmup_ratio: 0.03
 # GRPO specific parameters
-beta: 0.05 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
+beta: 0.04 # 0.04 as in the deepseek math paper 0.001 from https://hijkzzz.notion.site/unraveling-rlhf-and-its-variants-engineering-insights#147d9a33ecc9806090f3d5c749d31f05
 max_prompt_length: 256
 max_completion_length: 4096
 num_generations: 4
@@ -40,12 +40,12 @@ vllm_max_model_len: 4096
 gradient_clipping: 1.0
 # Logging arguments
 logging_strategy: steps
-logging_steps: 2
+logging_steps: 1
 report_to:
 - wandb
 
 save_strategy: "steps"
-save_steps: 50
+save_steps: 25
 seed: 42
 
 # Hugging Face Hub 
