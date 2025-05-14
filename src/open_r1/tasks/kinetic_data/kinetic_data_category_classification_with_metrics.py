@@ -483,6 +483,42 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             },
         }
 
+    def format_reward(self, completions, prompts, **kwargs):
+        """
+        Format: <think>...</think><answer>...</answer>
+        Args:
+            completions (list[str]): Generated outputs
+            target (list[str]): Expected answers
+
+        Returns:
+            list[float]: Reward scores
+        """
+
+        rewards = []
+        completions = self.preprocess_completions(completions)
+
+        for completion, prompt in zip(completions, prompts):
+        # for completion in completions:
+            try:
+                if random.random() < 0.00:  # 0% chance to print a completion
+                    print("===========prompt===========")
+                    print(prompt)
+                    print("===========completion===========")
+                    print(completion)
+
+                regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+                match = re.search(regex, completion, re.DOTALL)
+                # if the format is not correct, reward is 0
+                if match is None or len(match.groups()) != 2:
+                    rewards.append(0.0)
+                else:
+                    # The model tends to generate gibberish outside of the tags
+                    reward = len(match.group()) / len(completion)
+                    rewards.append(reward)
+            except Exception:
+                rewards.append(0.0)
+        return rewards
+
     def format_continuous_reward(self, completions, prompts, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
@@ -740,11 +776,14 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         """Extract the answer from the completion."""
         answers = []
         for completion in completions:
-            pattern = r"<answer>(.*)<\/answer>"
+            pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
             m = re.search(pattern, completion, re.DOTALL)
             if m:
                 ans = m.groups()[-1]
-                answers.append(ans)
+                if len(m.groups()) != 2:
+                    answers.append("NONE")
+                else:
+                    answers.append(ans)
             else:
                 answers.append("NONE")
         return answers

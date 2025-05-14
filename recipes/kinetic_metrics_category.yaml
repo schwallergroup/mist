@@ -9,7 +9,7 @@ tf32: true
 chem_task: kinetic_metrics_category
 dataset_id_or_path: /work/liac/kinetic
 rewards:
-- format_continuous
+- format
 - accuracy
 - answer_covered_in_reasoning_traces
 - correct_option
@@ -18,7 +18,7 @@ rewards:
 - metrics_coverage
 
 save_completions: true
-save_completions_dir: /Documents/sink_good_completions_0512
+save_completions_dir: /Documents/sink_good_completions_0514
 
 # Training arguments
 max_steps: 2000

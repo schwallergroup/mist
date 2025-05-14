@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=grpo-chem
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=2:00:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
