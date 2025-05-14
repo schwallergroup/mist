@@ -626,7 +626,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     loss_type: str = "grpo"
     custom_kl_clipping: float = None
     custom_kl_clipping_mean: float = None
-    custom_kl_division_temperature: bool = True
+    custom_kl_division_temperature: bool = False
     custom_kl_nan_to_zero: bool = True
     logging_kl: bool = False
     logging_kl_min: float = None
