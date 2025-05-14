@@ -343,7 +343,11 @@ class Iupac2SmilesV2(RLTask):
         pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         m = re.search(pattern, response, re.DOTALL)
         if m and len(m.groups()) == 2:
-            return m.groups()[1]
+            answer = m.groups()[1]
+            if "[START_SMILES]" in answer and "[END_SMILES]" in answer:
+                answer = answer.split("[START_SMILES]")[1]
+                answer = answer.split("[END_SMILES]")[0]
+            return answer.strip()
         else:
             return "NONE"
 
