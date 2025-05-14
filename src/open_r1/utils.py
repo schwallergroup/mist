@@ -40,6 +40,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.loss_type = args.loss_type
         self.custom_kl_clipping = args.custom_kl_clipping
         self.custom_kl_clipping_mean = args.custom_kl_clipping_mean
+        self.custom_kl_division_temperature = args.custom_kl_division_temperature
         self.logging_kl = args.logging_kl
         self.logging_kl_min = args.logging_kl_min
 
@@ -333,7 +334,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             logits = logits[:, :-1, :]  # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
 
             # Divide by temperature (added in TRL 0.17.0)
-            logits = logits / self.temperature
+            if self.custom_kl_division_temperature:
+                logits = logits / self.temperature
 
             # Compute the log probabilities for the input tokens. Use a loop to reduce memory peak.
             per_token_logps = []
@@ -409,7 +411,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping={self.custom_kl_clipping}")
         if self.custom_kl_clipping_mean is not None:
             mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
-            kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls).clamp(max=1.0)
+            kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls.clamp(min=0.1*self.custom_kl_clipping_mean)).clamp(max=1.0)
             per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
             _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
 
@@ -569,6 +571,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     loss_type: str = "grpo"
     custom_kl_clipping: float = None
     custom_kl_clipping_mean: float = None
+    custom_kl_division_temperature: bool = True
     logging_kl: bool = False
     logging_kl_min: float = None
 
