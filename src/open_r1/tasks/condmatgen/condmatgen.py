@@ -209,7 +209,7 @@ class ConditionalMaterialGeneration(RLTask):
                 # Remove zero or negative counts
                 self.element_usage_counter += Counter()  # clean up
                 self.space_group_usage_counter += Counter()  # clean up 
-
+            rewards.append(reward)
             self.custom_metrics['val/rewards'].extend(rewards)
         return rewards
 
