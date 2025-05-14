@@ -367,13 +367,15 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         completion_mask = (sequence_indices <= eos_idx.unsqueeze(1)).int()
 
         # KL logging
+        self._logging_kl_previously_logged = False
         def _logging_kl(per_token_kl, completion_mask, preprint_message=''):
             if self.logging_kl:
                 mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
                 mean_kl = mean_kls.mean().item()
                 if self.logging_kl_min is not None:
-                    if mean_kl < self.logging_kl_min:
+                    if mean_kl < self.logging_kl_min and self._logging_kl_previously_logged is False:
                         return None
+                self._logging_kl_previously_logged = True
                 n_kl = completion_mask.sum().item()
                 n_elements = completion_mask.numel()
                 n_kl_nan = torch.isnan(per_token_kl).sum().item()
