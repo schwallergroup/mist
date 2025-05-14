@@ -44,6 +44,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.custom_kl_nan_to_zero = args.custom_kl_nan_to_zero
         self.logging_kl = args.logging_kl
         self.logging_kl_min = args.logging_kl_min
+        self.custom_clipped_surrogate_objective = args.custom_clipped_surrogate_objective
+        self.custom_clipped_surrogate_objective_epsilon_high = args.custom_clipped_surrogate_objective_epsilon_high
+        self.custom_clipped_surrogate_objective_epsilon_low = args.custom_clipped_surrogate_objective_epsilon_low
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -491,9 +494,18 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         std_grouped_rewards = std_grouped_rewards.repeat_interleave(self.num_generations, dim=0)
         advantages = (rewards - mean_grouped_rewards) / (std_grouped_rewards + 1e-4)
 
+        # Compute the loss
         # x - x.detach() allows for preserving gradients from x
-        per_token_loss = torch.exp(per_token_logps - per_token_logps.detach()) * advantages.unsqueeze(1)
-        per_token_loss = -(per_token_loss - self.beta * per_token_kl)
+        coef_1 = torch.exp(per_token_logps - per_token_logps.detach())
+        if self.custom_clipped_surrogate_objective:
+            coef_2 = torch.clamp(coef_1, 1 - self.custom_clipped_surrogate_objective_epsilon_low, 1 + self.custom_clipped_surrogate_objective_epsilon_high)
+            per_token_loss1 = coef_1 * advantages.unsqueeze(1)
+            per_token_loss2 = coef_2 * advantages.unsqueeze(1)
+            per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
+        else:
+            per_token_loss = -coef_1 * advantages.unsqueeze(1)
+        if self.beta != 0.0:
+            per_token_loss = per_token_loss + self.beta * per_token_kl
         if self.loss_type == "grpo":
             loss = ((per_token_loss * completion_mask).sum(dim=1) / completion_mask.sum(dim=1).clamp(min=1.0)).mean()
         elif self.loss_type == "bnpo":
@@ -597,6 +609,9 @@ class ExtendedGRPOConfig(GRPOConfig):
     custom_kl_nan_to_zero: bool = True
     logging_kl: bool = False
     logging_kl_min: float = None
+    custom_clipped_surrogate_objective: bool = False
+    custom_clipped_surrogate_objective_epsilon_low: float = 0.1
+    custom_clipped_surrogate_objective_epsilon_high: float = 0.1
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
