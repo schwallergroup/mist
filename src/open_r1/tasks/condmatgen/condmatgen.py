@@ -211,6 +211,7 @@ class ConditionalMaterialGeneration(RLTask):
                 self.space_group_usage_counter += Counter()  # clean up 
             rewards.append(reward)
             self.custom_metrics['val/rewards'].extend(rewards)
+        print(rewards)
         return rewards
 
     def get_metrics(self) -> Dict:
