@@ -39,6 +39,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.loss_type = args.loss_type
         self.custom_kl_clipping = args.custom_kl_clipping
         self.custom_kl_clipping_mean = args.custom_kl_clipping_mean
+        self.logging_kl = args.logging_kl
+        self.logging_kl_min = args.logging_kl_min
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -360,13 +362,55 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         sequence_indices = torch.arange(is_eos.size(1), device=device).expand(is_eos.size(0), -1)
         completion_mask = (sequence_indices <= eos_idx.unsqueeze(1)).int()
 
+        # KL logging
+        def _logging_kl(per_token_kl, completion_mask, preprint_message=''):
+            if self.logging_kl:
+                mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
+                mean_kl = mean_kls.mean().item()
+                if self.logging_kl_min is not None:
+                    if mean_kl < self.logging_kl_min:
+                        return None
+                n_kl = completion_mask.sum().item()
+                n_elements = completion_mask.numel()
+                mean_kls = [f"{k:.2f}" for k in mean_kls.tolist()]
+                print(f"[LOGGING_KL]: {preprint_message}\n"
+                      f"\t[LOGGING_KL]: per_token_kl.shape={per_token_kl.shape} (used={n_kl}/{n_elements}, {100 * n_kl / n_elements:.2f}%)\n"
+                      f"\t[LOGGING_KL]: mean_kls: {mean_kls}\n"
+                      f"\t[LOGGING_KL]: max_kl: {per_token_kl.max().item():.8f}\n"
+                      f"\t[LOGGING_KL]: mean_kl: {mean_kl:.8f}\n"
+                      f"\t[LOGGING_KL]: std_kl: {torch.masked_select(per_token_kl, completion_mask.bool()).std().item():.8f}\n"
+                      f"\t[LOGGING_KL]: median_kl: {torch.masked_select(per_token_kl, completion_mask.bool()).median().item():.8f}")
+                kl_threshold = 1
+                for _ in range(13):
+                    n_kl_above_threshold = (per_token_kl >= kl_threshold).sum().item()
+                    if n_kl_above_threshold >= 1:
+                        print(f"\t[LOGGING_KL]: KL >= {kl_threshold}: {n_kl_above_threshold}/{n_kl} ({100 * n_kl_above_threshold / n_kl:.2f}%)")
+                    if n_kl_above_threshold == 1:
+                        break
+                    # Update kl_threshold
+                    if kl_threshold == 1:
+                        kl_threshold = 5
+                    elif kl_threshold == 5:
+                        kl_threshold = 10
+                    elif kl_threshold == 10:
+                        kl_threshold = 25
+                    elif kl_threshold == 25:
+                        kl_threshold = 50
+                    elif kl_threshold == 50:
+                        kl_threshold = 100
+                    else:
+                        kl_threshold = kl_threshold * 10
+
         # KL clipping
+        _logging_kl(per_token_kl, completion_mask)
         if self.custom_kl_clipping is not None:
             per_token_kl = torch.clamp(per_token_kl, max=self.custom_kl_clipping)
+            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping={self.custom_kl_clipping}")
         if self.custom_kl_clipping_mean is not None:
             mean_kls = (per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)
             kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls).clamp(max=1.0)
             per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
+            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
 
         # Decode the generated completions
         completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
@@ -524,7 +568,8 @@ class ExtendedGRPOConfig(GRPOConfig):
     loss_type: str = "grpo"
     custom_kl_clipping: float = None
     custom_kl_clipping_mean: float = None
-
+    logging_kl: bool = False
+    logging_kl_min: float = None
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
