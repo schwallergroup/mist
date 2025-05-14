@@ -432,6 +432,10 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             self.logging_print_once.append('print_per_token_kl_shape')
 
         # KL clipping
+        use_kl_divergence = True
+        if torch.isnan(per_token_kl).sum().item() != 0:
+            use_kl_divergence = False
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] KL divergence is NaN ({torch.isnan(per_token_kl).sum().item()}) before modification, skipping KL divergence term")
         _logging_kl(per_token_kl, completion_mask, completion_ids)
         if self.custom_kl_nan_to_zero:
             per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
@@ -444,9 +448,15 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls.clamp(min=0.1*self.custom_kl_clipping_mean)).clamp(max=1.0)
             per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
             _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
+        if torch.isnan(per_token_kl).sum().item() != 0:
+            use_kl_divergence = False
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] KL divergence is NaN ({torch.isnan(per_token_kl).sum().item()}) after modification, skipping KL divergence term")
         if self.custom_kl_nan_to_zero:
             per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
             _logging_kl(per_token_kl, completion_mask, completion_ids, preprint_message=f"after custom_kl_nan_to_zero")
+        if torch.isnan(per_token_kl).sum().item() != 0:
+            use_kl_divergence = False
+            print(f"[ExtendedGRPOTrainer._compute_loss_modified] KL divergence is NaN ({torch.isnan(per_token_kl).sum().item()}) after nan_to_num, check the code")
 
         # Decode the generated completions
         completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
@@ -504,7 +514,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
         else:
             per_token_loss = -coef_1 * advantages.unsqueeze(1)
-        if self.beta != 0.0:
+        if self.beta != 0.0 and use_kl_divergence:
             per_token_loss = per_token_loss + self.beta * per_token_kl
         if self.loss_type == "grpo":
             loss = ((per_token_loss * completion_mask).sum(dim=1) / completion_mask.sum(dim=1).clamp(min=1.0)).mean()
