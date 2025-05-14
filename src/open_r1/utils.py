@@ -602,7 +602,16 @@ class ExtendedGRPOConfig(GRPOConfig):
     save_completions_min_reward_threshold: float = None
     save_completions_top_reward_percentage: float = 0.1
     save_completions_chunk_size: int = 1000
-
+    loss_type: str = "grpo"
+    custom_kl_clipping: float = None
+    custom_kl_clipping_mean: float = None
+    custom_kl_division_temperature: bool = True
+    custom_kl_nan_to_zero: bool = True
+    logging_kl: bool = False
+    logging_kl_min: float = None
+    custom_clipped_surrogate_objective: bool = False
+    custom_clipped_surrogate_objective_epsilon_low: float = 0.1
+    custom_clipped_surrogate_objective_epsilon_high: float = 0.1
 
 def setup_logger(name="logger"):
     """Setup logger with colored output."""
