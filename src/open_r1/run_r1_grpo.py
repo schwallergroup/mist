@@ -71,6 +71,11 @@ def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
         logger.info(
             f"Checkpoint detected, resuming training at {last_checkpoint}."
         )
+    if last_checkpoint is not None and training_args.slurm_resume_job_id != "None" and training_args.slurm_job_id != "None":
+        new_output_dir = training_args.output_dir.replace(training_args.slurm_resume_job_id, training_args.slurm_job_id)
+        if os.path.isdir(new_output_dir) is False:
+            os.makedirs(new_output_dir)
+            training_args.output_dir = new_output_dir
 
     # Train the model
     logger.info(
