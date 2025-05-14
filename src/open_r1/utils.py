@@ -391,8 +391,6 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                     n_kl_above_threshold = (per_token_kl >= kl_threshold).sum().item()
                     if n_kl_above_threshold >= 1:
                         print(f"\t[LOGGING_KL]: KL >= {kl_threshold}: {n_kl_above_threshold}/{n_kl} ({100 * n_kl_above_threshold / n_kl:.2f}%)")
-                    if n_kl_above_threshold == 1:
-                        break
                     # Update kl_threshold
                     if kl_threshold == 1:
                         kl_threshold = 5
