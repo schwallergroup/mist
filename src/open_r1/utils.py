@@ -41,6 +41,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.custom_kl_clipping = args.custom_kl_clipping
         self.custom_kl_clipping_mean = args.custom_kl_clipping_mean
         self.custom_kl_division_temperature = args.custom_kl_division_temperature
+        self.custom_kl_nan_to_zero = args.custom_kl_nan_to_zero
         self.logging_kl = args.logging_kl
         self.logging_kl_min = args.logging_kl_min
 
@@ -375,9 +376,11 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                         return None
                 n_kl = completion_mask.sum().item()
                 n_elements = completion_mask.numel()
+                n_kl_nan = torch.isnan(per_token_kl).sum().item()
+                n_kl_inf = torch.isinf(per_token_kl).sum().item()
                 mean_kls = [f"{k:.2f}" for k in mean_kls.tolist()]
                 print(f"[LOGGING_KL]: {preprint_message}\n"
-                      f"\t[LOGGING_KL]: per_token_kl.shape={per_token_kl.shape} (used={n_kl}/{n_elements}, {100 * n_kl / n_elements:.2f}%)\n"
+                      f"\t[LOGGING_KL]: per_token_kl.shape={per_token_kl.shape} (used={n_kl}/{n_elements}, {100 * n_kl / n_elements:.2f}%) | nan={n_kl_nan}, inf={n_kl_inf}\n"
                       f"\t[LOGGING_KL]: mean_kls: {mean_kls}\n"
                       f"\t[LOGGING_KL]: max_kl: {per_token_kl.max().item():.8f}\n"
                       f"\t[LOGGING_KL]: mean_kl: {mean_kl:.8f}\n"
@@ -406,6 +409,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         # KL clipping
         _logging_kl(per_token_kl, completion_mask)
+        if self.custom_kl_nan_to_zero:
+            per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
+            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_nan_to_zero")
         if self.custom_kl_clipping is not None:
             per_token_kl = torch.clamp(per_token_kl, max=self.custom_kl_clipping)
             _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping={self.custom_kl_clipping}")
@@ -414,6 +420,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             kl_rescaling = (torch.full_like(mean_kls, self.custom_kl_clipping_mean, device=device) / mean_kls.clamp(min=0.1*self.custom_kl_clipping_mean)).clamp(max=1.0)
             per_token_kl = per_token_kl * kl_rescaling.unsqueeze(1)
             _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_clipping_mean={self.custom_kl_clipping_mean}")
+        if self.custom_kl_nan_to_zero:
+            per_token_kl = torch.nan_to_num(per_token_kl, nan=0.0, posinf=None, neginf=None)
+            _logging_kl(per_token_kl, completion_mask, preprint_message=f"after custom_kl_nan_to_zero")
 
         # Decode the generated completions
         completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
@@ -572,6 +581,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     custom_kl_clipping: float = None
     custom_kl_clipping_mean: float = None
     custom_kl_division_temperature: bool = True
+    custom_kl_nan_to_zero: bool = True
     logging_kl: bool = False
     logging_kl_min: float = None
 
