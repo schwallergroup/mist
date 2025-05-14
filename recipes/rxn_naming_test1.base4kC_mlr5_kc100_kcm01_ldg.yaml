@@ -20,6 +20,8 @@ task_kwargs:
 custom_kl_clipping: 100
 custom_kl_clipping_mean: 0.1
 loss_type: dr_grpo
+logging_kl: true
+logging_kl_min: 1
 
 # Lora Arguments
 # No LoRA is used here

@@ -20,7 +20,7 @@ task_kwargs:
 loss_type: dr_grpo
 custom_kl_clipping: 10
 custom_kl_clipping_mean: 0.01 
-logging_kl: True
+logging_kl: true
 logging_kl_min: 0.0
 
 # Lora Arguments
