@@ -28,7 +28,7 @@ def main():
     print("Seed set to 42")
     # data = random.sample(data, 100)
     
-    data = data.shuffle(seed=42).select(range(100))
+    data = data.shuffle(seed=42).select(range(500))
     # Load vLLM model
     llm = LLM(model=args.model)  # replace with your actual model
 
@@ -68,21 +68,21 @@ def main():
                 # reference_smiles = extract_normal_smiles(data[idx][0]['answer'])
                 reference_smiles = data[idx]['solution']
 
-                print(f"Example {idx+1}:", file=log)
-                print(f"Prompt: {prompts[idx]}", file=log)
-                print(f"Reference SMILES: {reference_smiles}", file=log)
-                print(f"Predicted Output: {predicted}", file=log)
-                print(f"Extracted SMILES: {predicted_smiles}", file=log)
+                print(f"[[EXAMPLE {idx+1}]]", file=log)
+                print(f"[Prompt]: {prompts[idx]}", file=log)
+                print(f"[Reference SMILES]: {reference_smiles}", file=log)
+                print(f"[Predicted Output]: {predicted}", file=log)
+                print(f"[Extracted SMILES]: {predicted_smiles}", file=log)
 
                 if predicted_smiles is None:
                     continue
                 elif ';' not in predicted_smiles:
                     if predicted_smiles and same_molecule(reference_smiles, predicted_smiles):
-                        print("✔️ Match", file=log)
+                        print("[✔️ Match]", file=log)
                         correct += 1
                         break
                     else:
-                        print("❌ No Match", file=log)
+                        print("[❌ No Match]", file=log)
                 else:
                     split_smile = predicted_smiles.split(";")
                     flag=0
@@ -101,10 +101,10 @@ def main():
                         correct+=1
                         break
 
-                print("=" * 60)
+                print("=" * 60, file=log)
 
         accuracy = 100.0 * correct / total
-        print(f"Final Accuracy: {accuracy:.2f}% ({correct}/{total})", file=log)
+        print(f"[[Final Accuracy: {accuracy:.2f}% ({correct}/{total})]]", file=log)
     
 if __name__ == "__main__":
     main()
