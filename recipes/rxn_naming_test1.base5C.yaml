@@ -18,7 +18,7 @@ task_kwargs:
   answer_history_buffer_size: 16
   accuracy_give_penalty_to_invalid_answer: true
 custom_kl_clipping: 100
-custom_kl_clipping_mean: 1
+custom_kl_clipping_mean: 0.2
 loss_type: dr_grpo
 logging_kl: true
 logging_kl_min: 1
