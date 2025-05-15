@@ -16,6 +16,7 @@ def arg_parse():
     parser.add_argument("--datapath", type=str, default="/data/USPTO/USPTO_480k_clean_no_sft/", help="Path to the evaluation data.")
     parser.add_argument("--n_samples", type=int, default=5, help="Number of samples generated.")
     parser.add_argument("--maxlength", type=int, default=4096, help="Maximum length of the output sequence.")
+    parser.add_argument("--temperature", type=float, default=0.8, help="Temperature for sampling.")
     parser.add_argument("--save_dir", type=str, default=".", help="Directory to save the evaluation results.")
     return parser.parse_args()
 
@@ -37,7 +38,7 @@ def main():
     # Load vLLM model
     llm = LLM(model=args.model)  # replace with your actual model
 
-    sampling_params = SamplingParams(n=args.n_samples, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.00, temperature=0.8, top_p=0.80, top_k=20, min_p=0.0, seed=None, stop=[], stop_token_ids=[151643, 151644, 151645], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=args.maxlength, min_tokens=0, logprobs=None, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)
+    sampling_params = SamplingParams(n=args.n_samples, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.00, temperature=args.temperature, top_p=0.80, top_k=20, min_p=0.0, seed=None, stop=[], stop_token_ids=[151643, 151644, 151645], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=args.maxlength, min_tokens=0, logprobs=None, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)
     #sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
 
     def extract_smiles(text, prompt="", relax=False):
