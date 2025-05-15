@@ -39,7 +39,9 @@ python evaluate.rxnpred.py \
     --save_dir ${OUTDIR}/think_at1
 
 python analyze_rxnpred_output.py \
-    --input_txt ${OUTDIR}/think_at1/output.txt
+    --input_txt ${OUTDIR}/think_at1/output.txt \
+    --datapath $DATAPATH \
+    --task_mode $THINK_MODE \
 
 python evaluate.rxnpred.py \
     --model $MODEL \
@@ -51,7 +53,9 @@ python evaluate.rxnpred.py \
     --save_dir ${OUTDIR}/think_at5
 
 python analyze_rxnpred_output.py \
-    --input_txt ${OUTDIR}/think_at5/output.txt
+    --input_txt ${OUTDIR}/think_at5/output.txt \
+    --datapath $DATAPATH \
+    --task_mode $THINK_MODE \
 
 python evaluate.rxnpred.py \
     --model $MODEL \
@@ -63,7 +67,9 @@ python evaluate.rxnpred.py \
     --save_dir ${OUTDIR}/no_think_at1
 
 python analyze_rxnpred_output.py \
-    --input_txt ${OUTDIR}/no_think_at1/output.txt
+    --input_txt ${OUTDIR}/no_think_at1/output.txt \
+    --datapath $DATAPATH \
+    --task_mode $NO_THINK_MODE \
 
 python evaluate.rxnpred.py \
     --model $MODEL \
@@ -75,6 +81,8 @@ python evaluate.rxnpred.py \
     --save_dir ${OUTDIR}/no_think_at5
 
 python analyze_rxnpred_output.py \
-    --input_txt ${OUTDIR}/no_think_at5/output.txt
+    --input_txt ${OUTDIR}/no_think_at5/output.txt \
+    --datapath $DATAPATH \
+    --task_mode $NO_THINK_MODE \
 
 echo "END TIME: $(date)"

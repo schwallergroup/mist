@@ -18,10 +18,14 @@ def arg_parse():
     parser = ArgumentParser(description="Evaluate the model on the USPTO dataset.")
     parser.add_argument("--input_txt", type=str, required=True, help="Path to the input text file.")
     parser.add_argument("--per_sample_eval_csv", type=str, default="per_sample_results.csv", help="Path to the per sample evaluation CSV file.")
+    parser.add_argument("--task_mode", type=str, required=True)
     parser.add_argument("--result_file", type=str, default="eval_results.txt", help="Path to the evaluation results JSON file.")
+    parser.add_argument("--datapath", type=str, default="/data/USPTO/USPTO_480k_clean_no_sft/", help="Path to the evaluation data.")
     return parser.parse_args()
 
-task = ForwardReaction(dataset_id_or_path='/data/share/USPTO_480k_clean_no_sft/', task_mode='tagged')
+args = arg_parse()
+task = ForwardReaction(dataset_id_or_path=args.datapath, task_mode=args.task_mode)
+
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
 
 def split_responses(content: str):
@@ -97,10 +101,11 @@ def summary_eval(per_response_eval_csv: str):
     
     
 def main():
-    args = arg_parse()
+    # args = arg_parse()
     output_dir = os.path.dirname(args.input_txt)
     per_sample_output_csv = os.path.join(output_dir, args.per_sample_eval_csv)
     results_file = os.path.join(output_dir, args.result_file)
+        
     with open(args.input_txt, 'r') as f:
         content = f.read()
     
