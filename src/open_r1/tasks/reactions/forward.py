@@ -74,6 +74,16 @@ class ForwardReaction(SMILESBasedTask):
                 "<|im_start|>assistant\n"
                 "<think>"
             )
+        elif self.task_mode == "qwen_base_no_thinking":
+            self.question_template = (
+                "<|im_start|>assistant\n"
+                "You are an organic chemistry expert. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Output only the final answer and return it in the <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "Reason and predict the most likely product in SMILES notation resulted from the reaction involving the following reactants: {}. Note that individual reactants are separated by a dot '.'.\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<answer>"
+            )
         elif self.task_mode == "tagged":
             self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
         
