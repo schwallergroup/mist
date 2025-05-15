@@ -8,7 +8,7 @@ from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 from .reactions.mcqa_inversion import SmilesInversion, SmilesInversionV2
 from .reactions.mcqa_reaction_diff import SmilesReplacement, SmilesReplacementV2
 from .reactions.reaction2name import Smiles2Name, Smiles2NameV2
-from .reactions.reaction_truefalse import ReactionTrueFalse
+from .reactions.reaction_truefalse import ReactionTrueFalse, ReactionTrueFalseV2
 
 # Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
@@ -29,4 +29,5 @@ CHEMTASKS = {
     "rxn_naming": Smiles2Name,
     "rxn_naming_v2": Smiles2NameV2,
     "rxn_truefalse": ReactionTrueFalse,
+    "rxn_truefalse_v2": ReactionTrueFalseV2,
 }
