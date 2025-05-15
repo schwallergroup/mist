@@ -352,14 +352,25 @@ class SMILESBasedTask(RLTask):
         smiles = max(smiles, key=len) if smiles else None
         return smiles
 
+    # def preprocess_response(self, response):
+    #     """Preprocess the response before checking for accuracy."""
+    #     if not response.startswith("<think>"):
+    #         response = "<think>" + response
+    #     pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
+    #     m = re.search(pattern, response, re.DOTALL)
+    #     if m and len(m.groups()) == 2:
+    #         return m.groups()[1]
+    #     else:
+    #         return "NONE"
+    
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         if not response.startswith("<think>"):
             response = "<think>" + response
-        pattern = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
-        m = re.search(pattern, response, re.DOTALL)
-        if m and len(m.groups()) == 2:
-            return m.groups()[1]
+        answer_pattern = r"(?<=<answer>)(.*?)(?=<\/answer>)"
+        answer = re.findall(answer_pattern, response)
+        if answer:
+            return answer[-1].strip()
         else:
             return "NONE"
         
