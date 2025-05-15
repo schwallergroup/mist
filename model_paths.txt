@@ -18,3 +18,4 @@ Qwen2.5-3B_pretrained-v5:		/LLM_models/Qwen2.5-3B_pretrained-v5
 Qwen2.5-3B_pretrained-v6-1:		/LLM_models/Qwen2.5-3B_pretrained-v6-1
 Qwen2.5-3B_pretrained-v6-2:		/LLM_models/Qwen2.5-3B_pretrained-v6-2
 Qwen2.5-3B_pretrained-v6-3:		/LLM_models/Qwen2.5-3B_pretrained-v6-3
+qwen_sft_base_hf:            /iopsstor/store/cscs/swissai/a05/LIAC/qwen_sft_base_hf
