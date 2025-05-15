@@ -621,7 +621,7 @@ class ExtendedGRPOConfig(GRPOConfig):
     save_completions: bool = True
     save_completions_dir: str = "/cache/sink_good_completions" # temporary instead of  "/Documents/sink_good_completions"
     save_completions_min_reward_threshold: float = -1e6 # temporary instead of None
-    save_completions_top_reward_percentage: float = 0.1
+    save_completions_top_reward_percentage: float = 1.0 # temporary instead of 0.1
     save_completions_chunk_size: int = 10000 # temporary instead of 1000
     loss_type: str = "grpo"
     custom_kl_clipping: float = None
