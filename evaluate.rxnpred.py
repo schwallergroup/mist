@@ -69,7 +69,7 @@ def main():
     
     outpath = os.path.join(args.save_dir, f"output.txt")
     if os.path.exists(outpath):
-        shutil.copyfile(outpath, outpath.replace(".txt", "txt.old"))
+        shutil.copyfile(outpath, outpath.replace(".txt", ".txt.old"))
         os.remove(outpath)
         
     arg_outpath = os.path.join(args.save_dir, f"args.json")

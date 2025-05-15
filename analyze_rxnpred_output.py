@@ -20,7 +20,7 @@ def arg_parse():
     parser.add_argument("--per_sample_eval_csv", type=str, default="per_sample_results.csv", help="Path to the per sample evaluation CSV file.")
     parser.add_argument("--task_mode", type=str, required=True)
     parser.add_argument("--result_file", type=str, default="eval_results.txt", help="Path to the evaluation results JSON file.")
-    parser.add_argument("--datapath", type=str, default="/data/USPTO/USPTO_480k_clean_no_sft/", help="Path to the evaluation data.")
+    parser.add_argument("--datapath", type=str, default="/data/share/USPTO_480k_clean_no_sft/", help="Path to the evaluation data.")
     return parser.parse_args()
 
 args = arg_parse()
