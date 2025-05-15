@@ -54,6 +54,8 @@ for SLURM_JOB_ID_TO_SYNC in "${SLURM_JOB_ID_TO_SYNCS[@]}"; do
           --project $LOGGING_WANDB_PROJECT \
           --id $LOGGING_WANDB_RUN_ID \
           ${LOGGING_WANDB_FOLDER}
+      else
+        echo "Folder ${LOGGING_WANDB_FOLDER} does not exist for ${LOGGING_WANDB_ENTITY}/${LOGGING_WANDB_PROJECT}/... (from SLURM job ${SLURM_JOB_ID_TO_SYNC})"
       fi
     fi
   done
