@@ -631,8 +631,8 @@ class ExtendedGRPOConfig(GRPOConfig):
     logging_kl: bool = False
     logging_kl_min: float = None
     custom_clipped_surrogate_objective: bool = False
-    custom_clipped_surrogate_objective_epsilon_low: float = 0.1
-    custom_clipped_surrogate_objective_epsilon_high: float = 0.1
+    custom_clipped_surrogate_objective_epsilon_low: float = 0.2 # Based on DAPO paper
+    custom_clipped_surrogate_objective_epsilon_high: float = 0.28 # Based on DAPO paper
     custom_reward_tanh: bool = False
     custom_reward_tanh_scale: float = 2
 
