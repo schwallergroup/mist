@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import os
 import re
 import pandas as pd
@@ -9,9 +10,16 @@ from tqdm import tqdm
 from open_r1.tasks import ForwardReaction
 from transformers import AutoTokenizer
 
-INPUT_TXT = 'eval_results_500/rxnpred_431710/thinking_diff_temp/temp_0.01/output.at1.txt'
-PER_SAMPLE_EVAL_CSV = 'per_sample_results.at1.csv'
-RESULT_JSON = 'eval_results.at1.txt'
+# INPUT_TXT = 'eval_results_500/rxnpred_431710/thinking_diff_temp/temp_0.01/output.at1.txt'
+# PER_SAMPLE_EVAL_CSV = 'per_sample_results.at1.csv'
+# RESULT_JSON = 'eval_results.at1.txt'
+
+def arg_parse():
+    parser = ArgumentParser(description="Evaluate the model on the USPTO dataset.")
+    parser.add_argument("--input_txt", type=str, required=True, help="Path to the input text file.")
+    parser.add_argument("--per_sample_eval_csv", type=str, default="per_sample_results.csv", help="Path to the per sample evaluation CSV file.")
+    parser.add_argument("--result_file", type=str, default="eval_results.txt", help="Path to the evaluation results JSON file.")
+    return parser.parse_args()
 
 task = ForwardReaction(dataset_id_or_path='/data/share/USPTO_480k_clean_no_sft/', task_mode='tagged')
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
@@ -89,10 +97,11 @@ def summary_eval(per_response_eval_csv: str):
     
     
 def main():
-    output_dir = os.path.dirname(INPUT_TXT)
-    per_sample_output_csv = os.path.join(output_dir, PER_SAMPLE_EVAL_CSV)
-    results_json = os.path.join(output_dir, RESULT_JSON)
-    with open(INPUT_TXT, 'r') as f:
+    args = arg_parse()
+    output_dir = os.path.dirname(args.input_txt)
+    per_sample_output_csv = os.path.join(output_dir, args.per_sample_eval_csv)
+    results_file = os.path.join(output_dir, args.result_file)
+    with open(args.input_txt, 'r') as f:
         content = f.read()
     
     responses = split_responses(content)
@@ -110,7 +119,7 @@ def main():
     res.to_csv(per_sample_output_csv, index=False)
     
     final_res = summary_eval(per_sample_output_csv)
-    with open(results_json, 'w') as f:
+    with open(results_file, 'w') as f:
         f.write(f"Final Accuracy: {final_res['accuracy']:.4f}\n")
         f.write(f"Final Accuracy Relax: {final_res['accuracy_relax']:.4f}\n")
         f.write(f"Response Lengths: {final_res['lengths'][0]:.2f} ± {final_res['lengths'][1]:.2f}\n")

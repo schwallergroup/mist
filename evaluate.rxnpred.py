@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import random
@@ -20,7 +21,9 @@ def arg_parse():
     parser.add_argument("--save_dir", type=str, default=".", help="Directory to save the evaluation results.")
     return parser.parse_args()
 
-
+def save_args(args, save_path: str):
+    with open(save_path, 'w') as f:
+        json.dump(vars(args), f)
 
 def main():
     args = arg_parse()
@@ -63,15 +66,19 @@ def main():
 
     correct = 0
     total = len(data)
+    
+    outpath = os.path.join(args.save_dir, f"output.txt")
+    if os.path.exists(outpath):
+        shutil.copyfile(outpath, outpath.replace(".txt", "txt.old"))
+        os.remove(outpath)
+        
+    arg_outpath = os.path.join(args.save_dir, f"args.json")
+    save_args(args, arg_outpath)
 
     # prompts= ["<|im_start|>assistant\You are a useful chemistry assistant and answer the question to change IUPAC to SMILES. Reason out your answer inside <think> tags and give your confident final answer inside the answer tags.<|im_end|>\n<|im_start|>user\\"+ item[0]['input'].replace("<answer>","")  +"\nDo only the necessary reasoning and backtracking to get to the final answer<|im_end|>\n<|im_start|>assitant\<think>" for item in data]
     prompts = [each['problem'] for each in data]
     outputs = llm.generate(prompts, sampling_params)
     
-    outpath = os.path.join(args.save_dir, f"output.at{args.n_samples}.txt")
-    if os.path.exists(outpath):
-        shutil.copyfile(outpath, outpath.replace(".txt", "txt.old"))
-        os.remove(outpath)
         
     def print_to_file(content, mode="a"):
         file_path=outpath
