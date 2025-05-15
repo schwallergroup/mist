@@ -9,9 +9,9 @@ import numpy as np
 def load_llm(model):
     llm = LLM(
         model=model,
-        max_num_seqs=12,
-        max_model_len=512,
-        tensor_parallel_size=1,
+        max_num_seqs=5,
+        max_model_len=256,
+        tensor_parallel_size=4,
     )
     params = SamplingParams(
         temperature=0.0,
@@ -19,6 +19,7 @@ def load_llm(model):
         max_tokens=1,
     )
     return llm, params
+
 
 def prompt_template(smiles):
     tmp = f"""The molecule represented with the SMILES [BEGIN_SMILES] {smiles} [END_SMILES]"""
@@ -54,7 +55,7 @@ def corrupt_smi(smiles, corruption_rate=0.2):
 
 
 def load_dataset(data_dir):
-    df = pd.read_csv(data_dir, nrows=100)
+    df = pd.read_csv(data_dir, nrows=10000)
     df['prompt_canon'] = df['SMILES'].apply(prompt_template)
     df['prompt_random'] = df['SMILES_variant1'].apply(prompt_template)
     
@@ -74,22 +75,31 @@ class LogprobStat(BaseModel):
 
 def run_column(col, llm, params, data):
     def process_out(out):
-        smiles_tokens = out.prompt_token_ids[12:][:-5]
-        lps = out.prompt_logprobs[12:][:-5]
+        try:
+            smiles_tokens = out.prompt_token_ids[12:][:-5]
+            lps = out.prompt_logprobs[12:][:-5]
 
-        # vllm gives you logprobs for your token, and for rank1 token
-        smi_lps = [v[x].logprob for v,x in zip(lps, smiles_tokens)]
-        smi_rank = [v[x].rank for v,x in zip(lps, smiles_tokens)]
+            # vllm gives you logprobs for your token, and for rank1 token
+            smi_lps = [v[x].logprob for v,x in zip(lps, smiles_tokens)]
+            smi_rank = [v[x].rank for v,x in zip(lps, smiles_tokens)]
 
-        smiles = "".join([v[x].decoded_token for v,x in zip(lps, smiles_tokens)])
-        smiles = re.sub('Ġ',"","".join(smiles))
+            smiles = "".join([v[x].decoded_token for v,x in zip(lps, smiles_tokens)])
+            smiles = re.sub('Ġ',"","".join(smiles))
 
-        return LogprobStat(
-            mean_logprob=np.mean(smi_lps),
-            mean_rank=np.mean(smi_rank),
-            n_tokens=len(smiles_tokens),
-            smiles=smiles
-        ).__dict__
+            return LogprobStat(
+                mean_logprob=np.mean(smi_lps),
+                mean_rank=np.mean(smi_rank),
+                n_tokens=len(smiles_tokens),
+                smiles=smiles
+            ).__dict__
+
+        except:
+            return LogprobStat(
+                mean_logprob=0,
+                mean_rank=0,
+                n_tokens=1000,
+                smiles=""
+            ).__dict__
 
     out = llm.generate(data[col], params)
     lps = [process_out(o) for o in out]
@@ -117,17 +127,42 @@ def main(model, data_dir):
     print("CORRUPT", out_corrupt[['mean_logprob','mean_rank']].mean())
     print("----------")
 
-    print("Mean distribution diff:")
-    print("Canon to Random", (out_canon[['mean_logprob','mean_rank']]- out_random[['mean_logprob','mean_rank']]).mean())
-    print("Canon to Corrupt", (out_canon[['mean_logprob','mean_rank']]- out_corrupt[['mean_logprob','mean_rank']]).mean())
-    print("----------")
+    from numpy import std, mean, sqrt
 
-    print("Diff of means:")
-    print("Canon to Random", out_canon[['mean_logprob','mean_rank']].mean() - out_random[['mean_logprob','mean_rank']].mean())
-    print("Canon to Corrupt", out_canon[['mean_logprob','mean_rank']].mean() - out_corrupt[['mean_logprob','mean_rank']].mean())
+    #correct if the population S.D. is expected to be equal for the two groups.
+    def cohen_d(x,y):
+        nx = len(x)
+        ny = len(y)
+        dof = nx + ny - 2
+        return (mean(x) - mean(y)) / sqrt(((nx-1)*std(x, ddof=1) ** 2 + (ny-1)*std(y, ddof=1) ** 2) / dof)
+
+    lp_canon = out_canon['mean_logprob']
+    rk_canon = out_canon['mean_rank']
+    lp_corrupt = out_corrupt['mean_logprob']
+    rk_corrupt = out_corrupt['mean_rank']
+    lp_sc = cohen_d(lp_canon, lp_corrupt)
+    rk_sc = cohen_d(rk_canon, rk_corrupt)
+
+    print("SCC logprobs", lp_sc)
+    print("SCC rank", rk_sc)
 
 
-if __name__=="__main__":
-    model = "Qwen/Qwen2.5-0.5B"
-    data_dir = "src/open_r1/diagnostic/data.csv"
-    main(model, data_dir)
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run LLM evaluation on SMILES data")
+    parser.add_argument(
+        "--model",
+        type=str,
+        required=True,
+        help="Model checkpoint or path to use with vllm"
+    )
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="/iopsstor/store/cscs/swissai/a05/LIAC/data/CRLLM-PubChem/CRLLM-PubChem-compounds1M.csv",
+        help="Path to the data CSV"
+    )
+    args = parser.parse_args()
+
+    main(args.model, args.data_dir)
