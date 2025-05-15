@@ -9,7 +9,7 @@ from tqdm import tqdm
 from open_r1.tasks import ForwardReaction
 from transformers import AutoTokenizer
 
-INPUT_TXT = 'eval_results_500/rxnpred_ShaiV6/no_thinking/output.at1.txt'
+INPUT_TXT = 'eval_results_500/rxnpred_431710/thinking_diff_temp/temp_0.01/output.at1.txt'
 PER_SAMPLE_EVAL_CSV = 'per_sample_results.at1.csv'
 RESULT_JSON = 'eval_results.at1.txt'
 

@@ -4,3 +4,4 @@ Qwen2.5-3B_pretrained-v5:		pretrained_models_v1
 Qwen2.5-3B_pretrained-v6-1:		pretrained_models_v1
 Qwen2.5-3B_pretrained-v6-2:		pretrained_models_v1
 Qwen2.5-3B_pretrained-v6-3:		pretrained_models_v1
+qwen_sft_base_hf:           pretrained_models_v1
