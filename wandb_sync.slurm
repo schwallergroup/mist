@@ -28,8 +28,8 @@ SLURM_LOGS_FILEPATH="../sink_logs/grpo-chem-${SLURM_JOB_ID_TO_SYNC}.out"
 LOGGING_WANDB_ENTITY="liac"
 
 # Read wandb project
-#LOGGING_WANDB_PROJECT=$(cat ${SLURM_LOGS_FILEPATH} | grep 'View project at https://wandb.ai/liac/' | awk '{print $6}' | head -n1 | sed 's|.*/||' | xargs)
-LOGGING_WANDB_PROJECT="r1-wandb_test"
+LOGGING_WANDB_PROJECT=$(cat ${SLURM_LOGS_FILEPATH} | grep 'View project at https://wandb.ai/liac/' | awk '{print $6}' | head -n1 | sed 's|.*/||' | xargs)
+#LOGGING_WANDB_PROJECT="r1-wandb_test"
 
 # Read all wandb local folders
 LOGGING_WANDB_FOLDERS=$(cat ${SLURM_LOGS_FILEPATH} | grep 'saved locally' | awk '{print $8}')
