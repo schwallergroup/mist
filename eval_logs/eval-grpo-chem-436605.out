@@ -1,0 +1,195 @@
+START TIME: Tue May 13 18:24:21 CEST 2025
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Requirement already satisfied: hf_transfer in /users/nnguyenx/.local/lib/python3.10/site-packages (0.1.9)
+Requirement already satisfied: gdown in /users/nnguyenx/.local/lib/python3.10/site-packages (5.2.0)
+Requirement already satisfied: levenshtein in /users/nnguyenx/.local/lib/python3.10/site-packages (0.26.1)
+Requirement already satisfied: rdkit in /usr/local/lib/python3.10/dist-packages (2024.9.5)
+Requirement already satisfied: wandb in /usr/local/lib/python3.10/dist-packages (0.19.6)
+Collecting exmol
+  Downloading exmol-3.3.0-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.10/dist-packages (from gdown) (4.12.3)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from gdown) (3.16.1)
+Requirement already satisfied: requests[socks] in /usr/local/lib/python3.10/dist-packages (from gdown) (2.32.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from gdown) (4.66.5)
+Requirement already satisfied: rapidfuzz<4.0.0,>=3.9.0 in /users/nnguyenx/.local/lib/python3.10/site-packages (from levenshtein) (3.12.1)
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from rdkit) (1.26.4)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.10/dist-packages (from rdkit) (10.4.0)
+Requirement already satisfied: click!=8.0.0,>=7.1 in /usr/local/lib/python3.10/dist-packages (from wandb) (8.1.7)
+Requirement already satisfied: docker-pycreds>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (0.4.0)
+Requirement already satisfied: gitpython!=3.1.29,>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (3.1.44)
+Requirement already satisfied: platformdirs in /usr/local/lib/python3.10/dist-packages (from wandb) (4.3.6)
+Requirement already satisfied: protobuf!=4.21.0,!=5.28.0,<6,>=3.19.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.24.4)
+Requirement already satisfied: psutil>=5.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.0)
+Requirement already satisfied: pydantic<3,>=2.6 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.9.2)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.2)
+Requirement already satisfied: sentry-sdk>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.20.0)
+Requirement already satisfied: setproctitle in /usr/local/lib/python3.10/dist-packages (from wandb) (1.3.4)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from wandb) (69.5.1)
+Requirement already satisfied: typing-extensions<5,>=4.4 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.12.2)
+Collecting selfies>=2.0.0 (from exmol)
+  Downloading selfies-2.2.0-py3-none-any.whl.metadata (14 kB)
+Collecting ratelimit (from exmol)
+  Downloading ratelimit-2.2.1.tar.gz (5.3 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.10/dist-packages (from exmol) (1.5.2)
+Collecting skunk>=0.4.0 (from exmol)
+  Downloading skunk-1.3.0-py3-none-any.whl.metadata (4.3 kB)
+Collecting importlib-resources (from exmol)
+  Downloading importlib_resources-6.5.2-py3-none-any.whl.metadata (3.9 kB)
+Collecting synspace (from exmol)
+  Downloading synspace-1.0.0-py3-none-any.whl.metadata (2.7 kB)
+Requirement already satisfied: openai in /usr/local/lib/python3.10/dist-packages (from exmol) (1.61.1)
+Requirement already satisfied: six>=1.4.0 in /usr/local/lib/python3.10/dist-packages (from docker-pycreds>=0.4.0->wandb) (1.16.0)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.10/dist-packages (from gitpython!=3.1.29,>=1.0.0->wandb) (4.0.12)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (0.7.0)
+Requirement already satisfied: pydantic-core==2.23.4 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (2.23.4)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.7)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2.0.7)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2024.8.30)
+Requirement already satisfied: matplotlib in /usr/local/lib/python3.10/dist-packages (from skunk>=0.4.0->exmol) (3.9.2)
+Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.10/dist-packages (from beautifulsoup4->gdown) (2.6)
+Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (4.6.0)
+Requirement already satisfied: distro<2,>=1.7.0 in /usr/lib/python3/dist-packages (from openai->exmol) (1.7.0)
+Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.27.2)
+Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.8.2)
+Requirement already satisfied: sniffio in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (1.3.1)
+Requirement already satisfied: PySocks!=1.5.7,>=1.5.6 in /users/nnguyenx/.local/lib/python3.10/site-packages (from requests[socks]->gdown) (1.7.1)
+Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.14.0)
+Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.4.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (3.5.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from synspace->exmol) (2.2.2)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.5.0->openai->exmol) (1.2.2)
+Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.10/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.29,>=1.0.0->wandb) (5.0.2)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->openai->exmol) (1.0.6)
+Requirement already satisfied: h11<0.15,>=0.13 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai->exmol) (0.14.0)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.3.0)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (4.54.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.4.7)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (23.2)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (3.1.4)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2023.4)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2024.1)
+Downloading exmol-3.3.0-py3-none-any.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 92.2 MB/s eta 0:00:00
+Downloading selfies-2.2.0-py3-none-any.whl (36 kB)
+Downloading skunk-1.3.0-py3-none-any.whl (6.5 kB)
+Downloading importlib_resources-6.5.2-py3-none-any.whl (37 kB)
+Downloading synspace-1.0.0-py3-none-any.whl (2.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.7/2.7 MB 249.5 MB/s eta 0:00:00
+Building wheels for collected packages: ratelimit
+  Building wheel for ratelimit (setup.py): started
+  Building wheel for ratelimit (setup.py): finished with status 'done'
+  Created wheel for ratelimit: filename=ratelimit-2.2.1-py3-none-any.whl size=5895 sha256=af7c4e5ee9c3844b4e39328e0b0dbf7ebe32e2bd0bc7ee385c7811a27be2f18d
+  Stored in directory: /tmp/pip-ephem-wheel-cache-v9ht6htn/wheels/27/5f/ba/e972a56dcbf5de9f2b7d2b2a710113970bd173c4dcd3d2c902
+Successfully built ratelimit
+Installing collected packages: ratelimit, selfies, importlib-resources, skunk, synspace, exmol
+Successfully installed exmol-3.3.0 importlib-resources-6.5.2 ratelimit-2.2.1 selfies-2.2.0 skunk-1.3.0 synspace-1.0.0
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Obtaining file:///Documents/sink
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Installing collected packages: open-r1
+  Running setup.py develop for open-r1
+Successfully installed open-r1
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Requirement already satisfied: trl==0.14.0 in /usr/local/lib/python3.10/dist-packages (0.14.0)
+Requirement already satisfied: transformers==4.48.2 in /usr/local/lib/python3.10/dist-packages (4.48.2)
+Collecting pandas==2.0.0
+  Downloading pandas-2.0.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (18 kB)
+Requirement already satisfied: accelerate>=0.34.0 in /usr/local/lib/python3.10/dist-packages (from trl==0.14.0) (1.3.0)
+Requirement already satisfied: datasets>=2.21.0 in /usr/local/lib/python3.10/dist-packages (from trl==0.14.0) (3.2.0)
+Requirement already satisfied: rich in /usr/local/lib/python3.10/dist-packages (from trl==0.14.0) (13.7.1)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (3.16.1)
+Requirement already satisfied: huggingface-hub<1.0,>=0.24.0 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (0.28.1)
+Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (1.26.4)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (23.2)
+Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (6.0.2)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (2024.9.11)
+Requirement already satisfied: requests in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (2.32.3)
+Requirement already satisfied: tokenizers<0.22,>=0.21 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (0.21.0)
+Requirement already satisfied: safetensors>=0.4.1 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (0.4.5)
+Requirement already satisfied: tqdm>=4.27 in /usr/local/lib/python3.10/dist-packages (from transformers==4.48.2) (4.66.5)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.10/dist-packages (from pandas==2.0.0) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas==2.0.0) (2023.4)
+Requirement already satisfied: tzdata>=2022.1 in /usr/local/lib/python3.10/dist-packages (from pandas==2.0.0) (2024.1)
+Requirement already satisfied: psutil in /usr/local/lib/python3.10/dist-packages (from accelerate>=0.34.0->trl==0.14.0) (6.0.0)
+Requirement already satisfied: torch>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from accelerate>=0.34.0->trl==0.14.0) (2.5.0a0+e000cf0ad9.nv24.10)
+Requirement already satisfied: pyarrow>=15.0.0 in /usr/local/lib/python3.10/dist-packages (from datasets>=2.21.0->trl==0.14.0) (16.1.0)
+Requirement already satisfied: dill<0.3.9,>=0.3.0 in /usr/local/lib/python3.10/dist-packages (from datasets>=2.21.0->trl==0.14.0) (0.3.8)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.10/dist-packages (from datasets>=2.21.0->trl==0.14.0) (3.5.0)
+Requirement already satisfied: multiprocess<0.70.17 in /usr/local/lib/python3.10/dist-packages (from datasets>=2.21.0->trl==0.14.0) (0.70.16)
+Requirement already satisfied: fsspec<=2024.9.0,>=2023.1.0 in /usr/local/lib/python3.10/dist-packages (from fsspec[http]<=2024.9.0,>=2023.1.0->datasets>=2.21.0->trl==0.14.0) (2024.6.1)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.10/dist-packages (from datasets>=2.21.0->trl==0.14.0) (3.10.5)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<1.0,>=0.24.0->transformers==4.48.2) (4.12.2)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.8.2->pandas==2.0.0) (1.16.0)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests->transformers==4.48.2) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests->transformers==4.48.2) (3.7)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests->transformers==4.48.2) (2.0.7)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests->transformers==4.48.2) (2024.8.30)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich->trl==0.14.0) (3.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich->trl==0.14.0) (2.18.0)
+Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (2.4.0)
+Requirement already satisfied: aiosignal>=1.1.2 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (1.3.1)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (24.2.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (1.4.1)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (6.0.5)
+Requirement already satisfied: yarl<2.0,>=1.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (1.9.4)
+Requirement already satisfied: async-timeout<5.0,>=4.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->datasets>=2.21.0->trl==0.14.0) (4.0.3)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich->trl==0.14.0) (0.1.2)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->accelerate>=0.34.0->trl==0.14.0) (3.3)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->accelerate>=0.34.0->trl==0.14.0) (3.1.4)
+Requirement already satisfied: sympy==1.13.1 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->accelerate>=0.34.0->trl==0.14.0) (1.13.1)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy==1.13.1->torch>=2.0.0->accelerate>=0.34.0->trl==0.14.0) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->torch>=2.0.0->accelerate>=0.34.0->trl==0.14.0) (2.1.5)
+Downloading pandas-2.0.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (11.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.6/11.6 MB 134.4 MB/s eta 0:00:00
+Installing collected packages: pandas
+  Attempting uninstall: pandas
+    Found existing installation: pandas 2.2.2
+    Uninstalling pandas-2.2.2:
+      Successfully uninstalled pandas-2.2.2
+Successfully installed pandas-2.0.0
+Found existing installation: torch 2.5.0a0+e000cf0ad9.nv24.10
+Uninstalling torch-2.5.0a0+e000cf0ad9.nv24.10:
+  Successfully uninstalled torch-2.5.0a0+e000cf0ad9.nv24.10
+Found existing installation: torchvision 0.20.0a0
+Uninstalling torchvision-0.20.0a0:
+  Successfully uninstalled torchvision-0.20.0a0
+Looking in indexes: https://download.pytorch.org/whl/cu124, https://pypi.ngc.nvidia.com
+Requirement already satisfied: vllm==0.7.1 in /usr/local/lib/python3.10/dist-packages (0.7.1+cu126)
+Requirement already satisfied: psutil in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (6.0.0)
+Requirement already satisfied: sentencepiece in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.2.0)
+Requirement already satisfied: numpy<2.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (1.26.4)
+Requirement already satisfied: requests>=2.26.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (2.32.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (4.66.5)
+Requirement already satisfied: blake3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (1.0.4)
+Requirement already satisfied: py-cpuinfo in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (9.0.0)
+Requirement already satisfied: transformers>=4.48.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (4.48.2)
+Requirement already satisfied: tokenizers>=0.19.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.21.0)
+Requirement already satisfied: protobuf in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (4.24.4)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (3.10.5)
+Requirement already satisfied: openai>=1.52.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (1.61.1)
+Requirement already satisfied: uvicorn[standard] in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.34.0)
+Requirement already satisfied: pydantic>=2.9 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (2.9.2)
+Requirement already satisfied: prometheus-client>=0.18.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.21.0)
+Requirement already satisfied: pillow in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (10.4.0)
+Requirement already satisfied: prometheus-fastapi-instrumentator>=7.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (7.0.2)
+Requirement already satisfied: tiktoken>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.7.0)
+Requirement already satisfied: lm-format-enforcer<0.11,>=0.10.9 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.10.9)
+Requirement already satisfied: outlines==0.1.11 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.1.11)
+Requirement already satisfied: lark==1.2.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (1.2.2)
+Requirement already satisfied: typing-extensions>=4.10 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (4.12.2)
+Requirement already satisfied: filelock>=3.16.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (3.16.1)
+Requirement already satisfied: partial-json-parser in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.2.1.1.post5)
+Requirement already satisfied: pyzmq in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (26.2.0)
+Requirement already satisfied: msgspec in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.19.0)
+Requirement already satisfied: gguf==0.10.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.10.0)
+Requirement already satisfied: importlib-metadata in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (7.2.1)
+Requirement already satisfied: mistral-common>=1.5.0 in /usr/local/lib/python3.10/dist-packages (from mistral-common[opencv]>=1.5.0->vllm==0.7.1) (1.5.2)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (6.0.2)
+Requirement already satisfied: einops in /usr/local/lib/python3.10/dist-packages (from vllm==0.7.1) (0.8.0)
+INFO: pip is looking at multiple versions of vllm to determine which version is compatible with other requirements. This could take a while.

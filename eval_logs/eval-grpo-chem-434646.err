@@ -1,0 +1,761 @@
++ ulimit -c 0
++ source /users/nnguyenx/.bashrc
+++ test -s /users/nnguyenx/.alias
+++ true
++++ /users/nnguyenx/miniconda3/bin/conda shell.bash hook
+++ __conda_setup='export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\''
+
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+__conda_exe() (
+    if [ -n "${_CE_M:+x}" ] && [ -n "${_CE_CONDA:+x}" ]; then
+        # only use _CE_M/_CE_CONDA when defined to avoid issues when run with `set -u`
+        "$CONDA_EXE" $_CE_M $_CE_CONDA "$@"
+    else
+        "$CONDA_EXE" "$@"
+    fi
+)
+
+__conda_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__conda_activate() {
+    if [ -n "${CONDA_PS1_BACKUP:+x}" ]; then
+        # Handle transition from shell activated with conda <= 4.3 to a subsequent activation
+        # after conda updated to >= 4.4. See issue #6173.
+        PS1="$CONDA_PS1_BACKUP"
+        \unset CONDA_PS1_BACKUP
+    fi
+    \local ask_conda
+    ask_conda="$(PS1="${PS1:-}" __conda_exe shell.posix "$@")" || \return
+    \eval "$ask_conda"
+    __conda_hashr
+}
+
+__conda_reactivate() {
+    # FUTURE: conda 25.9, remove this function
+    echo "'\''__conda_reactivate'\'' is deprecated and will be removed in 25.9. Use '\''__conda_activate reactivate'\'' instead." 1>&2
+    __conda_activate reactivate
+}
+
+conda() {
+    \local cmd="${1-__missing__}"
+    case "$cmd" in
+        activate|deactivate)
+            __conda_activate "$@"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __conda_exe "$@" || \return
+            __conda_activate reactivate
+            ;;
+        *)
+            __conda_exe "$@"
+            ;;
+    esac
+}
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    # In dev-mode CONDA_EXE is python.exe and on Windows
+    # it is in a different relative location to condabin.
+    if [ -n "${_CE_CONDA:+x}" ] && [ -n "${WINDIR+x}" ]; then
+        PATH="$(\dirname "$CONDA_EXE")/condabin${PATH:+":${PATH}"}"
+    else
+        PATH="$(\dirname "$(\dirname "$CONDA_EXE")")/condabin${PATH:+":${PATH}"}"
+    fi
+    \export PATH
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+conda activate base'
+++ '[' 0 -eq 0 ']'
+++ eval 'export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\''
+
+# Copyright (C) 2012 Anaconda, Inc
+# SPDX-License-Identifier: BSD-3-Clause
+__conda_exe() (
+    if [ -n "${_CE_M:+x}" ] && [ -n "${_CE_CONDA:+x}" ]; then
+        # only use _CE_M/_CE_CONDA when defined to avoid issues when run with `set -u`
+        "$CONDA_EXE" $_CE_M $_CE_CONDA "$@"
+    else
+        "$CONDA_EXE" "$@"
+    fi
+)
+
+__conda_hashr() {
+    if [ -n "${ZSH_VERSION:+x}" ]; then
+        \rehash
+    elif [ -n "${POSH_VERSION:+x}" ]; then
+        :  # pass
+    else
+        \hash -r
+    fi
+}
+
+__conda_activate() {
+    if [ -n "${CONDA_PS1_BACKUP:+x}" ]; then
+        # Handle transition from shell activated with conda <= 4.3 to a subsequent activation
+        # after conda updated to >= 4.4. See issue #6173.
+        PS1="$CONDA_PS1_BACKUP"
+        \unset CONDA_PS1_BACKUP
+    fi
+    \local ask_conda
+    ask_conda="$(PS1="${PS1:-}" __conda_exe shell.posix "$@")" || \return
+    \eval "$ask_conda"
+    __conda_hashr
+}
+
+__conda_reactivate() {
+    # FUTURE: conda 25.9, remove this function
+    echo "'\''__conda_reactivate'\'' is deprecated and will be removed in 25.9. Use '\''__conda_activate reactivate'\'' instead." 1>&2
+    __conda_activate reactivate
+}
+
+conda() {
+    \local cmd="${1-__missing__}"
+    case "$cmd" in
+        activate|deactivate)
+            __conda_activate "$@"
+            ;;
+        install|update|upgrade|remove|uninstall)
+            __conda_exe "$@" || \return
+            __conda_activate reactivate
+            ;;
+        *)
+            __conda_exe "$@"
+            ;;
+    esac
+}
+
+if [ -z "${CONDA_SHLVL+x}" ]; then
+    \export CONDA_SHLVL=0
+    # In dev-mode CONDA_EXE is python.exe and on Windows
+    # it is in a different relative location to condabin.
+    if [ -n "${_CE_CONDA:+x}" ] && [ -n "${WINDIR+x}" ]; then
+        PATH="$(\dirname "$CONDA_EXE")/condabin${PATH:+":${PATH}"}"
+    else
+        PATH="$(\dirname "$(\dirname "$CONDA_EXE")")/condabin${PATH:+":${PATH}"}"
+    fi
+    \export PATH
+
+    # We'\''re not allowing PS1 to be unbound. It must at least be set.
+    # However, we'\''re not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi
+
+conda activate base'
++++ export CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
++++ CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
++++ '[' -z x ']'
++++ conda activate base
++++ local cmd=activate
++++ case "$cmd" in
++++ __conda_activate activate base
++++ '[' -n '' ']'
++++ local ask_conda
+++++ PS1=
+++++ __conda_exe shell.posix activate base
+++++ '[' -n '' ']'
+++++ /users/nnguyenx/miniconda3/bin/conda shell.posix activate base
++++ ask_conda='unset _CE_M
+unset _CE_CONDA
+PS1='\''(base) '\''
+export PATH='\''/users/nnguyenx/miniconda3/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\'''
++++ eval 'unset _CE_M
+unset _CE_CONDA
+PS1='\''(base) '\''
+export PATH='\''/users/nnguyenx/miniconda3/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\'''
+++++ unset _CE_M
+++++ unset _CE_CONDA
+++++ PS1='(base) '
+++++ export PATH=/users/nnguyenx/miniconda3/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin
+++++ PATH=/users/nnguyenx/miniconda3/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin
+++++ export CONDA_SHLVL=1
+++++ CONDA_SHLVL=1
+++++ export 'CONDA_PROMPT_MODIFIER=(base) '
+++++ CONDA_PROMPT_MODIFIER='(base) '
+++++ export CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
+++++ CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
+++++ export CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
+++++ CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
++++ __conda_hashr
++++ '[' -n '' ']'
++++ '[' -n '' ']'
++++ hash -r
+++ unset __conda_setup
++ cd /Documents/sink
+++ date
++ echo 'START TIME: Mon May 12 20:24:14 CEST 2025'
++ export NUM_GPUS=1
++ NUM_GPUS=1
++ export MODEL_ID=Qwen2.5-3B_pretrained-v6-1
++ MODEL_ID=Qwen2.5-3B_pretrained-v6-1
++ export JOB_ID=0
++ JOB_ID=0
++ '[' 0 = 0 ']'
+++ grep '^Qwen2.5-3B_pretrained-v6-1:' model_paths.txt
+++ cut -d: -f2-
+++ sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
++ MODEL_PATH=/LLM_models/Qwen2.5-3B_pretrained-v6-1
++ MODEL_ARGS='model_name=/LLM_models/Qwen2.5-3B_pretrained-v6-1,dtype=bfloat16,max_num_batched_tokens=16384,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=1,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}'
++ OUTPUT_DIR=eval_results/Qwen2.5-3B_pretrained-v6-1_0
++ export NCCL_DEBUG=INFO
++ NCCL_DEBUG=INFO
++ export LD_LIBRARY_PATH=/usr/local/cuda/lib64
++ LD_LIBRARY_PATH=/usr/local/cuda/lib64
++ ACCELERATE_USE_DEEPSPEED=false
++ echo 'Running lighteval script ...'
++ echo 'Eval results will be saved to eval_results/Qwen2.5-3B_pretrained-v6-1_0'
++ conda deactivate
++ local cmd=deactivate
++ case "$cmd" in
++ __conda_activate deactivate
++ '[' -n '' ']'
++ local ask_conda
+++ PS1='(base) '
+++ __conda_exe shell.posix deactivate
+++ '[' -n '' ']'
+++ /users/nnguyenx/miniconda3/bin/conda shell.posix deactivate
++ ask_conda='export PATH='\''/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin'\''
+unset CONDA_PREFIX
+unset CONDA_DEFAULT_ENV
+unset CONDA_PROMPT_MODIFIER
+unset _CE_M
+unset _CE_CONDA
+PS1='\'''\''
+export CONDA_SHLVL='\''0'\''
+export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\'''
++ eval 'export PATH='\''/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin'\''
+unset CONDA_PREFIX
+unset CONDA_DEFAULT_ENV
+unset CONDA_PROMPT_MODIFIER
+unset _CE_M
+unset _CE_CONDA
+PS1='\'''\''
+export CONDA_SHLVL='\''0'\''
+export CONDA_EXE='\''/users/nnguyenx/miniconda3/bin/conda'\''
+export CONDA_PYTHON_EXE='\''/users/nnguyenx/miniconda3/bin/python'\'''
+++ export PATH=/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin
+++ PATH=/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin
+++ unset CONDA_PREFIX
+++ unset CONDA_DEFAULT_ENV
+++ unset CONDA_PROMPT_MODIFIER
+++ unset _CE_M
+++ unset _CE_CONDA
+++ PS1=
+++ export CONDA_SHLVL=0
+++ CONDA_SHLVL=0
+++ export CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
+++ CONDA_EXE=/users/nnguyenx/miniconda3/bin/conda
+++ export CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
+++ CONDA_PYTHON_EXE=/users/nnguyenx/miniconda3/bin/python
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ cd /Documents/sink
++ pip install hf_transfer gdown levenshtein rdkit wandb exmol
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip install -U 'git+https://github.com/huggingface/lighteval.git@4f381b352c0e467b5870a97d41cb66b487a2c503#egg=lighteval[math]'
+DEPRECATION: git+https://github.com/huggingface/lighteval.git@4f381b352c0e467b5870a97d41cb66b487a2c503#egg=lighteval[math] contains an egg fragment with a non-PEP 508 name. pip 25.1 will enforce this behaviour change. A possible replacement is to use the req @ url syntax, and remove the egg fragment. Discussion can be found at https://github.com/pypa/pip/issues/13157
+  Running command git clone --filter=blob:none --quiet https://github.com/huggingface/lighteval.git /tmp/pip-install-uz9qfxyb/lighteval_2e3035c5e4634e15bb75ca95d6948467
+  Running command git rev-parse -q --verify 'sha^4f381b352c0e467b5870a97d41cb66b487a2c503'
+  Running command git fetch -q https://github.com/huggingface/lighteval.git 4f381b352c0e467b5870a97d41cb66b487a2c503
+  Running command git checkout -q 4f381b352c0e467b5870a97d41cb66b487a2c503
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+vllm 0.7.1+cu126 requires torchaudio==2.5.1, which is not installed.
+vllm 0.7.1+cu126 requires compressed-tensors==0.9.0, but you have compressed-tensors 0.8.1 which is incompatible.
+vllm 0.7.1+cu126 requires torch==2.5.1, but you have torch 2.5.0a0+e000cf0ad9.nv24.10 which is incompatible.
+vllm 0.7.1+cu126 requires torchvision==0.20.1, but you have torchvision 0.20.0a0 which is incompatible.
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip install -e . --no-deps
+  DEPRECATION: Legacy editable install of open-r1==0.1.0.dev0 from file:///Documents/sink (setup.py develop) is deprecated. pip 25.1 will enforce this behaviour change. A possible replacement is to add a pyproject.toml or enable --use-pep517, and use setuptools >= 64. If the resulting installation is not behaving as expected, try using --config-settings editable_mode=compat. Please consult the setuptools documentation for more information. Discussion can be found at https://github.com/pypa/pip/issues/11457
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0 vllm==0.7.1
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+dask-cuda 24.8.0 requires pynvml<11.5,>=11.0.0, which is not installed.
+open-r1 0.1.0.dev0 requires liger_kernel==0.5.2, which is not installed.
+open-r1 0.1.0.dev0 requires deepspeed==0.15.4, but you have deepspeed 0.16.3 which is incompatible.
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip install -U torch==2.5.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu126
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip show torch vllm
++ nvcc --version
++ lighteval accelerate 'model_name=/LLM_models/Qwen2.5-3B_pretrained-v6-1,dtype=bfloat16,max_num_batched_tokens=16384,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=1,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}' 'custom|iupacsm|0|0' --custom-tasks src/open_r1/chem_evaluate/iupacsm.py --output-dir eval_results/Qwen2.5-3B_pretrained-v6-1_0
+[2025-05-12 20:26:23,766] [[32m    INFO[0m]: PyTorch version 2.5.1 available. (config.py:54)[0m
+[2025-05-12 20:26:23,767] [[32m    INFO[0m]: Polars version 1.2.1 available. (config.py:66)[0m
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /usr/local/lib/python3.10/dist-packages/lighteval/main_accelerate.py:114 in  │
+│ accelerate                                                                   │
+│                                                                              │
+│   111 │   from lighteval.models.transformers.adapter_model import AdapterMod │
+│   112 │   from lighteval.models.transformers.delta_model import DeltaModelCo │
+│   113 │   from lighteval.models.transformers.transformers_model import BitsA │
+│ ❱ 114 │   from lighteval.pipeline import EnvConfig, ParallelismManager, Pipe │
+│   115 │                                                                      │
+│   116 │   accelerator = Accelerator(kwargs_handlers=[InitProcessGroupKwargs( │
+│   117 │   cache_dir = CACHE_DIR                                              │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │               Accelerator = <class 'accelerate.accelerator.Accelerator'> │ │
+│ │        AdapterModelConfig = <class                                       │ │
+│ │                             'lighteval.models.transformers.adapter_mode… │ │
+│ │        BitsAndBytesConfig = <class                                       │ │
+│ │                             'transformers.utils.quantization_config.Bit… │ │
+│ │                 cache_dir = None                                         │ │
+│ │              custom_tasks = 'src/open_r1/chem_evaluate/iupacsm.py'       │ │
+│ │ dataset_loading_processes = 1                                            │ │
+│ │          DeltaModelConfig = <class                                       │ │
+│ │                             'lighteval.models.transformers.delta_model.… │ │
+│ │         EvaluationTracker = <class                                       │ │
+│ │                             'lighteval.logging.evaluation_tracker.Evalu… │ │
+│ │      GenerationParameters = <class                                       │ │
+│ │                             'lighteval.models.model_input.GenerationPar… │ │
+│ │    InitProcessGroupKwargs = <class                                       │ │
+│ │                             'accelerate.utils.dataclasses.InitProcessGr… │ │
+│ │                    job_id = 0                                            │ │
+│ │               max_samples = None                                         │ │
+│ │                model_args = 'model_name=/LLM_models/Qwen2.5-3B_pretrain… │ │
+│ │         num_fewshot_seeds = 1                                            │ │
+│ │                output_dir = 'eval_results/Qwen2.5-3B_pretrained-v6-1_0'  │ │
+│ │       override_batch_size = -1                                           │ │
+│ │                public_run = False                                        │ │
+│ │               push_to_hub = False                                        │ │
+│ │       push_to_tensorboard = False                                        │ │
+│ │               results_org = None                                         │ │
+│ │              save_details = False                                        │ │
+│ │             system_prompt = None                                         │ │
+│ │                     tasks = 'custom|iupacsm|0|0'                         │ │
+│ │                 timedelta = <class 'datetime.timedelta'>                 │ │
+│ │                     torch = <module 'torch' from                         │ │
+│ │                             '/usr/local/lib/python3.10/dist-packages/to… │ │
+│ │   TransformersModelConfig = <class                                       │ │
+│ │                             'lighteval.models.transformers.transformers… │ │
+│ │         use_chat_template = False                                        │ │
+│ │                      yaml = <module 'yaml' from                          │ │
+│ │                             '/usr/local/lib/python3.10/dist-packages/ya… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/lighteval/pipeline.py:36 in <module> │
+│                                                                              │
+│    33                                                                        │
+│    34 from lighteval.logging.evaluation_tracker import EvaluationTracker     │
+│    35 from lighteval.metrics.utils.metric_utils import MetricCategory        │
+│ ❱  36 from lighteval.models.model_loader import TransformersModel, load_mode │
+│    37 from lighteval.models.model_output import ModelResponse                │
+│    38 from lighteval.tasks.lighteval_task import LightevalTask, create_reque │
+│    39 from lighteval.tasks.registry import Registry, taskinfo_selector       │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │              auto = <class 'enum.auto'>                                  │ │
+│ │       collections = <module 'collections' from                           │ │
+│ │                     '/usr/lib/python3.10/collections/__init__.py'>       │ │
+│ │         dataclass = <function dataclass at 0x400016dd3010>               │ │
+│ │              Enum = <enum 'Enum'>                                        │ │
+│ │ EvaluationTracker = <class                                               │ │
+│ │                     'lighteval.logging.evaluation_tracker.EvaluationTra… │ │
+│ │             field = <function field at 0x400016dd1c60>                   │ │
+│ │    MetricCategory = <enum 'MetricCategory'>                              │ │
+│ │                np = <module 'numpy' from                                 │ │
+│ │                     '/usr/local/lib/python3.10/dist-packages/numpy/__in… │ │
+│ │       nullcontext = <class 'contextlib.nullcontext'>                     │ │
+│ │                os = <module 'os' from '/usr/lib/python3.10/os.py'>       │ │
+│ │            random = <module 'random' from                                │ │
+│ │                     '/usr/lib/python3.10/random.py'>                     │ │
+│ │            shutil = <module 'shutil' from                                │ │
+│ │                     '/usr/lib/python3.10/shutil.py'>                     │ │
+│ │         timedelta = <class 'datetime.timedelta'>                         │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/lighteval/models/model_loader.py:38  │
+│ in <module>                                                                  │
+│                                                                              │
+│    35 from lighteval.models.transformers.adapter_model import AdapterModel,  │
+│    36 from lighteval.models.transformers.delta_model import DeltaModel, Delt │
+│    37 from lighteval.models.transformers.transformers_model import Transform │
+│ ❱  38 from lighteval.models.vllm.vllm_model import VLLMModel, VLLMModelConfi │
+│    39 from lighteval.utils.imports import (                                  │
+│    40 │   NO_LITELLM_ERROR_MSG,                                              │
+│    41 │   NO_TGI_ERROR_MSG,                                                  │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                  AdapterModel = <class                                   │ │
+│ │                                 'lighteval.models.transformers.adapter_… │ │
+│ │            AdapterModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.transformers.adapter_… │ │
+│ │                    DeltaModel = <class                                   │ │
+│ │                                 'lighteval.models.transformers.delta_mo… │ │
+│ │              DeltaModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.transformers.delta_mo… │ │
+│ │                    DummyModel = <class                                   │ │
+│ │                                 'lighteval.models.dummy.dummy_model.Dum… │ │
+│ │              DummyModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.dummy.dummy_model.Dum… │ │
+│ │        InferenceEndpointModel = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.endpoint_mo… │ │
+│ │  InferenceEndpointModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.endpoint_mo… │ │
+│ │                 LiteLLMClient = <class                                   │ │
+│ │                                 'lighteval.models.litellm_model.LiteLLM… │ │
+│ │            LiteLLMModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.litellm_model.LiteLLM… │ │
+│ │                       logging = <module 'logging' from                   │ │
+│ │                                 '/usr/lib/python3.10/logging/__init__.p… │ │
+│ │                   ModelClient = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.tgi_model.M… │ │
+│ │                  OpenAIClient = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.openai_mode… │ │
+│ │             OpenAIModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.openai_mode… │ │
+│ │ ServerlessEndpointModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.endpoint_mo… │ │
+│ │                TGIModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.endpoints.tgi_model.T… │ │
+│ │             TransformersModel = <class                                   │ │
+│ │                                 'lighteval.models.transformers.transfor… │ │
+│ │       TransformersModelConfig = <class                                   │ │
+│ │                                 'lighteval.models.transformers.transfor… │ │
+│ │                         Union = typing.Union                             │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/lighteval/models/vllm/vllm_model.py: │
+│ 55 in <module>                                                               │
+│                                                                              │
+│    52 if is_vllm_available():                                                │
+│    53 │   import ray                                                         │
+│    54 │   from more_itertools import distribute                              │
+│ ❱  55 │   from vllm import LLM, SamplingParams                               │
+│    56 │   from vllm.distributed.parallel_state import destroy_distributed_en │
+│    57 │   from vllm.transformers_utils.tokenizer import get_tokenizer        │
+│    58                                                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            _get_dtype = <function _get_dtype at 0x40049c1d7f40>          │ │
+│ │        _simplify_name = <function _simplify_name at 0x40049d530160>      │ │
+│ │               as_list = <function as_list at 0x400243e57910>             │ │
+│ │             dataclass = <function dataclass at 0x400016dd3010>           │ │
+│ │            distribute = <function distribute at 0x4004f1535fc0>          │ │
+│ │             EnvConfig = <class 'lighteval.utils.utils.EnvConfig'>        │ │
+│ │                    gc = <module 'gc' (built-in)>                         │ │
+│ │  GenerationParameters = <class                                           │ │
+│ │                         'lighteval.models.model_input.GenerationParamet… │ │
+│ │    GenerativeResponse = <class                                           │ │
+│ │                         'lighteval.models.model_output.GenerativeRespon… │ │
+│ │ GenerativeTaskDataset = <class 'lighteval.data.GenerativeTaskDataset'>   │ │
+│ │    GreedyUntilRequest = <class                                           │ │
+│ │                         'lighteval.tasks.requests.GreedyUntilRequest'>   │ │
+│ │     is_vllm_available = <function is_vllm_available at 0x400498e3b7f0>   │ │
+│ │             itertools = <module 'itertools' (built-in)>                  │ │
+│ │        LightevalModel = <class                                           │ │
+│ │                         'lighteval.models.abstract_model.LightevalModel… │ │
+│ │                logger = <Logger lighteval.models.vllm.vllm_model (INFO)> │ │
+│ │               logging = <module 'logging' from                           │ │
+│ │                         '/usr/lib/python3.10/logging/__init__.py'>       │ │
+│ │  LoglikelihoodDataset = <class 'lighteval.data.LoglikelihoodDataset'>    │ │
+│ │  LoglikelihoodRequest = <class                                           │ │
+│ │                         'lighteval.tasks.requests.LoglikelihoodRequest'> │ │
+│ │ LoglikelihoodResponse = <class                                           │ │
+│ │                         'lighteval.models.model_output.LoglikelihoodRes… │ │
+│ │             ModelInfo = <class                                           │ │
+│ │                         'lighteval.models.abstract_model.ModelInfo'>     │ │
+│ │              Optional = typing.Optional                                  │ │
+│ │                    os = <module 'os' from '/usr/lib/python3.10/os.py'>   │ │
+│ │                   ray = <module 'ray' from                               │ │
+│ │                         '/usr/local/lib/python3.10/dist-packages/ray/__… │ │
+│ │                 torch = <module 'torch' from                             │ │
+│ │                         '/usr/local/lib/python3.10/dist-packages/torch/… │ │
+│ │                  tqdm = <class 'tqdm.std.tqdm'>                          │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:6 in <module>       │
+│                                                                              │
+│    3                                                                         │
+│    4 import torch                                                            │
+│    5                                                                         │
+│ ❱  6 from vllm.engine.arg_utils import AsyncEngineArgs, EngineArgs           │
+│    7 from vllm.engine.async_llm_engine import AsyncLLMEngine                 │
+│    8 from vllm.engine.llm_engine import LLMEngine                            │
+│    9 from vllm.entrypoints.llm import LLM                                    │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │           _version = <module 'vllm._version' from                        │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/_ver… │ │
+│ │    adapter_commons = <module 'vllm.adapter_commons' from                 │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/adap… │ │
+│ │        compilation = <module 'vllm.compilation' from                     │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/comp… │ │
+│ │             config = <module 'vllm.config' from                          │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/conf… │ │
+│ │        connections = <module 'vllm.connections' from                     │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/conn… │ │
+│ │        distributed = <module 'vllm.distributed' from                     │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/dist… │ │
+│ │             engine = <module 'vllm.engine' from                          │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/engi… │ │
+│ │               envs = <module 'vllm.envs' from                            │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/envs… │ │
+│ │           executor = <module 'vllm.executor' from                        │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/exec… │ │
+│ │             inputs = <module 'vllm.inputs' from                          │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/inpu… │ │
+│ │             logger = <module 'vllm.logger' from                          │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/logg… │ │
+│ │      logging_utils = <module 'vllm.logging_utils' from                   │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/logg… │ │
+│ │     logits_process = <module 'vllm.logits_process' from                  │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/logi… │ │
+│ │               lora = <module 'vllm.lora' from                            │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/lora… │ │
+│ │     model_executor = <module 'vllm.model_executor' from                  │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/mode… │ │
+│ │         multimodal = <module 'vllm.multimodal' from                      │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/mult… │ │
+│ │                 os = <module 'os' from '/usr/lib/python3.10/os.py'>      │ │
+│ │          platforms = <module 'vllm.platforms' from                       │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/plat… │ │
+│ │            plugins = <module 'vllm.plugins' from                         │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/plug… │ │
+│ │     pooling_params = <module 'vllm.pooling_params' from                  │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/pool… │ │
+│ │     prompt_adapter = <module 'vllm.prompt_adapter' from                  │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/prom… │ │
+│ │    sampling_params = <module 'vllm.sampling_params' from                 │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/samp… │ │
+│ │           sequence = <module 'vllm.sequence' from                        │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/sequ… │ │
+│ │        spec_decode = <module 'vllm.spec_decode' from                     │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/spec… │ │
+│ │              torch = <module 'torch' from                                │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/torch/__i… │ │
+│ │            tracing = <module 'vllm.tracing' from                         │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/trac… │ │
+│ │ transformers_utils = <module 'vllm.transformers_utils' from              │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/tran… │ │
+│ │              utils = <module 'vllm.utils' from                           │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/util… │ │
+│ │            version = <module 'vllm.version' from                         │ │
+│ │                      '/usr/local/lib/python3.10/dist-packages/vllm/vers… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/engine/arg_utils.py:18 in       │
+│ <module>                                                                     │
+│                                                                              │
+│     15 │   │   │   │   │   │    PoolerConfig, PromptAdapterConfig, Scheduler │
+│     16 │   │   │   │   │   │    SpeculativeConfig, TaskOption, TokenizerPool │
+│     17 │   │   │   │   │   │    VllmConfig)                                  │
+│ ❱   18 from vllm.executor.executor_base import ExecutorBase                  │
+│     19 from vllm.logger import init_logger                                   │
+│     20 from vllm.model_executor.layers.quantization import QUANTIZATION_METH │
+│     21 from vllm.transformers_utils.utils import check_gguf_file             │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │                 Any = typing.Any                                         │ │
+│ │            argparse = <module 'argparse' from                            │ │
+│ │                       '/usr/lib/python3.10/argparse.py'>                 │ │
+│ │         CacheConfig = <class 'vllm.config.CacheConfig'>                  │ │
+│ │                cast = <function cast at 0x4000166dfbe0>                  │ │
+│ │   CompilationConfig = <class 'vllm.config.CompilationConfig'>            │ │
+│ │        ConfigFormat = <enum 'ConfigFormat'>                              │ │
+│ │           dataclass = <function dataclass at 0x400016dd3010>             │ │
+│ │         dataclasses = <module 'dataclasses' from                         │ │
+│ │                       '/usr/lib/python3.10/dataclasses.py'>              │ │
+│ │      DecodingConfig = <class 'vllm.config.DecodingConfig'>               │ │
+│ │        DeviceConfig = <class 'vllm.config.DeviceConfig'>                 │ │
+│ │                Dict = typing.Dict                                        │ │
+│ │                envs = <module 'vllm.envs' from                           │ │
+│ │                       '/usr/local/lib/python3.10/dist-packages/vllm/env… │ │
+│ │            get_args = <function get_args at 0x4000166dfeb0>              │ │
+│ │         HfOverrides = typing.Union[typing.Dict[str, typing.Any],         │ │
+│ │                       typing.Callable[[transformers.configuration_utils… │ │
+│ │                       transformers.configuration_utils.PretrainedConfig… │ │
+│ │                json = <module 'json' from                                │ │
+│ │                       '/usr/lib/python3.10/json/__init__.py'>            │ │
+│ │    KVTransferConfig = <class 'vllm.config.KVTransferConfig'>             │ │
+│ │                List = typing.List                                        │ │
+│ │             Literal = typing.Literal                                     │ │
+│ │          LoadConfig = <class 'vllm.config.LoadConfig'>                   │ │
+│ │          LoadFormat = <enum 'LoadFormat'>                                │ │
+│ │          LoRAConfig = <class 'vllm.config.LoRAConfig'>                   │ │
+│ │             Mapping = typing.Mapping                                     │ │
+│ │         ModelConfig = <class 'vllm.config.ModelConfig'>                  │ │
+│ │ ObservabilityConfig = <class 'vllm.config.ObservabilityConfig'>          │ │
+│ │            Optional = typing.Optional                                    │ │
+│ │      ParallelConfig = <class 'vllm.config.ParallelConfig'>               │ │
+│ │        PoolerConfig = <class 'vllm.config.PoolerConfig'>                 │ │
+│ │ PromptAdapterConfig = <class 'vllm.config.PromptAdapterConfig'>          │ │
+│ │     SchedulerConfig = <class 'vllm.config.SchedulerConfig'>              │ │
+│ │   SpeculativeConfig = <class 'vllm.config.SpeculativeConfig'>            │ │
+│ │          TaskOption = typing.Literal['auto', 'generate', 'embedding',    │ │
+│ │                       'embed', 'classify', 'score', 'reward']            │ │
+│ │ TokenizerPoolConfig = <class 'vllm.config.TokenizerPoolConfig'>          │ │
+│ │               torch = <module 'torch' from                               │ │
+│ │                       '/usr/local/lib/python3.10/dist-packages/torch/__… │ │
+│ │               Tuple = typing.Tuple                                       │ │
+│ │                Type = typing.Type                                        │ │
+│ │       TYPE_CHECKING = False                                              │ │
+│ │               Union = typing.Union                                       │ │
+│ │          VllmConfig = <class 'vllm.config.VllmConfig'>                   │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/executor/executor_base.py:13 in │
+│ <module>                                                                     │
+│                                                                              │
+│    10 from vllm.logger import init_logger                                    │
+│    11 from vllm.lora.request import LoRARequest                              │
+│    12 from vllm.model_executor.layers.sampler import SamplerOutput           │
+│ ❱  13 from vllm.platforms import current_platform                            │
+│    14 from vllm.prompt_adapter.request import PromptAdapterRequest           │
+│    15 from vllm.sequence import ExecuteModelRequest, PoolerOutput            │
+│    16 from vllm.utils import make_async                                      │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            ABC = <class 'abc.ABC'>                                       │ │
+│ │ abstractmethod = <function abstractmethod at 0x4000162dc670>             │ │
+│ │            Any = typing.Any                                              │ │
+│ │        asyncio = <module 'asyncio' from                                  │ │
+│ │                  '/usr/lib/python3.10/asyncio/__init__.py'>              │ │
+│ │      Awaitable = typing.Awaitable                                        │ │
+│ │       Callable = typing.Callable                                         │ │
+│ │           Dict = typing.Dict                                             │ │
+│ │    init_logger = <function init_logger at 0x4004f1552e60>                │ │
+│ │           List = typing.List                                             │ │
+│ │    LoRARequest = <class 'vllm.lora.request.LoRARequest'>                 │ │
+│ │             nn = <module 'torch.nn' from                                 │ │
+│ │                  '/usr/local/lib/python3.10/dist-packages/torch/nn/__in… │ │
+│ │       Optional = typing.Optional                                         │ │
+│ │  SamplerOutput = <class                                                  │ │
+│ │                  'vllm.model_executor.layers.sampler.SamplerOutput'>     │ │
+│ │            Set = typing.Set                                              │ │
+│ │          Tuple = typing.Tuple                                            │ │
+│ │        TypeVar = <class 'typing_extensions.TypeVar'>                     │ │
+│ │          Union = typing.Union                                            │ │
+│ │     VllmConfig = <class 'vllm.config.VllmConfig'>                        │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:215 in    │
+│ __getattr__                                                                  │
+│                                                                              │
+│   212 │   │   global _current_platform                                       │
+│   213 │   │   if _current_platform is None:                                  │
+│   214 │   │   │   platform_cls_qualname = resolve_current_platform_cls_qualn │
+│ ❱ 215 │   │   │   _current_platform = resolve_obj_by_qualname(               │
+│   216 │   │   │   │   platform_cls_qualname)()                               │
+│   217 │   │   │   global _init_trace                                         │
+│   218 │   │   │   _init_trace = "".join(traceback.format_stack())            │
+│                                                                              │
+│ ╭────────────────────────── locals ──────────────────────────╮               │
+│ │                  name = 'current_platform'                 │               │
+│ │ platform_cls_qualname = 'vllm.platforms.cuda.CudaPlatform' │               │
+│ ╰────────────────────────────────────────────────────────────╯               │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/utils.py:1894 in                │
+│ resolve_obj_by_qualname                                                      │
+│                                                                              │
+│   1891 │   Resolve an object by its fully qualified name.                    │
+│   1892 │   """                                                               │
+│   1893 │   module_name, obj_name = qualname.rsplit(".", 1)                   │
+│ ❱ 1894 │   module = importlib.import_module(module_name)                     │
+│   1895 │   return getattr(module, obj_name)                                  │
+│   1896                                                                       │
+│   1897                                                                       │
+│                                                                              │
+│ ╭───────────────────── locals ─────────────────────╮                         │
+│ │ module_name = 'vllm.platforms.cuda'              │                         │
+│ │    obj_name = 'CudaPlatform'                     │                         │
+│ │    qualname = 'vllm.platforms.cuda.CudaPlatform' │                         │
+│ ╰──────────────────────────────────────────────────╯                         │
+│                                                                              │
+│ /usr/lib/python3.10/importlib/__init__.py:126 in import_module               │
+│                                                                              │
+│   123 │   │   │   if character != '.':                                       │
+│   124 │   │   │   │   break                                                  │
+│   125 │   │   │   level += 1                                                 │
+│ ❱ 126 │   return _bootstrap._gcd_import(name[level:], package, level)        │
+│   127                                                                        │
+│   128                                                                        │
+│   129 _RELOADING = {}                                                        │
+│                                                                              │
+│ ╭──────────── locals ─────────────╮                                          │
+│ │   level = 0                     │                                          │
+│ │    name = 'vllm.platforms.cuda' │                                          │
+│ │ package = None                  │                                          │
+│ ╰─────────────────────────────────╯                                          │
+│                                                                              │
+│ /usr/local/lib/python3.10/dist-packages/vllm/platforms/cuda.py:15 in         │
+│ <module>                                                                     │
+│                                                                              │
+│    12 from typing_extensions import ParamSpec                                │
+│    13                                                                        │
+│    14 # import custom ops, trigger op registration                           │
+│ ❱  15 import vllm._C  # noqa                                                 │
+│    16 import vllm.envs as envs                                               │
+│    17 from vllm.logger import init_logger                                    │
+│    18                                                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │      Callable = typing.Callable                                          │ │
+│ │          List = typing.List                                              │ │
+│ │     lru_cache = <function lru_cache at 0x4000163adbd0>                   │ │
+│ │      Optional = typing.Optional                                          │ │
+│ │            os = <module 'os' from '/usr/lib/python3.10/os.py'>           │ │
+│ │     ParamSpec = <class 'typing_extensions.ParamSpec'>                    │ │
+│ │        pynvml = <module 'pynvml' from                                    │ │
+│ │                 '/usr/local/lib/python3.10/dist-packages/pynvml.py'>     │ │
+│ │         torch = <module 'torch' from                                     │ │
+│ │                 '/usr/local/lib/python3.10/dist-packages/torch/__init__… │ │
+│ │         Tuple = typing.Tuple                                             │ │
+│ │ TYPE_CHECKING = False                                                    │ │
+│ │       TypeVar = <class 'typing.TypeVar'>                                 │ │
+│ │         Union = typing.Union                                             │ │
+│ │         wraps = <function wraps at 0x4000163700d0>                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ImportError: libtorch_cuda.so: cannot open shared object file: No such file or 
+directory

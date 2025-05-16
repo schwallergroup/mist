@@ -1,0 +1,536 @@
+START TIME: Tue May 13 22:01:59 CEST 2025
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Requirement already satisfied: pip in /usr/local/lib/python3.10/dist-packages (25.0)
+Collecting pip
+  Downloading pip-25.1.1-py3-none-any.whl.metadata (3.6 kB)
+Downloading pip-25.1.1-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 50.8 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 25.0
+    Uninstalling pip-25.0:
+      Successfully uninstalled pip-25.0
+Successfully installed pip-25.1.1
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Requirement already satisfied: hf_transfer in /users/nnguyenx/.local/lib/python3.10/site-packages (0.1.9)
+Requirement already satisfied: gdown in /users/nnguyenx/.local/lib/python3.10/site-packages (5.2.0)
+Requirement already satisfied: levenshtein in /users/nnguyenx/.local/lib/python3.10/site-packages (0.26.1)
+Requirement already satisfied: rdkit in /usr/local/lib/python3.10/dist-packages (2024.9.5)
+Requirement already satisfied: wandb in /usr/local/lib/python3.10/dist-packages (0.19.6)
+Collecting exmol
+  Downloading exmol-3.3.0-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.10/dist-packages (from gdown) (4.12.3)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from gdown) (3.16.1)
+Requirement already satisfied: requests[socks] in /usr/local/lib/python3.10/dist-packages (from gdown) (2.32.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from gdown) (4.66.5)
+Requirement already satisfied: rapidfuzz<4.0.0,>=3.9.0 in /users/nnguyenx/.local/lib/python3.10/site-packages (from levenshtein) (3.12.1)
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from rdkit) (1.26.4)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.10/dist-packages (from rdkit) (10.4.0)
+Requirement already satisfied: click!=8.0.0,>=7.1 in /usr/local/lib/python3.10/dist-packages (from wandb) (8.1.7)
+Requirement already satisfied: docker-pycreds>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (0.4.0)
+Requirement already satisfied: gitpython!=3.1.29,>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (3.1.44)
+Requirement already satisfied: platformdirs in /usr/local/lib/python3.10/dist-packages (from wandb) (4.3.6)
+Requirement already satisfied: protobuf!=4.21.0,!=5.28.0,<6,>=3.19.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.24.4)
+Requirement already satisfied: psutil>=5.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.0)
+Requirement already satisfied: pydantic<3,>=2.6 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.9.2)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.2)
+Requirement already satisfied: sentry-sdk>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.20.0)
+Requirement already satisfied: setproctitle in /usr/local/lib/python3.10/dist-packages (from wandb) (1.3.4)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from wandb) (69.5.1)
+Requirement already satisfied: typing-extensions<5,>=4.4 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.12.2)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (0.7.0)
+Requirement already satisfied: pydantic-core==2.23.4 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (2.23.4)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.7)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2.0.7)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2024.8.30)
+Collecting selfies>=2.0.0 (from exmol)
+  Downloading selfies-2.2.0-py3-none-any.whl.metadata (14 kB)
+Collecting ratelimit (from exmol)
+  Downloading ratelimit-2.2.1.tar.gz (5.3 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.10/dist-packages (from exmol) (1.5.2)
+Collecting skunk>=0.4.0 (from exmol)
+  Downloading skunk-1.3.0-py3-none-any.whl.metadata (4.3 kB)
+Collecting importlib-resources (from exmol)
+  Downloading importlib_resources-6.5.2-py3-none-any.whl.metadata (3.9 kB)
+Collecting synspace (from exmol)
+  Downloading synspace-1.0.0-py3-none-any.whl.metadata (2.7 kB)
+Requirement already satisfied: openai in /usr/local/lib/python3.10/dist-packages (from exmol) (1.61.1)
+Requirement already satisfied: six>=1.4.0 in /usr/local/lib/python3.10/dist-packages (from docker-pycreds>=0.4.0->wandb) (1.16.0)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.10/dist-packages (from gitpython!=3.1.29,>=1.0.0->wandb) (4.0.12)
+Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.10/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.29,>=1.0.0->wandb) (5.0.2)
+Requirement already satisfied: matplotlib in /usr/local/lib/python3.10/dist-packages (from skunk>=0.4.0->exmol) (3.9.2)
+Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.10/dist-packages (from beautifulsoup4->gdown) (2.6)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.3.0)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (4.54.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.4.7)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (23.2)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (3.1.4)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (2.9.0.post0)
+Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (4.6.0)
+Requirement already satisfied: distro<2,>=1.7.0 in /usr/lib/python3/dist-packages (from openai->exmol) (1.7.0)
+Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.27.2)
+Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.8.2)
+Requirement already satisfied: sniffio in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (1.3.1)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.5.0->openai->exmol) (1.2.2)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->openai->exmol) (1.0.6)
+Requirement already satisfied: h11<0.15,>=0.13 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai->exmol) (0.14.0)
+Requirement already satisfied: PySocks!=1.5.7,>=1.5.6 in /users/nnguyenx/.local/lib/python3.10/site-packages (from requests[socks]->gdown) (1.7.1)
+Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.14.0)
+Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.4.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (3.5.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from synspace->exmol) (2.2.2)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2023.4)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2024.1)
+Downloading exmol-3.3.0-py3-none-any.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 97.2 MB/s eta 0:00:00
+Downloading selfies-2.2.0-py3-none-any.whl (36 kB)
+Downloading skunk-1.3.0-py3-none-any.whl (6.5 kB)
+Downloading importlib_resources-6.5.2-py3-none-any.whl (37 kB)
+Downloading synspace-1.0.0-py3-none-any.whl (2.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.7/2.7 MB 104.4 MB/s eta 0:00:00
+Building wheels for collected packages: ratelimit
+  Building wheel for ratelimit (setup.py): started
+  Building wheel for ratelimit (setup.py): finished with status 'done'
+  Created wheel for ratelimit: filename=ratelimit-2.2.1-py3-none-any.whl size=5895 sha256=3f7e81d87798efbfdab854d15a66f466ebf983ab97720af54363c8dbb8ecfea0
+  Stored in directory: /tmp/pip-ephem-wheel-cache-zxhm5cee/wheels/27/5f/ba/e972a56dcbf5de9f2b7d2b2a710113970bd173c4dcd3d2c902
+Successfully built ratelimit
+Installing collected packages: ratelimit, selfies, importlib-resources, skunk, synspace, exmol
+
+Successfully installed exmol-3.3.0 importlib-resources-6.5.2 ratelimit-2.2.1 selfies-2.2.0 skunk-1.3.0 synspace-1.0.0
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Obtaining file:///Documents/sink
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Installing collected packages: open-r1
+  Running setup.py develop for open-r1
+Successfully installed open-r1
+Found existing installation: vllm 0.7.1+cu126
+Uninstalling vllm-0.7.1+cu126:
+  Successfully uninstalled vllm-0.7.1+cu126
+Found existing installation: torch 2.5.0a0+e000cf0ad9.nv24.10
+Uninstalling torch-2.5.0a0+e000cf0ad9.nv24.10:
+  Successfully uninstalled torch-2.5.0a0+e000cf0ad9.nv24.10
+Found existing installation: torchvision 0.20.0a0
+Uninstalling torchvision-0.20.0a0:
+  Successfully uninstalled torchvision-0.20.0a0
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Collecting vllm==0.8.2
+  Downloading vllm-0.8.2.tar.gz (6.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.5/6.5 MB 110.8 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: cachetools in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (5.5.0)
+Requirement already satisfied: psutil in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (6.0.0)
+Requirement already satisfied: sentencepiece in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.2.0)
+Requirement already satisfied: numpy<2.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.26.4)
+Requirement already satisfied: requests>=2.26.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (2.32.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (4.66.5)
+Requirement already satisfied: blake3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.0.4)
+Requirement already satisfied: py-cpuinfo in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (9.0.0)
+Requirement already satisfied: transformers>=4.48.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (4.48.2)
+Requirement already satisfied: tokenizers>=0.19.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.21.0)
+Requirement already satisfied: protobuf in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (4.24.4)
+Requirement already satisfied: fastapi>=0.115.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]>=0.115.0->vllm==0.8.2) (0.115.8)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (3.10.5)
+Requirement already satisfied: openai>=1.52.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.61.1)
+Requirement already satisfied: pydantic>=2.9 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (2.9.2)
+Requirement already satisfied: prometheus_client>=0.18.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.21.0)
+Requirement already satisfied: pillow in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (10.4.0)
+Requirement already satisfied: prometheus-fastapi-instrumentator>=7.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (7.0.2)
+Requirement already satisfied: tiktoken>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.7.0)
+Collecting lm-format-enforcer<0.11,>=0.10.11 (from vllm==0.8.2)
+  Downloading lm_format_enforcer-0.10.11-py3-none-any.whl.metadata (17 kB)
+Collecting llguidance<0.8.0,>=0.7.9 (from vllm==0.8.2)
+  Downloading llguidance-0.7.19-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (9.6 kB)
+Requirement already satisfied: outlines==0.1.11 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.1.11)
+Requirement already satisfied: lark==1.2.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.2.2)
+Collecting xgrammar==0.1.16 (from vllm==0.8.2)
+  Downloading xgrammar-0.1.16-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (3.3 kB)
+Requirement already satisfied: typing_extensions>=4.10 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (4.12.2)
+Requirement already satisfied: filelock>=3.16.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (3.16.1)
+Requirement already satisfied: partial-json-parser in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.2.1.1.post5)
+Requirement already satisfied: pyzmq in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (26.2.0)
+Requirement already satisfied: msgspec in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.19.0)
+Requirement already satisfied: gguf==0.10.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.10.0)
+Requirement already satisfied: importlib_metadata in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (7.2.1)
+Collecting mistral_common>=1.5.4 (from mistral_common[opencv]>=1.5.4->vllm==0.8.2)
+  Downloading mistral_common-1.5.4-py3-none-any.whl.metadata (4.5 kB)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (6.0.2)
+Requirement already satisfied: einops in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.8.0)
+Collecting compressed-tensors==0.9.2 (from vllm==0.8.2)
+  Downloading compressed_tensors-0.9.2-py3-none-any.whl.metadata (7.0 kB)
+Requirement already satisfied: depyf==0.18.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (0.18.0)
+Requirement already satisfied: cloudpickle in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (3.0.0)
+Requirement already satisfied: watchfiles in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.0.4)
+Requirement already satisfied: python-json-logger in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (2.0.7)
+Requirement already satisfied: scipy in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.14.0)
+Requirement already satisfied: ninja in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (1.11.1.1)
+Collecting torch==2.5.1 (from vllm==0.8.2)
+  Downloading torch-2.5.1-cp310-cp310-manylinux2014_aarch64.whl.metadata (28 kB)
+Collecting torchaudio (from vllm==0.8.2)
+  Downloading torchaudio-2.7.0-cp310-cp310-manylinux_2_28_aarch64.whl.metadata (6.6 kB)
+Collecting torchvision (from vllm==0.8.2)
+  Downloading torchvision-0.22.0-cp310-cp310-manylinux_2_28_aarch64.whl.metadata (6.1 kB)
+Requirement already satisfied: datasets in /usr/local/lib/python3.10/dist-packages (from vllm==0.8.2) (3.2.0)
+Requirement already satisfied: astor in /usr/local/lib/python3.10/dist-packages (from depyf==0.18.0->vllm==0.8.2) (0.8.1)
+Requirement already satisfied: dill in /usr/local/lib/python3.10/dist-packages (from depyf==0.18.0->vllm==0.8.2) (0.3.8)
+Requirement already satisfied: interegular in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (0.3.3)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (3.1.4)
+Requirement already satisfied: nest_asyncio in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (1.6.0)
+Requirement already satisfied: diskcache in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (5.6.3)
+Requirement already satisfied: referencing in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (0.35.1)
+Requirement already satisfied: jsonschema in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (4.23.0)
+Requirement already satisfied: pycountry in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (24.6.1)
+Requirement already satisfied: airportsdata in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (20241001)
+Requirement already satisfied: outlines_core==0.1.26 in /usr/local/lib/python3.10/dist-packages (from outlines==0.1.11->vllm==0.8.2) (0.1.26)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch==2.5.1->vllm==0.8.2) (3.3)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torch==2.5.1->vllm==0.8.2) (2024.6.1)
+Requirement already satisfied: sympy==1.13.1 in /usr/local/lib/python3.10/dist-packages (from torch==2.5.1->vllm==0.8.2) (1.13.1)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy==1.13.1->torch==2.5.1->vllm==0.8.2) (1.3.0)
+Requirement already satisfied: packaging in /usr/local/lib/python3.10/dist-packages (from lm-format-enforcer<0.11,>=0.10.11->vllm==0.8.2) (23.2)
+Requirement already satisfied: starlette<0.46.0,>=0.40.0 in /usr/local/lib/python3.10/dist-packages (from fastapi>=0.115.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.45.3)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.9->vllm==0.8.2) (0.7.0)
+Requirement already satisfied: pydantic-core==2.23.4 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.9->vllm==0.8.2) (2.23.4)
+Requirement already satisfied: anyio<5,>=3.6.2 in /usr/local/lib/python3.10/dist-packages (from starlette<0.46.0,>=0.40.0->fastapi>=0.115.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (4.6.0)
+Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.6.2->starlette<0.46.0,>=0.40.0->fastapi>=0.115.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (3.7)
+Requirement already satisfied: sniffio>=1.1 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.6.2->starlette<0.46.0,>=0.40.0->fastapi>=0.115.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (1.3.1)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.6.2->starlette<0.46.0,>=0.40.0->fastapi>=0.115.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (1.2.2)
+Collecting fastapi-cli>=0.0.5 (from fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2)
+  Downloading fastapi_cli-0.0.7-py3-none-any.whl.metadata (6.2 kB)
+Requirement already satisfied: httpx>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]>=0.115.0->vllm==0.8.2) (0.27.2)
+Collecting jinja2 (from outlines==0.1.11->vllm==0.8.2)
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting python-multipart>=0.0.18 (from fastapi[standard]>=0.115.0->vllm==0.8.2)
+  Downloading python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+Collecting email-validator>=2.0.0 (from fastapi[standard]>=0.115.0->vllm==0.8.2)
+  Downloading email_validator-2.2.0-py3-none-any.whl.metadata (25 kB)
+Requirement already satisfied: uvicorn>=0.12.0 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.34.0)
+Collecting dnspython>=2.0.0 (from email-validator>=2.0.0->fastapi[standard]>=0.115.0->vllm==0.8.2)
+  Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: typer>=0.12.3 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.12.5)
+Collecting rich-toolkit>=0.11.1 (from fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2)
+  Downloading rich_toolkit-0.14.6-py3-none-any.whl.metadata (999 bytes)
+Requirement already satisfied: certifi in /usr/local/lib/python3.10/dist-packages (from httpx>=0.23.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (2024.8.30)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx>=0.23.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (1.0.6)
+Requirement already satisfied: h11<0.15,>=0.13 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx>=0.23.0->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.14.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->outlines==0.1.11->vllm==0.8.2) (2.1.5)
+Requirement already satisfied: attrs>=22.2.0 in /usr/local/lib/python3.10/dist-packages (from jsonschema->outlines==0.1.11->vllm==0.8.2) (24.2.0)
+Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.10/dist-packages (from jsonschema->outlines==0.1.11->vllm==0.8.2) (2023.12.1)
+Requirement already satisfied: rpds-py>=0.7.1 in /usr/local/lib/python3.10/dist-packages (from jsonschema->outlines==0.1.11->vllm==0.8.2) (0.20.0)
+Requirement already satisfied: opencv-python-headless>=4.0.0 in /usr/local/lib/python3.10/dist-packages (from mistral_common[opencv]>=1.5.4->vllm==0.8.2) (4.11.0.86)
+Requirement already satisfied: distro<2,>=1.7.0 in /usr/lib/python3/dist-packages (from openai>=1.52.0->vllm==0.8.2) (1.7.0)
+Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from openai>=1.52.0->vllm==0.8.2) (0.8.2)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests>=2.26.0->vllm==0.8.2) (3.3.2)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests>=2.26.0->vllm==0.8.2) (2.0.7)
+Requirement already satisfied: click>=8.1.7 in /usr/local/lib/python3.10/dist-packages (from rich-toolkit>=0.11.1->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (8.1.7)
+Requirement already satisfied: rich>=13.7.1 in /usr/local/lib/python3.10/dist-packages (from rich-toolkit>=0.11.1->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (13.7.1)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.7.1->rich-toolkit>=0.11.1->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (3.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.7.1->rich-toolkit>=0.11.1->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (2.18.0)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich>=13.7.1->rich-toolkit>=0.11.1->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.1.2)
+Requirement already satisfied: regex>=2022.1.18 in /usr/local/lib/python3.10/dist-packages (from tiktoken>=0.6.0->vllm==0.8.2) (2024.9.11)
+Requirement already satisfied: huggingface-hub<1.0,>=0.16.4 in /usr/local/lib/python3.10/dist-packages (from tokenizers>=0.19.1->vllm==0.8.2) (0.28.1)
+Requirement already satisfied: safetensors>=0.4.1 in /usr/local/lib/python3.10/dist-packages (from transformers>=4.48.2->vllm==0.8.2) (0.4.5)
+Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from typer>=0.12.3->fastapi-cli>=0.0.5->fastapi-cli[standard]>=0.0.5; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (1.5.4)
+Requirement already satisfied: httptools>=0.6.3 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.6.4)
+Requirement already satisfied: python-dotenv>=0.13 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (1.0.1)
+Requirement already satisfied: uvloop!=0.15.0,!=0.15.1,>=0.14.0 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (0.21.0)
+Requirement already satisfied: websockets>=10.4 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]>=0.115.0->vllm==0.8.2) (14.2)
+Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (2.4.0)
+Requirement already satisfied: aiosignal>=1.1.2 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (1.3.1)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (1.4.1)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (6.0.5)
+Requirement already satisfied: yarl<2.0,>=1.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (1.9.4)
+Requirement already satisfied: async-timeout<5.0,>=4.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp->vllm==0.8.2) (4.0.3)
+Requirement already satisfied: pyarrow>=15.0.0 in /usr/local/lib/python3.10/dist-packages (from datasets->vllm==0.8.2) (16.1.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from datasets->vllm==0.8.2) (2.2.2)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.10/dist-packages (from datasets->vllm==0.8.2) (3.5.0)
+Requirement already satisfied: multiprocess<0.70.17 in /usr/local/lib/python3.10/dist-packages (from datasets->vllm==0.8.2) (0.70.16)
+Requirement already satisfied: zipp>=0.5 in /usr/local/lib/python3.10/dist-packages (from importlib_metadata->vllm==0.8.2) (3.20.0)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.10/dist-packages (from pandas->datasets->vllm==0.8.2) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas->datasets->vllm==0.8.2) (2023.4)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas->datasets->vllm==0.8.2) (2024.1)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.8.2->pandas->datasets->vllm==0.8.2) (1.16.0)
+INFO: pip is looking at multiple versions of torchaudio to determine which version is compatible with other requirements. This could take a while.
+Collecting torchaudio (from vllm==0.8.2)
+  Downloading torchaudio-2.6.0-cp310-cp310-manylinux_2_28_aarch64.whl.metadata (6.6 kB)
+  Downloading torchaudio-2.5.1-cp310-cp310-manylinux2014_aarch64.whl.metadata (6.4 kB)
+INFO: pip is looking at multiple versions of torchvision to determine which version is compatible with other requirements. This could take a while.
+Collecting torchvision (from vllm==0.8.2)
+  Downloading torchvision-0.21.0-1-cp310-cp310-manylinux_2_28_aarch64.whl.metadata (6.1 kB)
+  Downloading torchvision-0.20.1-cp310-cp310-manylinux2014_aarch64.whl.metadata (6.1 kB)
+Downloading compressed_tensors-0.9.2-py3-none-any.whl (97 kB)
+Downloading torch-2.5.1-cp310-cp310-manylinux2014_aarch64.whl (91.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 91.9/91.9 MB 138.9 MB/s eta 0:00:00
+Downloading xgrammar-0.1.16-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 162.5 MB/s eta 0:00:00
+Downloading llguidance-0.7.19-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (13.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.9/13.9 MB 128.1 MB/s eta 0:00:00
+Downloading lm_format_enforcer-0.10.11-py3-none-any.whl (44 kB)
+Downloading email_validator-2.2.0-py3-none-any.whl (33 kB)
+Downloading dnspython-2.7.0-py3-none-any.whl (313 kB)
+Downloading fastapi_cli-0.0.7-py3-none-any.whl (10 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading mistral_common-1.5.4-py3-none-any.whl (6.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.5/6.5 MB 147.4 MB/s eta 0:00:00
+Downloading python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Downloading rich_toolkit-0.14.6-py3-none-any.whl (24 kB)
+Downloading torchaudio-2.5.1-cp310-cp310-manylinux2014_aarch64.whl (1.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 163.8 MB/s eta 0:00:00
+Downloading torchvision-0.20.1-cp310-cp310-manylinux2014_aarch64.whl (14.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.3/14.3 MB 148.9 MB/s eta 0:00:00
+Building wheels for collected packages: vllm
+  Building wheel for vllm (pyproject.toml): started
+  Building wheel for vllm (pyproject.toml): finished with status 'done'
+  Created wheel for vllm: filename=vllm-0.8.2-cp310-cp310-linux_aarch64.whl size=8780731 sha256=ed3ede5bababc9c70ae9d6b4caeb97f44dfd04c0f35014736f1c813ac8bd68f7
+  Stored in directory: /tmp/pip-ephem-wheel-cache-mefqal0t/wheels/17/4b/17/01a7e598cf03557fa38b8d8a109f9e6fe704c4321b8f87893e
+Successfully built vllm
+Installing collected packages: python-multipart, llguidance, jinja2, dnspython, torch, email-validator, torchvision, torchaudio, rich-toolkit, lm-format-enforcer, mistral_common, fastapi-cli, xgrammar, compressed-tensors, vllm
+  Attempting uninstall: jinja2
+    Found existing installation: Jinja2 3.1.4
+    Uninstalling Jinja2-3.1.4:
+      Successfully uninstalled Jinja2-3.1.4
+  Attempting uninstall: lm-format-enforcer
+    Found existing installation: lm-format-enforcer 0.10.9
+    Uninstalling lm-format-enforcer-0.10.9:
+      Successfully uninstalled lm-format-enforcer-0.10.9
+  Attempting uninstall: mistral_common
+    Found existing installation: mistral_common 1.5.2
+    Uninstalling mistral_common-1.5.2:
+      Successfully uninstalled mistral_common-1.5.2
+  Attempting uninstall: compressed-tensors
+    Found existing installation: compressed-tensors 0.8.1
+    Uninstalling compressed-tensors-0.8.1:
+      Successfully uninstalled compressed-tensors-0.8.1
+
+Successfully installed compressed-tensors-0.9.2 dnspython-2.7.0 email-validator-2.2.0 fastapi-cli-0.0.7 jinja2-3.1.6 llguidance-0.7.19 lm-format-enforcer-0.10.11 mistral_common-1.5.4 python-multipart-0.0.20 rich-toolkit-0.14.6 torch-2.5.1 torchaudio-2.5.1 torchvision-0.20.1 vllm-0.8.2 xgrammar-0.1.16
+Name: torch
+Version: 2.5.1
+Summary: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+Home-page: https://pytorch.org/
+Author: PyTorch Team
+Author-email: packages@pytorch.org
+License: BSD-3-Clause
+Location: /usr/local/lib/python3.10/dist-packages
+Requires: filelock, fsspec, jinja2, networkx, sympy, typing-extensions
+Required-by: accelerate, bitsandbytes, compressed-tensors, deepspeed, flash_attn, lightning-thunder, outlines, torch_tensorrt, torchaudio, torchprofile, torchvision, transformer_engine, vllm, xformers, xgrammar
+---
+Name: vllm
+Version: 0.8.2
+Summary: A high-throughput and memory-efficient inference and serving engine for LLMs
+Home-page: https://github.com/vllm-project/vllm
+Author: vLLM Team
+Author-email: 
+License: Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for reasonable and customary use in describing the
+              origin of the Work and reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may choose to offer,
+              and charge a fee for, acceptance of support, warranty, indemnity,
+              or other liability obligations and/or rights consistent with this
+              License. However, in accepting such obligations, You may act only
+              on Your own behalf and on Your sole responsibility, not on behalf
+              of any other Contributor, and only if You agree to indemnify,
+              defend, and hold each Contributor harmless for any liability
+              incurred by, or claims asserted against, such Contributor by reason
+              of your accepting any such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "[]"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright [yyyy] [name of copyright owner]
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Location: /usr/local/lib/python3.10/dist-packages
+Requires: aiohttp, blake3, cachetools, cloudpickle, compressed-tensors, datasets, depyf, einops, fastapi, filelock, gguf, importlib_metadata, lark, llguidance, lm-format-enforcer, mistral_common, msgspec, ninja, numpy, openai, outlines, partial-json-parser, pillow, prometheus-fastapi-instrumentator, prometheus_client, protobuf, psutil, py-cpuinfo, pydantic, python-json-logger, pyyaml, pyzmq, requests, scipy, sentencepiece, tiktoken, tokenizers, torch, torchaudio, torchvision, tqdm, transformers, typing_extensions, watchfiles, xgrammar
+Required-by: 
+INFO 05-13 22:04:23 [__init__.py:239] Automatically detected platform cuda.

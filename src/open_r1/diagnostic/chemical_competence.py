@@ -15,6 +15,7 @@ def load_llm(model):
         max_num_seqs=1,
         max_model_len=1024,
         tensor_parallel_size=2,
+	gpu_memory_utilization=0.7
     )
     params = SamplingParams(
         temperature=0.0,
