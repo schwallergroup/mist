@@ -189,5 +189,7 @@ kuma.env
 completion_samples/
 misc/
 output/
+diagnostic_logs/
+diagnostic_results/
 core*
 *.ipynb
