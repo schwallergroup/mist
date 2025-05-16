@@ -192,6 +192,8 @@ cluster/*.local.env.sh
 completion_samples/
 misc/
 output/
+diagnostic_logs/
+diagnostic_results/
 core*
 *.ipynb
 slurm_logs/*.out
