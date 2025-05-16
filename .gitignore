@@ -176,6 +176,7 @@ data/
 wandb/
 logs/
 docs/build/
+eval_results*/
 
 # Others
 .idea
