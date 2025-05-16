@@ -1,0 +1,131 @@
+START TIME: Mon May 12 15:00:31 CEST 2025
+conda deactivate; nvcc --version; cd /Documents/sink; pip install hf_transfer gdown levenshtein rdkit wandb exmol; pip install -e . --no-deps; pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0 torch==2.6.0 torchvision torchaudio git+https://github.com/XuanVuNguyen/lighteval lighteval[math] --index-url https://download.pytorch.org/whl/cu126; lighteval vllm "model_name=/cache/checkpoints/Qwen2.5-3B_pretrained-v6-1/0,dtype=bfloat16,max_model_length=4096,gpu_memory_utilization=0.8,data_parallel_size=1,generation_parameters={max_new_tokens:4096,temperature:0.6,top_p:0.95}" "custom|iupacsm|0|0" --custom-tasks src/open_r1/chem_evaluate/iupacsm.py --output-dir evals/_0
+evals/_0
+[H[2J[3Jslurmstepd: error: couldn't chdir to `/Documents/sink': No such file or directory: going to /tmp instead
+slurmstepd: error: couldn't chdir to `/Documents/sink': No such file or directory: going to /tmp instead
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2024 NVIDIA Corporation
+Built on Thu_Sep_12_02:27:38_PDT_2024
+Cuda compilation tools, release 12.6, V12.6.77
+Build cuda_12.6.r12.6/compiler.34841621_0
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Requirement already satisfied: hf_transfer in /users/nnguyenx/.local/lib/python3.10/site-packages (0.1.9)
+Requirement already satisfied: gdown in /users/nnguyenx/.local/lib/python3.10/site-packages (5.2.0)
+Requirement already satisfied: levenshtein in /users/nnguyenx/.local/lib/python3.10/site-packages (0.26.1)
+Requirement already satisfied: rdkit in /usr/local/lib/python3.10/dist-packages (2024.9.5)
+Requirement already satisfied: wandb in /usr/local/lib/python3.10/dist-packages (0.19.6)
+Collecting exmol
+  Downloading exmol-3.3.0-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.10/dist-packages (from gdown) (4.12.3)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from gdown) (3.16.1)
+Requirement already satisfied: requests[socks] in /usr/local/lib/python3.10/dist-packages (from gdown) (2.32.3)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from gdown) (4.66.5)
+Requirement already satisfied: rapidfuzz<4.0.0,>=3.9.0 in /users/nnguyenx/.local/lib/python3.10/site-packages (from levenshtein) (3.12.1)
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from rdkit) (1.26.4)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.10/dist-packages (from rdkit) (10.4.0)
+Requirement already satisfied: click!=8.0.0,>=7.1 in /usr/local/lib/python3.10/dist-packages (from wandb) (8.1.7)
+Requirement already satisfied: docker-pycreds>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (0.4.0)
+Requirement already satisfied: gitpython!=3.1.29,>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (3.1.44)
+Requirement already satisfied: platformdirs in /usr/local/lib/python3.10/dist-packages (from wandb) (4.3.6)
+Requirement already satisfied: protobuf!=4.21.0,!=5.28.0,<6,>=3.19.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.24.4)
+Requirement already satisfied: psutil>=5.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.0)
+Requirement already satisfied: pydantic<3,>=2.6 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.9.2)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from wandb) (6.0.2)
+Requirement already satisfied: sentry-sdk>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from wandb) (2.20.0)
+Requirement already satisfied: setproctitle in /usr/local/lib/python3.10/dist-packages (from wandb) (1.3.4)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from wandb) (69.5.1)
+Requirement already satisfied: typing-extensions<5,>=4.4 in /usr/local/lib/python3.10/dist-packages (from wandb) (4.12.2)
+Collecting selfies>=2.0.0 (from exmol)
+  Downloading selfies-2.2.0-py3-none-any.whl.metadata (14 kB)
+Collecting ratelimit (from exmol)
+  Downloading ratelimit-2.2.1.tar.gz (5.3 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.10/dist-packages (from exmol) (1.5.2)
+Collecting skunk>=0.4.0 (from exmol)
+  Downloading skunk-1.3.0-py3-none-any.whl.metadata (4.3 kB)
+Collecting importlib-resources (from exmol)
+  Downloading importlib_resources-6.5.2-py3-none-any.whl.metadata (3.9 kB)
+Collecting synspace (from exmol)
+  Downloading synspace-1.0.0-py3-none-any.whl.metadata (2.7 kB)
+Requirement already satisfied: openai in /usr/local/lib/python3.10/dist-packages (from exmol) (1.61.1)
+Requirement already satisfied: six>=1.4.0 in /usr/local/lib/python3.10/dist-packages (from docker-pycreds>=0.4.0->wandb) (1.16.0)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.10/dist-packages (from gitpython!=3.1.29,>=1.0.0->wandb) (4.0.12)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (0.7.0)
+Requirement already satisfied: pydantic-core==2.23.4 in /usr/local/lib/python3.10/dist-packages (from pydantic<3,>=2.6->wandb) (2.23.4)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (3.7)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2.0.7)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests[socks]->gdown) (2024.8.30)
+Requirement already satisfied: matplotlib in /usr/local/lib/python3.10/dist-packages (from skunk>=0.4.0->exmol) (3.9.2)
+Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.10/dist-packages (from beautifulsoup4->gdown) (2.6)
+Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (4.6.0)
+Requirement already satisfied: distro<2,>=1.7.0 in /usr/lib/python3/dist-packages (from openai->exmol) (1.7.0)
+Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.27.2)
+Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (0.8.2)
+Requirement already satisfied: sniffio in /usr/local/lib/python3.10/dist-packages (from openai->exmol) (1.3.1)
+Requirement already satisfied: PySocks!=1.5.7,>=1.5.6 in /users/nnguyenx/.local/lib/python3.10/site-packages (from requests[socks]->gdown) (1.7.1)
+Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.14.0)
+Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (1.4.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->exmol) (3.5.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from synspace->exmol) (2.2.2)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.5.0->openai->exmol) (1.2.2)
+Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.10/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.29,>=1.0.0->wandb) (5.0.2)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->openai->exmol) (1.0.6)
+Requirement already satisfied: h11<0.15,>=0.13 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai->exmol) (0.14.0)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.3.0)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (4.54.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (1.4.7)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (23.2)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (3.1.4)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.10/dist-packages (from matplotlib->skunk>=0.4.0->exmol) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2023.4)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas->synspace->exmol) (2024.1)
+Downloading exmol-3.3.0-py3-none-any.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 96.6 MB/s eta 0:00:00
+Downloading selfies-2.2.0-py3-none-any.whl (36 kB)
+Downloading skunk-1.3.0-py3-none-any.whl (6.5 kB)
+Downloading importlib_resources-6.5.2-py3-none-any.whl (37 kB)
+Downloading synspace-1.0.0-py3-none-any.whl (2.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.7/2.7 MB 161.8 MB/s eta 0:00:00
+Building wheels for collected packages: ratelimit
+  Building wheel for ratelimit (setup.py): started
+  Building wheel for ratelimit (setup.py): finished with status 'done'
+  Created wheel for ratelimit: filename=ratelimit-2.2.1-py3-none-any.whl size=5895 sha256=c014b4104af0b3979ba08401c80073dc41343bb30917f045c3119dff712afd78
+  Stored in directory: /tmp/pip-ephem-wheel-cache-7cc2hq0a/wheels/27/5f/ba/e972a56dcbf5de9f2b7d2b2a710113970bd173c4dcd3d2c902
+Successfully built ratelimit
+Installing collected packages: ratelimit, selfies, importlib-resources, skunk, synspace, exmol
+Successfully installed exmol-3.3.0 importlib-resources-6.5.2 ratelimit-2.2.1 selfies-2.2.0 skunk-1.3.0 synspace-1.0.0
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Obtaining file:///Documents/sink
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Installing collected packages: open-r1
+  DEPRECATION: Legacy editable install of open-r1==0.1.0.dev0 from file:///Documents/sink (setup.py develop) is deprecated. pip 25.1 will enforce this behaviour change. A possible replacement is to add a pyproject.toml or enable --use-pep517, and use setuptools >= 64. If the resulting installation is not behaving as expected, try using --config-settings editable_mode=compat. Please consult the setuptools documentation for more information. Discussion can be found at https://github.com/pypa/pip/issues/11457
+  Running setup.py develop for open-r1
+Successfully installed open-r1
+
+[notice] A new release of pip is available: 25.0 -> 25.1.1
+[notice] To update, run: python -m pip install --upgrade pip
+Looking in indexes: https://download.pytorch.org/whl/cu126, https://pypi.ngc.nvidia.com
+Collecting git+https://github.com/XuanVuNguyen/lighteval
+  Cloning https://github.com/XuanVuNguyen/lighteval to /tmp/pip-req-build-z03t4ru9
+  Running command git clone --filter=blob:none --quiet https://github.com/XuanVuNguyen/lighteval /tmp/pip-req-build-z03t4ru9
+  Resolved https://github.com/XuanVuNguyen/lighteval to commit a49041a3b86df8505bdc98b266b91344dc22df2b
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: trl==0.14.0 in /usr/local/lib/python3.10/dist-packages (0.14.0)
+Requirement already satisfied: transformers==4.48.2 in /usr/local/lib/python3.10/dist-packages (4.48.2)
+ERROR: Could not find a version that satisfies the requirement pandas==2.0.0 (from versions: none)
+ERROR: No matching distribution found for pandas==2.0.0
+/usr/bin/bash: line 7: lighteval: command not found
+srun: error: nid006902: task 0: Exited with exit code 127
+srun: Terminating StepId=434166.0
