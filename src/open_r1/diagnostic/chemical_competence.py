@@ -54,7 +54,7 @@ def run_column(col, llm, params, data):
                 prompt=prompt
             ).__dict__
         except:
-            print(out)
+            # print(out)
             return LogprobStat(
                 mean_logprob=0,
                 mean_rank=0,
@@ -116,8 +116,8 @@ def main():
         f.write(f"Means:\n")
         f.write(f"ORIGIN {out_origin[['mean_logprob','mean_rank']].mean()}\n")
         f.write(f"CORRUPT {out_corrupt[['mean_logprob','mean_rank']].mean()}\n\n")
-        f.write(f"SCC logprobs {lp_sc}\n")
-        f.write(f"SCC rank {rk_sc}\n")
+        f.write(f"SCC logprobs: {lp_sc}\n")
+        f.write(f"SCC rank: {rk_sc}\n")
 
 if __name__=="__main__":
     main()
