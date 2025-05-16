@@ -180,7 +180,7 @@ docs/build/
 eval_results*/
 diagnostic_results*/
 diagnostic_logs/
-
+eval_logs/
 # Others
 .idea
 
