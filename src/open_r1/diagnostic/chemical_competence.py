@@ -7,7 +7,21 @@ import pandas as pd
 from vllm import LLM, SamplingParams
 import numpy as np
 
-from open_r1.diagnostic.utils import load_llm, cohen_d
+from open_r1.diagnostic.utils import cohen_d
+
+def load_llm(model):
+    llm = LLM(
+        model=model,
+        max_num_seqs=1,
+        max_model_len=1024,
+        tensor_parallel_size=4,
+    )
+    params = SamplingParams(
+        temperature=0.0,
+        prompt_logprobs=1,
+        max_tokens=1,
+    )
+    return llm, params
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Chemical competence evaluation")
