@@ -177,6 +177,8 @@ wandb/
 logs/
 docs/build/
 eval_results*/
+diagnostic_results*/
+diagnostic_logs/
 
 # Others
 .idea
