@@ -14,7 +14,7 @@ def load_llm(model):
         model=model,
         max_num_seqs=1,
         max_model_len=1024,
-        tensor_parallel_size=4,
+        tensor_parallel_size=2,
     )
     params = SamplingParams(
         temperature=0.0,
