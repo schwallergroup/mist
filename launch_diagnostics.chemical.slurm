@@ -25,6 +25,10 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE))
 
 export CMD="conda deactivate;
 cd /Documents/sink;
+pip install -U pip;
+pip install hf_transfer gdown levenshtein rdkit wandb exmol;
+pip install -e . --no-deps;
+pip show torch vllm;
 python src/open_r1/diagnostic/chemical_competence.py \
     --model $MODEL_PATH \
     --data_path $DATA_PATH \
