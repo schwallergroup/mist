@@ -37,21 +37,30 @@ class LogprobStat(BaseModel):
 
 def run_column(col, llm, params, data):
     def process_out(out):
-        token_ids = out.prompt_token_ids[1:]
-        lps = out.prompt_logprobs[1:]
+        try:
+            token_ids = out.prompt_token_ids[1:]
+            lps = out.prompt_logprobs[1:]
 
-        # vllm gives you logprobs for your token, and for rank1 token
-        token_lps = [v[x].logprob for v,x in zip(lps, token_ids)]
-        token_rank = [v[x].rank for v,x in zip(lps, token_ids)]
+            # vllm gives you logprobs for your token, and for rank1 token
+            token_lps = [v[x].logprob for v,x in zip(lps, token_ids)]
+            token_rank = [v[x].rank for v,x in zip(lps, token_ids)]
 
-        prompt = "".join([v[x].decoded_token for v,x in zip(lps, token_ids)])
+            prompt = "".join([v[x].decoded_token for v,x in zip(lps, token_ids)])
 
-        return LogprobStat(
-            mean_logprob=np.mean(token_lps),
-            mean_rank=np.mean(token_rank),
-            n_tokens=len(token_ids),
-            prompt=prompt
-        ).__dict__
+            return LogprobStat(
+                mean_logprob=np.mean(token_lps),
+                mean_rank=np.mean(token_rank),
+                n_tokens=len(token_ids),
+                prompt=prompt
+            ).__dict__
+        except:
+            print(out)
+            return LogprobStat(
+                mean_logprob=0,
+                mean_rank=0,
+                n_tokens=1000,
+                prompt=""
+            ).__dict__
 
     out = llm.generate(data[col], params)
     lps = [process_out(o) for o in out]
