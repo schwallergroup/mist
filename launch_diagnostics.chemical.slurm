@@ -22,6 +22,22 @@ GPUS_PER_NODE=4
 WORLD_SIZE=$(($NUM_NODES*$GPUS_PER_NODE))
 NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE))
 
+export HF_HOME=/cache/huggingface
+export WANDB_PROJECT="r1-${TASK%%.*}"
+export WANDB_API_KEY=$(cat wandb_api_key.txt)
+
+export NCCL_TIMEOUT=3600
+export TORCH_DISTRIBUTED_TIMEOUT=3600
+export TORCHELASTIC_ERROR_FILE="/tmp/torch_elastic_error.json"
+export NCCL_P2P_DISABLE=1  # Try this if you're having network issues
+export NCCL_ASYNC_ERROR_HANDLING=1
+# export NCCL_DEBUG=INFO
+export NCCL_IB_TIMEOUT=23
+export NCCL_SOCKET_TIMEOUT=23
+#export NCCL_DEBUG_SUBSYS=ALL
+export NCCL_TREE_THRESHOLD=0
+export CUDA_LAUNCH_BLOCKING=1
+
 
 export CMD="conda deactivate;
 cd /Documents/sink;
