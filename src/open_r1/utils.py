@@ -130,6 +130,15 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             self.sampling_params = SamplingParams(**sampling_params_dict)
         print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
 
+        self.global_time_start = time.time()
+        self.logging_time_infos = {
+            'global_time_start': time.time(),
+            'n_compute_loss': 0,
+            'total_time_generation': 0,
+            'total_time_compute_loss': 0,
+            'total_time_compute_loss_minus_generation': 0,
+        }
+
     def add_custom_metrics(self):
         # Additional logging
         mode = "eval" if self.control.should_evaluate else "train"
@@ -278,6 +287,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         Modify the initial compute_loss method (TRL package version 0.14.0)
         This version is a mix between TRL 0.14.0 & TRL 0.17.0 and additional modifications
         """
+        time_start_compute_loss = time.time()
         # Check TRL version
         if version("trl") != "0.14.0":
             raise Exception(f"[ExtendedGRPOTrainer._compute_loss_modified] TRL version should be 0.14.0 (found {version('trl')})")
@@ -299,6 +309,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             prompt_inputs["attention_mask"] = prompt_inputs["attention_mask"][:, -self.max_prompt_length:]
 
         # Generate completions using either vLLM or regular generation
+        time_start_generate = time.time()
         logging_completions_infos_local = dict()
         if self.args.use_vllm:
             # First, have main process load weights if needed
@@ -342,6 +353,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 prompt_completion_ids = unwrapped_model.generate(
                     **prompt_inputs, generation_config=self.generation_config
                 )
+        time_generate = time.time() - time_start_generate
 
         prompt_length = prompt_inputs["input_ids"].size(1)
         completion_ids = prompt_completion_ids[:, prompt_length:]
@@ -570,21 +582,21 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         # log completions tokens
         if 'n_completions_all' in logging_completions_infos_local.keys():
             self.logging_completions_infos['n_completions_all'] += logging_completions_infos_local['n_completions_all']
-            self._metrics["tokens_logging/batch/n_completions_all"] = logging_completions_infos_local['n_completions_all']
+            self._metrics["tokens_logging/batch/n_completions_all"].append(logging_completions_infos_local['n_completions_all'])
         if 'n_tokens_all' in logging_completions_infos_local.keys():
             self.logging_completions_infos['n_tokens_all'] += logging_completions_infos_local['n_tokens_all']
-            self._metrics["tokens_logging/batch/n_tokens_all"] = logging_completions_infos_local['n_tokens_all']
+            self._metrics["tokens_logging/batch/n_tokens_all"].append(logging_completions_infos_local['n_tokens_all'])
         if 'n_completions' in logging_completions_infos_local.keys():
             self.logging_completions_infos['n_completions'] += logging_completions_infos_local['n_completions']
-            self._metrics["tokens_logging/batch/n_completions"] = logging_completions_infos_local['n_completions']
+            self._metrics["tokens_logging/batch/n_completions"].append(logging_completions_infos_local['n_completions'])
         if 'n_tokens' in logging_completions_infos_local.keys():
             self.logging_completions_infos['n_tokens'] += logging_completions_infos_local['n_tokens']
-            self._metrics["tokens_logging/batch/n_tokens"] = logging_completions_infos_local['n_tokens']
+            self._metrics["tokens_logging/batch/n_tokens"].append(logging_completions_infos_local['n_tokens'])
         training_runtime = time.time() - self.logging_completions_infos['time_start']
-        self._metrics["tokens_logging/per_sec/n_completions_all"] = self.logging_completions_infos['n_completions_all'] / training_runtime
-        self._metrics["tokens_logging/per_sec/n_tokens_all"] = self.logging_completions_infos['n_tokens_all'] / training_runtime
-        self._metrics["tokens_logging/per_sec/n_completions"] = self.logging_completions_infos['n_completions'] / training_runtime
-        self._metrics["tokens_logging/per_sec/n_tokens"] = self.logging_completions_infos['n_tokens'] / training_runtime
+        self._metrics["tokens_logging/per_sec/n_completions_all"].append(self.logging_completions_infos['n_completions_all'] / training_runtime)
+        self._metrics["tokens_logging/per_sec/n_tokens_all"].append(self.logging_completions_infos['n_tokens_all'] / training_runtime)
+        self._metrics["tokens_logging/per_sec/n_completions"].append(self.logging_completions_infos['n_completions'] / training_runtime)
+        self._metrics["tokens_logging/per_sec/n_tokens"].append(self.logging_completions_infos['n_tokens'] / training_runtime)
 
         # identify sequences that terminated with EOS and log their lengths
         agg_terminated_with_eos = self.accelerator.gather_for_metrics(is_eos.any(dim=1))
@@ -614,6 +626,24 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         mean_kl = ((per_token_kl * completion_mask).sum(dim=1) / completion_mask.sum(dim=1)).mean()
         self._metrics["kl"].append(self.accelerator.gather_for_metrics(mean_kl).mean().item())
+
+        # log time
+        time_compute_loss = time.time() - time_start_compute_loss
+        self.logging_time_infos['n_compute_loss'] += 1
+        self.logging_time_infos['total_time_generation'] += time_generate
+        self.logging_time_infos['total_time_compute_loss'] += time_compute_loss
+        self.logging_time_infos['total_time_compute_loss_minus_generation'] = self.logging_time_infos['total_time_compute_loss'] - self.logging_time_infos['total_time_generation']
+
+        self._metrics["time/n_compute_loss"].append(self.logging_time_infos['n_compute_loss'])
+        self._metrics["time/per_step/time_compute_loss"].append(time_compute_loss)
+        self._metrics["time/per_step/time_generate"].append(time_generate)
+        self._metrics["time/total/global_time_since_init"].append(time.time()-self.logging_time_infos['global_time_start'])
+        self._metrics["time/total/total_time_generation"].append(self.logging_time_infos['total_time_generation'])
+        self._metrics["time/total/total_time_compute_loss"].append(self.logging_time_infos['total_time_compute_loss'])
+        self._metrics["time/total/total_time_compute_loss_minus_generation"].append(self.logging_time_infos['total_time_compute_loss_minus_generation'])
+        self._metrics["time/average/time_generation"].append(self.logging_time_infos['total_time_generation'] / self.logging_time_infos['n_compute_loss'])
+        self._metrics["time/average/time_compute_loss"].append(self.logging_time_infos['total_time_compute_loss'] / self.logging_time_infos['n_compute_loss'])
+        self._metrics["time/average/time_compute_loss_minus_generation"].append(self.logging_time_infos['total_time_compute_loss_minus_generation'] / self.logging_time_infos['n_compute_loss'])
 
         return loss
 
