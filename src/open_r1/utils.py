@@ -3,6 +3,7 @@ import os
 import json
 import platform
 import functools
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -49,6 +50,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self.custom_clipped_surrogate_objective_epsilon_low = args.custom_clipped_surrogate_objective_epsilon_low
         self.custom_reward_tanh = args.custom_reward_tanh
         self.custom_reward_tanh_scale = args.custom_reward_tanh_scale
+        self.logging_completions_infos = {
+            'time_start': time.time(),
+            'n_tokens': 0,
+            'n_tokens_all': 0,
+            'n_completions': 0,
+            'n_completions_all': 0,
+        }
 
         # Logging
         if is_deepspeed_zero3_enabled():
@@ -291,6 +299,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             prompt_inputs["attention_mask"] = prompt_inputs["attention_mask"][:, -self.max_prompt_length:]
 
         # Generate completions using either vLLM or regular generation
+        logging_completions_infos_local = dict()
         if self.args.use_vllm:
             # First, have main process load weights if needed
             if self.state.global_step != self._last_loaded_step:
@@ -312,6 +321,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             # Broadcast the completions from the main process to all processes, ensuring each process receives its
             # corresponding slice.
             completion_ids = broadcast_object_list(completion_ids, from_process=0)
+            logging_completions_infos_local['n_completions_all'] = len(completion_ids)
+            logging_completions_infos_local['n_tokens_all'] = sum([len(ids) for ids in completion_ids])
             process_slice = slice(
                 self.accelerator.process_index * len(prompts) * self.num_generations,
                 (self.accelerator.process_index + 1) * len(prompts) * self.num_generations,
@@ -319,6 +330,8 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             completion_ids = completion_ids[process_slice]
 
             # Pad the completions, and concatenate them with the prompts
+            logging_completions_infos_local['n_completions'] = len(completion_ids)
+            logging_completions_infos_local['n_tokens'] = sum([len(ids) for ids in completion_ids])
             completion_ids = [torch.tensor(ids, device=device) for ids in completion_ids]
             completion_ids = pad(completion_ids, padding_value=self.processing_class.pad_token_id)
             prompt_inputs_repeated = torch.repeat_interleave(prompt_inputs["input_ids"], self.num_generations, dim=0)
@@ -553,6 +566,25 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         self._metrics["completions/mean_length"].append(agg_completion_mask.float().mean().item())
         self._metrics["completions/min_length"].append(agg_completion_mask.float().min().item())
         self._metrics["completions/max_length"].append(agg_completion_mask.float().max().item())
+
+        # log completions tokens
+        if 'n_completions_all' in logging_completions_infos_local.keys():
+            self.logging_completions_infos['n_completions_all'] += logging_completions_infos_local['n_completions_all']
+            self._metrics["tokens_logging/batch/n_completions_all"] = logging_completions_infos_local['n_completions_all']
+        if 'n_tokens_all' in logging_completions_infos_local.keys():
+            self.logging_completions_infos['n_tokens_all'] += logging_completions_infos_local['n_tokens_all']
+            self._metrics["tokens_logging/batch/n_tokens_all"] = logging_completions_infos_local['n_tokens_all']
+        if 'n_completions' in logging_completions_infos_local.keys():
+            self.logging_completions_infos['n_completions'] += logging_completions_infos_local['n_completions']
+            self._metrics["tokens_logging/batch/n_completions"] = logging_completions_infos_local['n_completions']
+        if 'n_tokens' in logging_completions_infos_local.keys():
+            self.logging_completions_infos['n_tokens'] += logging_completions_infos_local['n_tokens']
+            self._metrics["tokens_logging/batch/n_tokens"] = logging_completions_infos_local['n_tokens']
+        training_runtime = time.time() - self.logging_completions_infos['time_start']
+        self._metrics["tokens_logging/per_sec/n_completions_all"] = self.logging_completions_infos['n_completions_all'] / training_runtime
+        self._metrics["tokens_logging/per_sec/n_tokens_all"] = self.logging_completions_infos['n_tokens_all'] / training_runtime
+        self._metrics["tokens_logging/per_sec/n_completions"] = self.logging_completions_infos['n_completions'] / training_runtime
+        self._metrics["tokens_logging/per_sec/n_tokens"] = self.logging_completions_infos['n_tokens'] / training_runtime
 
         # identify sequences that terminated with EOS and log their lengths
         agg_terminated_with_eos = self.accelerator.gather_for_metrics(is_eos.any(dim=1))
