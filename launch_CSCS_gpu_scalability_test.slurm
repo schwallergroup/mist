@@ -119,6 +119,10 @@ export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | 
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
+# JOBREPORT
+export JOBREPORT=/users/jgoumaz/jobreport
+export PROFILING_FOLDER=/iopsstor/scratch/cscs/jgoumaz/jobreports/jobreport_${SLURM_JOB_ID}
+
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
 # --kill-on-bad-exit=1: terminate a step if any task exits with a non-zero exit code
@@ -128,6 +132,12 @@ SRUN_ARGS=" \
     --jobid $SLURM_JOB_ID \
 "
 
-clear; srun $SRUN_ARGS bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+clear;
+srun $SRUN_ARGS $JOBREPORT monitor -o "$PROFILING_FOLDER" -- bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD; $WANDBLOG" 2>&1
+
+# JOBREPORT: After the training completes, print a summary of the profiling results
+echo "NODELIST=$SLURM_JOB_NODELIST"
+echo "PROCID=$SLURM_PROCID of $SLURM_NNODES nodes"
+$JOBREPORT print "$PROFILING_FOLDER"
 
 echo "END TIME: $(date)"
