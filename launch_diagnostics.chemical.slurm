@@ -13,9 +13,9 @@ set -x -e
 source ~/.bashrc
 echo "START TIME: $(date)"
 
-MODEL_PATH=/LLM_models/Qwen2.5-3B_pretrained-v6-1
-DATA_PATH=/data/sink_diagnostic/smol_instruct_mol_caption.test.corrupted.csv
-OUTDIR=./diagnostic_results/Qwen2.5-3B_pretrained-v6-1
+MODEL_PATH=/LLM_models/qwen_sft_base_hf
+DATA_PATH=/data/sink_diagnostic/smol_instruct_mol_caption.test.corrupted.v2.csv
+OUTDIR=./diagnostic_results/Qwen2.5-3B_sft
 
 NUM_NODES=$SLURM_NNODES
 GPUS_PER_NODE=4
