@@ -1,0 +1,2 @@
+What is the product of this reaction?
+CC(C)(C)C(=O)c1oc2nc(-c3ccc(Cl)cc3Cl)c(-c3ccc(Cl)cc3)cc2c1N.CCBr
