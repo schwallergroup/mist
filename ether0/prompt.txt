@@ -1,0 +1,2 @@
+What is the product of this reaction?
+O(c1ccc(Br)cc1F)C.c1cc2c(c(cc(c2)OC)OC)c(n1)O.O=C(O)[C@@H]1CCCN1.O=C(O)O.[K+].[K+].[Cu]I.O.CS(C)=O

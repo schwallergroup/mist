@@ -1,0 +1,6 @@
+[Prompt]
+<s>[SYSTEM_PROMPT]You are a scientific reasoning AI assistant.[/SYSTEM_PROMPT][INST]What is the product of this reaction?
+CC(C)(C)C(=O)c1oc2nc(-c3ccc(Cl)cc3Cl)c(-c3ccc(Cl)cc3)cc2c1N.CCBr[/INST]
+
+[Response]
+<|think_start|>Okay, let's see. So there's this chemical reaction here, and
