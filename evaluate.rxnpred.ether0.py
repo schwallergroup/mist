@@ -12,12 +12,10 @@ from argparse import ArgumentParser
 
 def arg_parse():
     parser = ArgumentParser(description="Evaluate the model on the USPTO dataset.")
-    parser.add_argument("--model", type=str, required=True, help="Path to the model checkpoint.")
     parser.add_argument("--task_mode", type=str, required=True, help="Path to the evaluation data.")
     parser.add_argument("--datapath", type=str, default="/data/USPTO/USPTO_480k_clean_no_sft/", help="Path to the evaluation data.")
     parser.add_argument("--n_samples", type=int, default=5, help="Number of samples generated.")
-    parser.add_argument("--maxlength", type=int, default=4096, help="Maximum length of the output sequence.")
-    parser.add_argument("--temperature", type=float, default=0.8, help="Temperature for sampling.")
+    # parser.add_argument("--temperature", type=float, default=0.8, help="Temperature for sampling.")
     parser.add_argument("--save_dir", type=str, default=".", help="Directory to save the evaluation results.")
     return parser.parse_args()
 
@@ -40,23 +38,27 @@ def main():
     if len(data) > 500:
         data = data.shuffle(seed=42).select(range(500))
     # Load vLLM model
-    llm = LLM(model=args.model)  # replace with your actual model
+    llm = LLM(
+        model="futurehouse/ether0",
+        generation_config="auto",
+        download_dir="/iopsstor/scratch/cscs/nnguyenx/models/",
+        tensor_parallel_size=2, 
+        gpu_memory_utilization=0.7
+    )  # replace with your actual model
 
-    sampling_params = SamplingParams(n=args.n_samples, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.00, temperature=args.temperature, top_p=0.80, top_k=20, min_p=0.0, seed=None, stop=[], stop_token_ids=[151643, 151644, 151645], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=args.maxlength, min_tokens=0, logprobs=None, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)
+    sampling_params = llm.get_default_sampling_params()
+    sampling_params.n = args.n_samples
+    sampling_params.max_tokens=2048
     #sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
 
     def extract_smiles(text, prompt="", relax=False):
-        # match = re.search(r'<answer>\s*\[START_SMILES\]\s*(.*?)\s*\[END_SMILES\]\s*</answer>', text)
-        # return match.group(1).strip() if match else None
-        res = task.extract_smiles_from_answer(task.preprocess_response(text), prompt)
-        if res is None and relax: # if relax is True, extract the longest SMILES in the reponse that is different from those in the prompt
-            res = task.extract_smiles_from_answer(text, prompt)
-        return res
-
-    def extract_normal_smiles(text):
-        match = re.search(r'\[START_SMILES\](.*?)\[END_SMILES\]', text)
-        return match.group(1).strip() if match else None
-
+        ''' Example answer
+        <|think_start|>...<|think_end|><|answer_start|>c1cc2c(c(cc(c2)OC)OC)c(n1)Oc3ccc(OC)c(F)c3<|answer_end|>
+        '''
+        match = re.search(r'<\|answer_start\|>(.*?)<\|answer_end\|>', text)
+        if match is None:
+            return None
+        return match.group(1).strip()
 
     def same_molecule(smiles1, smiles2):
         mol1 = Chem.MolFromSmiles(smiles1)
