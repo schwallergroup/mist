@@ -32,6 +32,8 @@ class ForwardReaction(SMILESBasedTask):
     tgt_test_file: str = ""
     mol_to_fgs_file: str = ""
     mol_to_fgs: Dict[str, str] = {}
+    mol_to_name_file: str = ""
+    mol_to_names: Dict[str, str] = {}
     question_template: str = ""
 
     # custom_metrics: Dict[str, Any] = {}
@@ -54,6 +56,11 @@ class ForwardReaction(SMILESBasedTask):
         if os.path.exists(self.mol_to_fgs_file):
             mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
             self.mol_to_fgs = {row.smiles: row.fgs.split('.') for row in mol_to_fgs_df.itertuples()}
+            
+        self.mol_to_name_file = os.path.join(self.dataset_id_or_path, "iupac_names.csv")
+        if os.path.exists(self.mol_to_name_file):
+            mol_to_names_df = pd.read_csv(self.mol_to_name_file)
+            self.mol_to_names = {row.smiles: row.iupac for row in mol_to_names_df.itertuples()}
        
         if self.task_mode == "base":
             # self.question_template = (
@@ -87,6 +94,9 @@ class ForwardReaction(SMILESBasedTask):
         elif self.task_mode == "tagged":
             self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
         
+        elif self.task_mode == "tagged_with_name":
+            self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Reason and predict the correct product in SMILES notation from the reaction involving the following reagents: {}.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"
+        
         elif self.task_mode == "tagged_no_thinking":
             self.question_template = "<|im_start|>assistant\You are an organic chemistry expert, and I have a task for you. Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. Return the final answer in <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Predict the correct product in SMILES notation from the following reaction [START_SMILES] {} [END_SMILES].<|im_end|>\n<|im_start|>assistant\Response:\n<answer>"
         
@@ -109,6 +119,9 @@ class ForwardReaction(SMILESBasedTask):
                 "<|im_start|>assistant\Response:\n"
                 "<think> Okay"
             )
+        
+        elif self.task_mode == "ether0":
+            self.question_template = "<s>[SYSTEM_PROMPT]You are a scientific reasoning AI assistant.[/SYSTEM_PROMPT][INST]What is the product of this reaction?\n{}[/INST]"
             
         else:
             raise ValueError(f"Unknown task mode: {self.task_mode}")
@@ -146,11 +159,26 @@ class ForwardReaction(SMILESBasedTask):
                     reactant_with_fgs.append(f'{reactant}: {", ".join(fgs)}')
         reactant_with_fgs = '\n\t'.join(reactant_with_fgs)
         return self.question_template.format(reactants, reactant_with_fgs)
+    
+    def _question_template_format_with_names(self, reactants: str):
+        reactant_list = reactants.split('.')
+        reactant_with_names = []
         
+        for reactant in reactant_list:
+            name = self.mol_to_names.get(reactant, None)
+            if name:
+                reactant_with_names.append(f'[START_MOL] {name} [END_MOL][START_SMILES] {reactant} [END_SMILES]')
+            else:
+                reactant_with_names.append(f'[START_SMILES] {reactant} [END_SMILES]')
+        reactant_with_names = ', '.join(reactant_with_names)
+        return self.question_template.format(reactant_with_names)
+            
     
     def question_template_format(self, reactants: str):
         if 'fg' in self.task_mode:
             return self._question_template_format_with_fgs(reactants)
+        elif self.task_mode == "tagged_with_name":
+            return self._question_template_format_with_names(reactants)
         else:
             return self.question_template.format(reactants)
     
@@ -204,8 +232,11 @@ class ForwardReaction(SMILESBasedTask):
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
         # Load training data
-        train_dict = self.read_files(self.src_train_file, self.tgt_train_file)
-        train_dataset = Dataset.from_dict(train_dict)
+        if os.path.exists(self.src_train_file) and os.path.exists(self.tgt_train_file):
+            train_dict = self.read_files(self.src_train_file, self.tgt_train_file)
+            train_dataset = Dataset.from_dict(train_dict)
+        else:
+            train_dataset = None
 
         # Load or create test data
         if self.src_test_file and self.tgt_test_file:

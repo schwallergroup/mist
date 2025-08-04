@@ -16,11 +16,11 @@ source ~/.bashrc
 
 echo "START TIME: $(date)"
 
-MODEL=/LLM_models/Qwen2.5-3B_pretrained-v6-1 # Path to your model checkpoint
+MODEL=/capstor/store/cscs/swissai/a05/LIAC/checkpoints/rxnpred_431710/checkpoint-88/ # Path to your model checkpoint
 THINK_MODE=tagged # "qwen_base" for post-RL and base Qwen models. "tagged" for any model produced by Shai. This is equivalent to 'task_mode` params in `src/open_r1/tasks/reactions/forward.py`, which affects the prompt the model is given. Used to evaluate the model with reasoning, i.e system 2
 NO_THINK_MODE=tagged_no_thinking # "qwen_base_no_thinking" for post-RL and base Qwen models. "tagged_no_thinking" for any model produced by Shai. This is equivalent to 'task_mode` params in `src/open_r1/tasks/reactions/forward.py`, which affects the prompt the model is given. Used to evaluate the model without thinking, i.e system 1
-DATAPATH=/data/USPTO/USPTO_480k_clean_no_sft # likely you don't need to change this
-OUTDIR=eval_results_500/qwen_pt_sft # Where do you want to save the evaluation results
+DATAPATH=/data/ether0_rxnpred # likely you don't need to change this
+OUTDIR=eval_results_ether0/mist # Where do you want to save the evaluation results
 
 conda deactivate;
 cd /Documents/sink;
