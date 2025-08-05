@@ -188,3 +188,10 @@ completion_samples/
 output/
 core*
 *.ipynb
+
+
+diagnostic_logs/
+diagnostic_results/
+eval_logs/
+lighteval/
+rxnpred_eval_results/
