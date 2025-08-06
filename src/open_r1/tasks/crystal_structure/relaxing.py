@@ -5,7 +5,7 @@ from typing import Dict, Optional
 from open_r1.download_data import download_data
 import pandas as pd
 from datasets import Dataset, DatasetDict
-from ..base import RLTask
+from open_r1.tasks.base import RLTask
 from dataclasses import field
 from ase.io import read
 import gemmi
@@ -229,7 +229,7 @@ class BinaryCompoundRelaxing(RLTask):
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
         rewards = []
-        # Here task is simple: check that the smiles is the same as the target smiles
+        print(completions)
         for content, sol in zip(completions, solution):
             print(f"\n\n=======<RESPONSE>=======\n"
                 f"# answer_text: {content}\n"
