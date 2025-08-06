@@ -7,7 +7,7 @@
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --environment=vllm071
-#SBATCH -A a-a131
+#SBATCH -A a131
 
 # Run like:
 # Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
@@ -35,7 +35,7 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
-MASTER_PORT=6000
+MASTER_PORT=6100
 
 MODEL_ID=$1
 TASK=$2
