@@ -307,6 +307,7 @@ class Smiles2NameV2(Smiles2Name):
     completion_shortening_penalty: float = 10.0
     completion_shortening_interval_high: int = 25000
     completion_shortening_interval_low: int = 1000
+    train_test_split_seed: int = 42
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -324,6 +325,33 @@ class Smiles2NameV2(Smiles2Name):
         self.completion_shortening_penalty = self.task_kwargs.get("completion_shortening_penalty", 10.0)
         self.completion_shortening_interval_high = self.task_kwargs.get("completion_shortening_interval_high", 25000)
         self.completion_shortening_interval_low = self.task_kwargs.get("completion_shortening_interval_low", 1000)
+        self.train_test_split_seed = self.task_kwargs.get("train_test_split_seed", 42)
+
+    def load(self) -> DatasetDict:
+        """Load and return the complete dataset."""
+        df = pd.read_csv(self.dataset_id_or_path)
+        train_dict = {
+            'problem': df['REACTION_PROMPT'].tolist(),
+            'solution': df['CLASS'].tolist()
+        }
+        train_dataset = Dataset.from_dict(train_dict)
+        train_test_split_seed = self.train_test_split_seed
+        train_test_split = train_dataset.train_test_split(test_size=0.1, seed=train_test_split_seed)
+        train_dataset = train_test_split['train']
+        test_dataset = train_test_split['test']
+        # Print hash of the first train example
+        first_train_problem_hash = hashlib.sha256(train_dataset[0]['problem'].encode()).hexdigest()[:8]
+        first_test_problem_hash = hashlib.sha256(test_dataset[0]['problem'].encode()).hexdigest()[:8]
+        print(f"Smiles2Name train_test_split shuffling seed: {train_test_split_seed}")
+        print(f"First train problem hash: {first_train_problem_hash}")
+        print(f"First test problem hash: {first_test_problem_hash}")
+
+        # Combine into DatasetDict
+        self.dataset = DatasetDict({
+            'train': train_dataset,
+            'test': test_dataset
+        })
+        return self.dataset
 
     def accuracy_reward(self, completions, **kwargs):
         completions = self.preprocess_completions(completions)
