@@ -5,12 +5,17 @@ from typing import Dict, Optional
 from open_r1.download_data import download_data
 import pandas as pd
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
 from ..base import RLTask
-import requests
 from dataclasses import field
+from ase.io import read
+import gemmi
+from io import StringIO
+from mace.calculators import mace_mp
+from pymatgen.core import Structure
+from pymatgen.analysis.structure_matcher import StructureMatcher
+from .AIRS_preporcess._tokenizer import CIFTokenizer
 
-
+cif_tokenizer = CIFTokenizer()
 class BinaryCompoundRelaxing(RLTask):
     src_train_file: str = ""
     tgt_train_file: str = ""
@@ -61,7 +66,7 @@ class BinaryCompoundRelaxing(RLTask):
             'val/rewards': [],
         }
 
-        # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
+        # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/binary_compound_relaxing
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
@@ -118,34 +123,130 @@ class BinaryCompoundRelaxing(RLTask):
 
         return self.dataset
     
+    def sanitize_cif(cif_str):
+        lines = cif_str.splitlines()
+        in_symmetry_loop = False
+        new_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("loop_"):
+                in_symmetry_loop = False
+                new_lines.append(line)
+                continue
+            if not in_symmetry_loop and "_symmetry_equiv_pos_as_xyz" in line:
+                in_symmetry_loop = True
+                new_lines.append(line)
+                continue
+            if in_symmetry_loop:
+                if stripped == "" or stripped.startswith("_") or stripped.startswith("loop_"):
+                    in_symmetry_loop = False
+                    new_lines.append(line)
+                else:
+                    line = re.sub(r'"([^"]+)"', r"'\1'", line)
+                    new_lines.append(line)
+            else:
+                new_lines.append(line)
+        return "\n".join(new_lines)
+
+    def parse_llm_structure(self, cif_content):
+        sanitized = self.sanitize_cif(cif_content)
+        try:
+            return Structure.from_str(sanitized, fmt="cif")
+        except Exception as e:
+            print(f"Error parsing LLM‐generated structure: {e}")
+            return None
+
+    def compare_internal_energy(cif1, cif2):
+        # uses ASE + MACE to get per‐atom potential energies
+        atoms1 = read(StringIO(cif1), format='cif')
+        atoms2 = read(StringIO(cif2), format='cif')
+        calc = mace_mp(model="large", device='cuda')
+        atoms1.calc = calc
+        atoms2.calc = calc
+        e1 = atoms1.get_potential_energy() / len(atoms1)
+        e2 = atoms2.get_potential_energy() / len(atoms2)
+        print("Original per‐atom energy:", e1)
+        print("LLM per‐atom energy:", e2)
+        if e1 < e2:
+            return -4
+        elif e1 > e2:
+            return  1
+        else:
+            return -10
+
+    def compute_internal_score(self, answer_cif, ground_truth_dict, alpha=5.0):
+        gt_cif = ground_truth_dict.get("ground_truth", "")
+        if not gt_cif:
+            print("No ground truth CIF provided.")
+            return -10
+
+        # first, reformat / deserialize via tokenizer
+        try:
+            answer_cif = cif_tokenizer.deserialize(answer_cif, gt_cif)
+        except Exception as e:
+            print("Tokenization error:", e)
+            return -10
+
+        # quick gemmi checks
+        try:
+            for s in (gt_cif, answer_cif):
+                doc = gemmi.cif.read_string(s)
+                doc.check_for_missing_values()
+                doc.check_for_duplicates()
+        except Exception as e:
+            print("CIF validation error:", e)
+            return -10
+
+        # parse Pymatgen structures
+        try:
+            dft_struct = Structure.from_str(gt_cif, fmt="cif")
+        except Exception as e:
+            print("Error parsing DFT structure:", e)
+            return -10
+
+        llm_struct = self.parse_llm_structure(answer_cif)
+        if llm_struct is None:
+            return -10
+
+        # structure‐matching reward (–RMSD if match, else penalty)
+        matcher = StructureMatcher(ltol=0.05, stol=0.05, angle_tol=1)
+        try:
+            if matcher.fit(dft_struct, llm_struct):
+                rmsd = matcher.get_rms_dist(dft_struct, llm_struct)
+                struct_reward = -rmsd
+            else:
+                return -10
+        except Exception as e:
+            print("Matcher error:", e)
+            return -10
+
+        # energy‐based reward
+        energy_reward = self.compare_internal_energy(gt_cif, answer_cif)
+
+        # choose which to return (here using energy check as original)
+        return energy_reward
+    
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
-
-        answers = [self.preprocess_response(c) for c in completions]
-
         rewards = []
-
         # Here task is simple: check that the smiles is the same as the target smiles
-        for content, sol in zip(answers, solution):
+        for content, sol in zip(completions, solution):
+            print(f"\n\n=======<RESPONSE>=======\n"
+                f"# answer_text: {content}\n"
+                f"# ground_truth: {sol}\n"
+            )
+            content = self.preprocess_response(content)
             if content == "NONE":
                 rewards.append(-10)
                 continue
 
-            server_url = os.environ.get("SERVER_URL", "http://10.197.48.175:9001/compute_score")
+            # server_url = os.environ.get("SERVER_URL", "http://10.197.48.175:9001/compute_score")
             if content == sol:
                 rewards.append(-10)
                 continue
-
-            payload = {
-                "answer_text": content,
-                "ground_truth": sol
-            }
             
             try:
-                response = requests.post(server_url, json=payload, timeout=20)
-                response.raise_for_status()
-                data = response.json()
-                reward = data.get("reward", -10)
+                reward = self.compute_internal_score(content, sol)
                 rewards.append(reward)
             except Exception as e:
                 rewards.append(-10)
