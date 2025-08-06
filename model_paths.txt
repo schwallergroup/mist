@@ -14,3 +14,5 @@ Qwen2.5-3B_pretrained-v1_cot-v1:	/LLM_models/Qwen2.5-3B_pretrained-v1_cot-v1
 Qwen2.5-3B_pretrained-v2:		/LLM_models/Qwen2.5-3B_pretrained-v2
 Qwen2.5-3B_pretrained-v3:		/LLM_models/Qwen2.5-3B_pretrained-v3
 Qwen2.5-3B_pretrained-v4-cot:		/LLM_models/Qwen2.5-3B_pretrained-v4-cot
+Qwen2.5-3B_pretrained-vj1-sfte8:        /capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_3B/pretrained_sft_qwen2.5_3B_epoch8
+Qwen2.5-7B_pretrained-vj1-sfte8:        /capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_7B/pretrained_sft_qwen2.5_7B_epoch8

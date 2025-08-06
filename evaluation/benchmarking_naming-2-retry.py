@@ -47,7 +47,7 @@ def generate_with_retry(prompt, sampling_params, llm, max_retries=1):
 def parse_args():
     parser = argparse.ArgumentParser(description="Benchmarking Naming-2 with retries")
     parser.add_argument("--model_path", type=str, required=True, help="Path to the vLLM model checkpoint")
-    parser.add_argument("--output_dir", type=str, required=True, help="Directory to save output files")
+    parser.add_argument("--out_dir", type=str, required=True, help="Directory to save output files")
     parser.add_argument("--data_path", type=str, required=True, default="/data/david/final_tasks_prompts/reaction_class_prompts_600k.csv", help="Path to the input data CSV file")
 
     return parser.parse_args()
@@ -197,7 +197,7 @@ def main(args):
 
     out_df = pd.DataFrame(records)
     # out_df.to_csv("/data/david/benchmark_save_completion_runs/naming_2_correct_completions_think_retry_pt.csv", index=False)
-    samplewise_csv = os.path.join(args.output_dir, "samplewise_results.csv")
+    samplewise_csv = os.path.join(args.out_dir, "samplewise_results.csv")
     out_df.to_csv(samplewise_csv, index=False)
         
     acc = 100 * correct / len(test_data)
@@ -210,8 +210,9 @@ def main(args):
     }])
 
     # metrics.to_csv("/data/david/benchmark_save_completion_runs/naming_2_metrics_think_retry_pt.csv", index=False)
-    eval_res_csv = os.path.join(args.output_dir, "evaluation_metrics.csv")
+    eval_res_csv = os.path.join(args.out_dir, "evaluation_metrics.csv")
     metrics.to_csv(eval_res_csv, index=False)
 
 if __name__ == "__main__":
+    args = parse_args()
     main(args)
