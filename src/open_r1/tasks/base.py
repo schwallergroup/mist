@@ -192,7 +192,7 @@ class RLTask(BaseModel):
                 else:
                     current_reward -= 0.05
                 # 0.1 reward if the thinking is followed by an answer
-                if completion.count("</think>\n<answer>") == 1:
+                if len(re.findall(r"</think>\s*<answer>", completion)) == 1:
                     current_reward += 0.1
                 else:
                     current_reward -= 0.1
@@ -206,7 +206,7 @@ class RLTask(BaseModel):
                 else:
                     current_reward += 0.2
                 # 0.4 reward is the format is correct
-                pattern = r"<think>(.*)<\/think>\n<answer>(.*)<\/answer>"
+                pattern = r"<think>(.*)<\/think>\s*<answer>(.*)<\/answer>"
                 match = re.search(pattern, completion, re.DOTALL)
                 if match is None:
                     current_reward -= 0.4
