@@ -23,7 +23,7 @@ pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip show torch vllm;
 
-vllm serve /capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_7B/pretrained_sft_qwen2.5_7B_epoch8 \
+vllm serve /iopsstor/store/cscs/swissai/a05/LIAC/LLM_models/models--AI4Chem--ChemLLM-7B-Chat-1_5-DPO/snapshots/766f19ab06c0237aa3a1643c3152cecea83e8fca/ \
     --trust-remote-code \
     --host 0.0.0.0 \
     --port 8000
