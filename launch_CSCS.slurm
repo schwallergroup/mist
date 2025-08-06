@@ -35,7 +35,7 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
-MASTER_PORT=6010
+MASTER_PORT=6100
 
 MODEL_ID=$1
 TASK=$2
