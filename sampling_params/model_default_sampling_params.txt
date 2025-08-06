@@ -5,3 +5,14 @@ Qwen2.5-3B_pretrained-v6-1:		pretrained_models_v1
 Qwen2.5-3B_pretrained-v6-2:		pretrained_models_v1
 Qwen2.5-3B_pretrained-v6-3:		pretrained_models_v1
 qwen_sft_base_hf:           pretrained_models_v1
+Qwen2.5-3B_pretrained-vj1-10k:		pretrained_models_v3
+Qwen2.5-3B_pretrained-vj1-30k:		pretrained_models_v3
+Qwen2.5-3B_pretrained-vj1-50k:		pretrained_models_v3
+Qwen2.5-7B_pretrained-vj1-e1:		pretrained_models_v3
+Qwen2.5-7B_pretrained-vj1-e3:		pretrained_models_v3
+Qwen2.5-3B_pretrained-vj1-sfte1:	pretrained_models_v3
+Qwen2.5-3B_pretrained-vj1-sfte4:	pretrained_models_v3
+Qwen2.5-3B_pretrained-vj1-sfte8:	pretrained_models_v3
+Qwen2.5-7B_pretrained-vj1-sfte1:	pretrained_models_v3
+Qwen2.5-7B_pretrained-vj1-sfte4:	pretrained_models_v3
+Qwen2.5-7B_pretrained-vj1-sfte8:	pretrained_models_v3
