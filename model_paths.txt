@@ -43,3 +43,4 @@ Qwen2.5-3B_pretrained-vj1-sfte8:	/capstor/store/cscs/swissai/a131/jmeng/models/p
 Qwen2.5-7B_pretrained-vj1-sfte1:	/capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_7B/pretrained_sft_qwen2.5_7B_epoch1
 Qwen2.5-7B_pretrained-vj1-sfte4:	/capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_7B/pretrained_sft_qwen2.5_7B_epoch4
 Qwen2.5-7B_pretrained-vj1-sfte8:	/capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_7B/pretrained_sft_qwen2.5_7B_epoch8
+Qwen2.5-3B_pretrained-vj1-sfte8_rxn_naming_616486_c75:	/capstor/store/cscs/swissai/a131/jgoumaz/models/Qwen2.5-3B_pretrained-vj1-sfte8_rxn_naming_616486_c75
