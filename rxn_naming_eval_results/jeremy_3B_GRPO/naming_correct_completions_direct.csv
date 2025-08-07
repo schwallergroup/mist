@@ -1,0 +1,973 @@
+example_idx,gold_answer,predicted_answer,full_completion
+1,protection,Protection, Protection </answer>
+12,protection,Protection, Protection </answer>
+18,deprotection,Deprotection, Deprotection </answer>
+19,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+20,protection,Protection, Protection </answer>
+25,protection,Protection, Protection </answer>
+26,reduction,Reduction, Reduction </answer>
+37,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+41,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+46,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+47,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+48,protection,Protection, Protection </answer>
+51,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+54,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+58,protection,Protection, Protection </answer>
+59,protection,Protection, Protection </answer>
+60,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+65,acylation,Acylation, Acylation </answer>
+66,reduction,Reduction, Reduction </answer>
+74,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+75,protection,Protection, Protection </answer>
+77,c-c coupling,C-C Coupling, C-C Coupling </answer>
+79,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+85,protection,Protection, Protection </answer>
+87,protection,Protection, Protection </answer>
+88,protection,Protection, Protection </answer>
+93,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+99,deprotection,Deprotection, Deprotection </answer>
+101,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+105,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+111,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+113,reduction,Reduction, Reduction </answer>
+116,protection,Protection, Protection </answer>
+117,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+125,protection,Protection, Protection </answer>
+127,protection,Protection, Protection </answer>
+130,deprotection,Deprotection, Deprotection </answer>
+134,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+138,protection,Protection, Protection </answer>
+141,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+142,protection,Protection, Protection </answer>
+143,acylation,Acylation, Acylation </answer>
+144,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+145,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+146,protection,Protection, Protection </answer>
+147,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+152,reduction,Reduction, Reduction </answer>
+157,protection,Protection, Protection </answer>
+158,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+160,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+161,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+163,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+166,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+170,protection,Protection, Protection </answer>
+171,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+172,protection,Protection, Protection </answer>
+174,protection,Protection, Protection </answer>
+182,protection,Protection, Protection </answer>
+183,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+184,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+187,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+188,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+193,reduction,Reduction, Reduction </answer>
+195,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+198,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+201,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+203,c-c coupling,C-C Coupling, C-C Coupling </answer>
+207,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+208,c-c coupling,C-C Coupling, C-C Coupling </answer>
+215,reduction,Reduction, Reduction </answer>
+217,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+219,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+221,deprotection,Deprotection, Deprotection </answer>
+224,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+226,protection,Protection, Protection </answer>
+229,protection,Protection, Protection </answer>
+233,protection,Protection, Protection </answer>
+235,deprotection,Deprotection, Deprotection </answer>
+243,reduction,Reduction, Reduction </answer>
+244,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+246,reduction,Reduction, Reduction </answer>
+250,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+252,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+258,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+260,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+262,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+264,reduction,Reduction, Reduction </answer>
+266,protection,Protection, Protection </answer>
+276,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+278,reduction,Reduction, Reduction </answer>
+281,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+294,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+295,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+296,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+298,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+300,c-c coupling,C-C Coupling, C-C Coupling </answer>
+305,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+309,reduction,Reduction, Reduction </answer>
+313,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+314,c-c coupling,C-C Coupling, C-C Coupling </answer>
+318,acylation,Acylation, Acylation </answer>
+322,protection,Protection, Protection </answer>
+323,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+332,protection,Protection, Protection </answer>
+334,reduction,Reduction, Reduction </answer>
+339,deprotection,Deprotection, Deprotection </answer>
+343,protection,Protection, Protection </answer>
+347,protection,Protection, Protection </answer>
+350,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+354,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+358,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+360,protection,Protection, Protection </answer>
+361,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+362,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+363,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+367,protection,Protection, Protection </answer>
+369,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+372,c-c coupling,C-C Coupling, C-C Coupling </answer>
+374,reduction,Reduction, Reduction </answer>
+376,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+379,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+382,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+384,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+391,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+392,reduction,Reduction, Reduction </answer>
+398,reduction,Reduction, Reduction </answer>
+402,protection,Protection, Protection </answer>
+404,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+405,c-c coupling,C-C Coupling, C-C Coupling </answer>
+406,protection,Protection, Protection </answer>
+408,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+413,protection,Protection, Protection </answer>
+414,reduction,Reduction, Reduction </answer>
+420,protection,Protection, Protection </answer>
+428,reduction,Reduction, Reduction </answer>
+437,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+440,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+441,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+443,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+450,reduction,Reduction, Reduction </answer>
+451,protection,Protection, Protection </answer>
+453,deprotection,Deprotection, Deprotection </answer>
+459,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+462,reduction,Reduction, Reduction </answer>
+465,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+467,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+469,c-c coupling,C-C Coupling, C-C Coupling </answer>
+471,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+472,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+475,acylation,Acylation, Acylation </answer>
+477,c-c coupling,C-C Coupling, C-C Coupling </answer>
+480,deprotection,Deprotection, Deprotection </answer>
+484,protection,Protection, Protection </answer>
+488,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+497,protection,Protection, Protection </answer>
+498,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+499,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+500,reduction,Reduction, Reduction </answer>
+501,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+510,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+518,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+519,protection,Protection, Protection </answer>
+522,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+524,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+526,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+527,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+528,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+535,protection,Protection, Protection </answer>
+537,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+546,reduction,Reduction, Reduction </answer>
+548,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+549,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+551,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+554,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+564,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+571,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+572,protection,Protection, Protection </answer>
+574,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+576,protection,Protection, Protection </answer>
+580,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+590,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+595,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+600,protection,Protection, Protection </answer>
+601,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+604,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+607,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+610,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+613,protection,Protection, Protection </answer>
+616,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+617,protection,Protection, Protection </answer>
+620,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+622,deprotection,Deprotection, Deprotection </answer>
+623,deprotection,Deprotection, Deprotection </answer>
+625,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+637,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+646,protection,Protection, Protection </answer>
+650,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+652,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+653,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+655,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+658,protection,Protection, Protection </answer>
+666,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+669,reduction,Reduction, Reduction </answer>
+672,protection,Protection, Protection </answer>
+675,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+676,protection,Protection, Protection </answer>
+682,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+687,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+689,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+690,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+691,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+695,deprotection,Deprotection, Deprotection </answer>
+697,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+699,reduction,Reduction, Reduction </answer>
+709,protection,Protection, Protection </answer>
+710,c-c coupling,C-C Coupling, C-C Coupling </answer>
+719,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+721,protection,Protection, Protection </answer>
+722,protection,Protection, Protection </answer>
+723,reduction,Reduction, Reduction </answer>
+725,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+728,acylation,Acylation, Acylation </answer>
+729,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+731,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+736,protection,Protection, Protection </answer>
+739,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+747,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+752,protection,Protection, Protection </answer>
+755,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+756,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+757,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+759,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+760,c-c coupling,C-C Coupling, C-C Coupling </answer>
+763,protection,Protection, Protection </answer>
+765,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+766,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+768,protection,Protection, Protection </answer>
+774,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+776,reduction,Reduction, Reduction </answer>
+779,reduction,Reduction, Reduction </answer>
+782,reduction,Reduction, Reduction </answer>
+783,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+785,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+787,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+789,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+791,protection,Protection, Protection </answer>
+797,reduction,Reduction, Reduction </answer>
+798,deprotection,Deprotection, Deprotection </answer>
+803,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+804,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+805,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+810,protection,Protection, Protection </answer>
+812,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+814,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+821,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+822,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+823,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+825,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+836,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+838,protection,Protection, Protection </answer>
+840,protection,Protection, Protection </answer>
+844,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+846,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+847,reduction,Reduction, Reduction </answer>
+850,protection,Protection, Protection </answer>
+856,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+858,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+863,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+864,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+865,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+874,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+875,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+882,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+891,protection,Protection, Protection </answer>
+892,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+893,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+894,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+895,protection,Protection, Protection </answer>
+897,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+900,protection,Protection, Protection </answer>
+914,protection,Protection, Protection </answer>
+916,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+917,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+923,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+925,protection,Protection, Protection </answer>
+929,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+932,c-c coupling,C-C Coupling, C-C Coupling </answer>
+933,deprotection,Deprotection, Deprotection </answer>
+935,reduction,Reduction, Reduction </answer>
+938,reduction,Reduction, Reduction </answer>
+942,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+944,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+945,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+946,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+948,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+950,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+952,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+953,protection,Protection, Protection </answer>
+956,protection,Protection, Protection </answer>
+957,reduction,Reduction, Reduction </answer>
+961,reduction,Reduction, Reduction </answer>
+963,protection,Protection, Protection </answer>
+969,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+971,reduction,Reduction, Reduction </answer>
+974,protection,Protection, Protection </answer>
+976,protection,Protection, Protection </answer>
+982,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+985,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+987,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+988,deprotection,Deprotection, Deprotection </answer>
+992,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+994,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+998,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1002,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1003,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1007,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1008,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1009,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1017,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1018,reduction,Reduction, Reduction </answer>
+1022,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1028,reduction,Reduction, Reduction </answer>
+1030,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1032,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1038,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1039,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1040,deprotection,Deprotection, Deprotection </answer>
+1041,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1049,protection,Protection, Protection </answer>
+1051,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1054,protection,Protection, Protection </answer>
+1056,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1057,protection,Protection, Protection </answer>
+1059,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1061,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1063,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1064,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1065,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1066,protection,Protection, Protection </answer>
+1068,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1070,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1074,protection,Protection, Protection </answer>
+1078,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1079,reduction,Reduction, Reduction </answer>
+1080,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1085,protection,Protection, Protection </answer>
+1086,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1088,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1090,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1099,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1100,reduction,Reduction, Reduction </answer>
+1101,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1104,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1108,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1114,protection,Protection, Protection </answer>
+1122,protection,Protection, Protection </answer>
+1133,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1135,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1141,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1142,protection,Protection, Protection </answer>
+1143,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1145,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1147,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1148,deprotection,Deprotection, Deprotection </answer>
+1149,reduction,Reduction, Reduction </answer>
+1150,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1157,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1160,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1161,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1164,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1165,reduction,Reduction, Reduction </answer>
+1172,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1177,protection,Protection, Protection </answer>
+1179,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1181,reduction,Reduction, Reduction </answer>
+1182,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1190,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1195,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1197,protection,Protection, Protection </answer>
+1204,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1206,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1208,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1209,protection,Protection, Protection </answer>
+1212,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1213,reduction,Reduction, Reduction </answer>
+1215,protection,Protection, Protection </answer>
+1225,protection,Protection, Protection </answer>
+1229,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1232,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1235,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+1236,deprotection,Deprotection, Deprotection </answer>
+1245,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1246,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1249,protection,Protection, Protection </answer>
+1254,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1257,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1258,protection,Protection, Protection </answer>
+1260,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1264,protection,Protection, Protection </answer>
+1266,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1267,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1275,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1277,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1289,protection,Protection, Protection </answer>
+1294,protection,Protection, Protection </answer>
+1295,reduction,Reduction, Reduction </answer>
+1304,protection,Protection, Protection </answer>
+1309,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1315,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1318,reduction,Reduction, Reduction </answer>
+1319,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1320,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1321,reduction,Reduction, Reduction </answer>
+1324,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1325,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1330,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1333,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1334,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1335,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1337,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1341,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1347,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1350,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1353,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1355,protection,Protection, Protection </answer>
+1359,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1361,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1363,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1365,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1367,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1368,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1373,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1375,protection,Protection, Protection </answer>
+1377,protection,Protection, Protection </answer>
+1380,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1383,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1385,protection,Protection, Protection </answer>
+1386,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1387,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1391,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1399,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1400,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1401,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1405,acylation,Acylation, Acylation </answer>
+1407,protection,Protection, Protection </answer>
+1408,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1410,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1411,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1412,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1414,protection,Protection, Protection </answer>
+1424,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1427,reduction,Reduction, Reduction </answer>
+1429,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1430,protection,Protection, Protection </answer>
+1434,protection,Protection, Protection </answer>
+1436,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1441,protection,Protection, Protection </answer>
+1444,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1447,protection,Protection, Protection </answer>
+1448,reduction,Reduction, Reduction </answer>
+1451,reduction,Reduction, Reduction </answer>
+1453,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1455,protection,Protection, Protection </answer>
+1460,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1468,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1475,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1480,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1482,protection,Protection, Protection </answer>
+1485,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1486,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1492,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1493,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1494,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1496,protection,Protection, Protection </answer>
+1497,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1499,protection,Protection, Protection </answer>
+1500,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1503,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1505,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1506,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1507,protection,Protection, Protection </answer>
+1508,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1512,protection,Protection, Protection </answer>
+1516,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1520,reduction,Reduction, Reduction </answer>
+1528,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1530,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1531,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1532,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1533,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1534,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1536,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1537,protection,Protection, Protection </answer>
+1538,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1541,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1556,protection,Protection, Protection </answer>
+1557,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1560,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1562,protection,Protection, Protection </answer>
+1564,protection,Protection, Protection </answer>
+1566,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1567,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1568,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1572,protection,Protection, Protection </answer>
+1578,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1579,protection,Protection, Protection </answer>
+1580,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1581,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1582,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1588,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1589,deprotection,Deprotection, Deprotection </answer>
+1590,deprotection,Deprotection, Deprotection </answer>
+1597,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1602,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1605,reduction,Reduction, Reduction </answer>
+1610,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1616,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1618,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1625,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1626,protection,Protection, Protection </answer>
+1627,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1628,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1632,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1633,protection,Protection, Protection </answer>
+1637,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1638,reduction,Reduction, Reduction </answer>
+1641,protection,Protection, Protection </answer>
+1642,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1643,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1646,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1650,reduction,Reduction, Reduction </answer>
+1651,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1655,protection,Protection, Protection </answer>
+1657,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1659,protection,Protection, Protection </answer>
+1663,protection,Protection, Protection </answer>
+1666,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1670,protection,Protection, Protection </answer>
+1672,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1678,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1681,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1682,protection,Protection, Protection </answer>
+1686,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1688,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1693,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1696,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1703,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1705,protection,Protection, Protection </answer>
+1707,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1712,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1715,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1719,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1727,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1729,reduction,Reduction, Reduction </answer>
+1733,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1739,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1745,reduction,Reduction, Reduction </answer>
+1749,protection,Protection, Protection </answer>
+1755,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1757,protection,Protection, Protection </answer>
+1763,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1765,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1766,deprotection,Deprotection, Deprotection </answer>
+1768,protection,Protection, Protection </answer>
+1770,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1772,protection,Protection, Protection </answer>
+1775,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1776,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1780,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1782,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1783,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1788,protection,Protection, Protection </answer>
+1790,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1791,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1792,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1795,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1796,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1801,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1802,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1803,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1805,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+1806,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1807,protection,Protection, Protection </answer>
+1809,protection,Protection, Protection </answer>
+1815,protection,Protection, Protection </answer>
+1817,protection,Protection, Protection </answer>
+1821,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1822,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1825,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1826,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1833,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1840,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1845,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1849,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1850,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1851,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1852,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1853,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1854,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1855,protection,Protection, Protection </answer>
+1856,reduction,Reduction, Reduction </answer>
+1860,protection,Protection, Protection </answer>
+1867,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1868,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1869,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1870,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1875,protection,Protection, Protection </answer>
+1880,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1883,reduction,Reduction, Reduction </answer>
+1884,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1885,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1886,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1888,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1893,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1898,reduction,Reduction, Reduction </answer>
+1909,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1912,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1916,reduction,Reduction, Reduction </answer>
+1918,protection,Protection, Protection </answer>
+1919,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1925,protection,Protection, Protection </answer>
+1926,protection,Protection, Protection </answer>
+1929,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1935,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1936,deprotection,Deprotection, Deprotection </answer>
+1939,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1942,deprotection,Deprotection, Deprotection </answer>
+1943,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1944,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1949,protection,Protection, Protection </answer>
+1950,protection,Protection, Protection </answer>
+1951,protection,Protection, Protection </answer>
+1952,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1954,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1962,protection,Protection, Protection </answer>
+1968,deprotection,Deprotection, Deprotection </answer>
+1969,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1975,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1976,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1982,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1983,reduction,Reduction, Reduction </answer>
+1985,deprotection,Deprotection, Deprotection </answer>
+1986,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1988,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1989,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1993,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1994,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1995,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1996,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1997,reduction,Reduction, Reduction </answer>
+1999,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2004,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2009,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2013,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2017,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2019,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2021,deprotection,Deprotection, Deprotection </answer>
+2022,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2024,protection,Protection, Protection </answer>
+2026,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2029,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2030,reduction,Reduction, Reduction </answer>
+2031,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2037,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2038,acylation,Acylation, Acylation </answer>
+2043,protection,Protection, Protection </answer>
+2044,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2046,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2053,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2055,protection,Protection, Protection </answer>
+2057,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2059,deprotection,Deprotection, Deprotection </answer>
+2060,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2062,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2067,protection,Protection, Protection </answer>
+2072,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2074,protection,Protection, Protection </answer>
+2075,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2076,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2082,protection,Protection, Protection </answer>
+2083,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2086,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2088,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2092,protection,Protection, Protection </answer>
+2094,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2097,reduction,Reduction, Reduction </answer>
+2104,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2107,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2112,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2113,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2117,protection,Protection, Protection </answer>
+2119,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2129,protection,Protection, Protection </answer>
+2138,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2140,reduction,Reduction, Reduction </answer>
+2144,protection,Protection, Protection </answer>
+2147,protection,Protection, Protection </answer>
+2149,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2152,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2157,protection,Protection, Protection </answer>
+2158,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2165,protection,Protection, Protection </answer>
+2168,reduction,Reduction, Reduction </answer>
+2170,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2177,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2182,protection,Protection, Protection </answer>
+2184,protection,Protection, Protection </answer>
+2199,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2201,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2203,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2205,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2208,protection,Protection, Protection </answer>
+2209,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2211,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2213,reduction,Reduction, Reduction </answer>
+2214,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2221,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2222,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2232,protection,Protection, Protection </answer>
+2234,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2235,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2240,protection,Protection, Protection </answer>
+2243,deprotection,Deprotection, Deprotection </answer>
+2247,acylation,Acylation, Acylation </answer>
+2253,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2254,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2257,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2260,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2263,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2267,deprotection,Deprotection, Deprotection </answer>
+2281,protection,Protection, Protection </answer>
+2282,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2283,protection,Protection, Protection </answer>
+2284,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2285,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2286,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2287,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2288,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2292,reduction,Reduction, Reduction </answer>
+2296,deprotection,Deprotection, Deprotection </answer>
+2297,protection,Protection, Protection </answer>
+2300,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2301,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2302,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2303,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2304,reduction,Reduction, Reduction </answer>
+2310,deprotection,Deprotection, Deprotection </answer>
+2312,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2320,protection,Protection, Protection </answer>
+2326,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2327,reduction,Reduction, Reduction </answer>
+2328,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2330,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2335,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2339,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2347,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2352,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2353,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2356,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2362,protection,Protection, Protection </answer>
+2364,protection,Protection, Protection </answer>
+2372,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2374,reduction,Reduction, Reduction </answer>
+2375,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+2376,protection,Protection, Protection </answer>
+2377,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2381,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+2383,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2384,acylation,Acylation, Acylation </answer>
+2385,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2390,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2398,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2400,protection,Protection, Protection </answer>
+2401,protection,Protection, Protection </answer>
+2403,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2409,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2410,protection,Protection, Protection </answer>
+2412,protection,Protection, Protection </answer>
+2414,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2415,protection,Protection, Protection </answer>
+2417,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2419,protection,Protection, Protection </answer>
+2420,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2423,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2424,protection,Protection, Protection </answer>
+2428,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2430,reduction,Reduction, Reduction </answer>
+2432,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2433,protection,Protection, Protection </answer>
+2437,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2440,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2443,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2448,reduction,Reduction, Reduction </answer>
+2452,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2453,protection,Protection, Protection </answer>
+2457,reduction,Reduction, Reduction </answer>
+2459,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2462,reduction,Reduction, Reduction </answer>
+2465,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2469,reduction,Reduction, Reduction </answer>
+2470,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2474,protection,Protection, Protection </answer>
+2476,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2478,protection,Protection, Protection </answer>
+2479,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2482,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2487,protection,Protection, Protection </answer>
+2488,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2490,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2492,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2494,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2500,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2501,protection,Protection, Protection </answer>
+2503,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2504,reduction,Reduction, Reduction </answer>
+2507,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2509,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2512,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2513,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2517,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2522,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2529,protection,Protection, Protection </answer>
+2533,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2535,protection,Protection, Protection </answer>
+2537,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2546,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2553,protection,Protection, Protection </answer>
+2557,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2559,protection,Protection, Protection </answer>
+2562,protection,Protection, Protection </answer>
+2565,reduction,Reduction, Reduction </answer>
+2568,reduction,Reduction, Reduction </answer>
+2574,protection,Protection, Protection </answer>
+2575,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2577,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2578,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2583,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2584,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2590,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2591,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2592,reduction,Reduction, Reduction </answer>
+2593,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2594,reduction,Reduction, Reduction </answer>
+2595,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2599,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2601,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2602,protection,Protection, Protection </answer>
+2609,deprotection,Deprotection, Deprotection </answer>
+2614,reduction,Reduction, Reduction </answer>
+2619,protection,Protection, Protection </answer>
+2621,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2626,protection,Protection, Protection </answer>
+2637,reduction,Reduction, Reduction </answer>
+2639,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2642,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2643,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2644,acylation,Acylation, Acylation </answer>
+2646,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2648,reduction,Reduction, Reduction </answer>
+2649,functional group addition,Functional Group Addition, Answer: Functional Group Addition </answer>
+2650,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2655,acylation,Acylation, Acylation </answer>
+2660,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2664,reduction,Reduction, Reduction </answer>
+2667,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2669,protection,Protection, Protection </answer>
+2671,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2672,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2673,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2674,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2676,protection,Protection, Protection </answer>
+2679,reduction,Reduction, Reduction </answer>
+2684,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2690,protection,Protection, Protection </answer>
+2698,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2699,protection,Protection, Protection </answer>
+2710,protection,Protection, Protection </answer>
+2712,reduction,Reduction, Reduction </answer>
+2721,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2722,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2723,protection,Protection, Protection </answer>
+2726,protection,Protection, Protection </answer>
+2727,protection,Protection, Protection </answer>
+2730,reduction,Reduction, Reduction </answer>
+2731,protection,Protection, Protection </answer>
+2732,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2735,reduction,Reduction, Reduction </answer>
+2737,protection,Protection, Protection </answer>
+2742,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2746,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2749,protection,Protection, Protection </answer>
+2750,protection,Protection, Protection </answer>
+2751,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2758,protection,Protection, Protection </answer>
+2761,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2763,reduction,Reduction, Reduction </answer>
+2766,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2769,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2774,protection,Protection, Protection </answer>
+2781,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2782,reduction,Reduction, Reduction </answer>
+2785,reduction,Reduction, Reduction </answer>
+2786,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2788,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2790,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2799,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2803,protection,Protection, Protection </answer>
+2804,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2806,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2813,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2818,protection,Protection, Protection </answer>
+2820,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2825,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2830,protection,Protection, Protection </answer>
+2835,protection,Protection, Protection </answer>
+2837,protection,Protection, Protection </answer>
+2838,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2843,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2845,reduction,Reduction, Reduction </answer>
+2846,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2849,reduction,Reduction, Reduction </answer>
+2857,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2864,protection,Protection, Protection </answer>
+2867,protection,Protection, Protection </answer>
+2869,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2871,protection,Protection, Protection </answer>
+2872,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2873,deprotection,Deprotection, Deprotection </answer>
+2874,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2875,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2880,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2881,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2886,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2888,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2890,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2891,deprotection,Deprotection, Deprotection </answer>
+2893,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2895,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2896,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2898,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2900,deprotection,Deprotection, Deprotection </answer>
+2905,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2908,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2912,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2914,protection,Protection, Protection </answer>
+2917,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2919,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2923,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2924,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2928,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2930,protection,Protection, Protection </answer>
+2932,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2935,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2939,reduction,Reduction, Reduction </answer>
+2940,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2942,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2949,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2950,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2953,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2959,reduction,Reduction, Reduction </answer>
+2963,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2964,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2965,protection,Protection, Protection </answer>
+2967,protection,Protection, Protection </answer>
+2975,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2977,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2981,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2984,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2985,protection,Protection, Protection </answer>
+2992,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2993,reduction,Reduction, Reduction </answer>
+2999,functional group addition,Functional Group Addition, Functional Group Addition </answer>

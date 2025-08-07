@@ -1,0 +1,682 @@
+example_idx,gold_answer,predicted_answer,full_completion
+1,protection,Deprotection, Deprotection </answer>
+2,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+4,deprotection,Deprotection, Deprotection </answer>
+5,deprotection,Deprotection, Deprotection </answer>
+6,deprotection,Deprotection, Deprotection </answer>
+7,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+8,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+11,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+12,protection,Deprotection, Deprotection </answer>
+14,acylation,Acylation, Acylation </answer>
+17,deprotection,Deprotection, The answer is: Deprotection </answer>
+18,deprotection,Deprotection, Deprotection </answer>
+20,protection,Deprotection, Deprotection </answer>
+25,protection,Deprotection, Deprotection </answer>
+29,deprotection,Deprotection, Deprotection </answer>
+32,deprotection,Deprotection, Deprotection </answer>
+38,deprotection,Deprotection, Deprotection </answer>
+41,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+45,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+48,protection,Deprotection, Deprotection </answer>
+49,deprotection,Deprotection, Deprotection </answer>
+53,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+55,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+59,protection,Deprotection, Deprotection </answer>
+68,deprotection,Deprotection, The answer is: Deprotection </answer>
+69,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+70,deprotection,Deprotection, Deprotection </answer>
+71,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+75,protection,Deprotection, Deprotection </answer>
+79,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+85,protection,Deprotection, Deprotection </answer>
+86,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+87,protection,Deprotection, Deprotection </answer>
+88,protection,Deprotection, Deprotection </answer>
+91,deprotection,Deprotection, The correct answer is: Deprotection </answer>
+95,deprotection,Deprotection, Deprotection </answer>
+96,protection,Deprotection, Deprotection </answer>
+103,deprotection,Deprotection, Deprotection </answer>
+107,deprotection,Deprotection, Deprotection </answer>
+116,protection,Deprotection, Deprotection </answer>
+119,deprotection,Deprotection, Deprotection </answer>
+121,deprotection,Deprotection, Deprotection </answer>
+124,deprotection,Deprotection, Deprotection </answer>
+125,protection,Deprotection, Deprotection </answer>
+127,protection,Deprotection, Deprotection </answer>
+129,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+130,deprotection,Deprotection, Deprotection </answer>
+134,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+139,c-c coupling,C-C Coupling, C-C Coupling </answer>
+142,protection,Deprotection, Deprotection </answer>
+143,acylation,Acylation, Acylation </answer>
+146,protection,Deprotection, Deprotection </answer>
+149,deprotection,Deprotection, Deprotection </answer>
+153,aromatic heterocycle formation,Aromatic Heterocycle Formation, The correct answer is: Aromatic Heterocycle Formation </answer>
+157,protection,Deprotection, Deprotection </answer>
+159,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+165,deprotection,Deprotection, Deprotection </answer>
+169,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+172,protection,Deprotection, Deprotection </answer>
+182,protection,Deprotection, Deprotection </answer>
+188,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+194,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+198,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+199,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+212,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+226,protection,Deprotection, Deprotection </answer>
+229,protection,Deprotection, Deprotection </answer>
+230,deprotection,Deprotection, Deprotection </answer>
+232,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+233,protection,Protection, Protection </answer>
+235,deprotection,Deprotection, Deprotection </answer>
+239,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+241,deprotection,Deprotection, Deprotection </answer>
+242,deprotection,Deprotection, Deprotection </answer>
+244,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+246,reduction,Reduction, Reduction </answer>
+247,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+251,deprotection,Deprotection, Deprotection </answer>
+254,c-c coupling,C-C Coupling, C-C Coupling </answer>
+255,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+256,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+266,protection,Deprotection, Deprotection </answer>
+267,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+271,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+277,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+283,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+286,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+292,deprotection,Deprotection, Deprotection </answer>
+304,deprotection,Deprotection, Deprotection </answer>
+312,c-c coupling,C-C Coupling, The answer is: C-C Coupling </answer>
+322,protection,Deprotection, Deprotection </answer>
+329,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+332,protection,Deprotection, Deprotection </answer>
+335,deprotection,Deprotection, Deprotection </answer>
+336,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+342,acylation,Acylation, Acylation </answer>
+343,protection,Deprotection, Deprotection </answer>
+347,protection,Deprotection, Deprotection </answer>
+351,deprotection,Deprotection, Deprotection </answer>
+356,deprotection,Deprotection, Deprotection </answer>
+358,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+361,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+363,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+364,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+367,protection,Deprotection, Deprotection </answer>
+369,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+379,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+385,protection,Deprotection, The answer is: Deprotection </answer>
+388,acylation,Acylation, Acylation </answer>
+393,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+400,deprotection,Deprotection, Deprotection </answer>
+402,protection,Deprotection, Deprotection </answer>
+404,functional group addition,Functional Group Addition, The correct answer is: Functional Group Addition </answer>
+407,deprotection,Deprotection, Deprotection </answer>
+410,deprotection,Deprotection, Deprotection </answer>
+412,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+413,protection,Deprotection, Deprotection </answer>
+415,deprotection,Deprotection, Deprotection </answer>
+421,deprotection,Deprotection, Deprotection </answer>
+429,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+438,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+442,acylation,Acylation, Acylation </answer>
+445,deprotection,Deprotection, Deprotection </answer>
+447,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+453,deprotection,Deprotection, Deprotection </answer>
+459,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+461,deprotection,Deprotection, Deprotection </answer>
+464,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+468,deprotection,Deprotection, Deprotection </answer>
+472,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+473,deprotection,Deprotection, Deprotection </answer>
+474,deprotection,Deprotection, Deprotection </answer>
+479,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+480,deprotection,Deprotection, Deprotection </answer>
+484,protection,Deprotection, Deprotection </answer>
+490,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+491,deprotection,Deprotection, Deprotection </answer>
+494,deprotection,Deprotection, Deprotection </answer>
+496,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+504,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+505,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+530,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+544,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+557,deprotection,Deprotection, Deprotection </answer>
+559,protection,Deprotection, Deprotection </answer>
+564,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+570,reduction,Reduction, Reduction </answer>
+572,protection,Deprotection, Deprotection </answer>
+573,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+576,protection,Deprotection, Deprotection </answer>
+582,deprotection,Deprotection, Deprotection </answer>
+585,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+594,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+611,deprotection,Deprotection, Deprotection </answer>
+612,deprotection,Deprotection, Deprotection </answer>
+613,protection,Deprotection, Deprotection </answer>
+617,protection,Deprotection, Deprotection </answer>
+618,deprotection,Deprotection, Deprotection </answer>
+619,deprotection,Deprotection, Deprotection </answer>
+621,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+622,deprotection,Deprotection, Deprotection </answer>
+623,deprotection,Deprotection, Deprotection </answer>
+628,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+631,deprotection,Deprotection, Deprotection </answer>
+646,protection,Deprotection, Deprotection </answer>
+659,deprotection,Deprotection, Deprotection </answer>
+661,deprotection,Deprotection, Deprotection </answer>
+662,deprotection,Deprotection, Deprotection </answer>
+671,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+679,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+681,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+685,deprotection,Deprotection, Deprotection </answer>
+693,deprotection,Deprotection, Deprotection </answer>
+695,deprotection,Deprotection, Deprotection </answer>
+696,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+700,acylation,Acylation, Acylation </answer>
+708,acylation,Acylation, Acylation </answer>
+709,protection,Deprotection, Deprotection </answer>
+712,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+718,deprotection,Deprotection, Deprotection </answer>
+722,protection,Deprotection, Deprotection </answer>
+729,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+734,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+737,deprotection,Deprotection, Deprotection </answer>
+738,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+740,protection,Deprotection, Deprotection </answer>
+754,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+763,protection,Deprotection, Deprotection </answer>
+768,protection,Deprotection, Deprotection </answer>
+769,deprotection,Deprotection, Deprotection </answer>
+771,deprotection,Deprotection, Deprotection </answer>
+778,protection,Deprotection, The answer is: Deprotection </answer>
+791,protection,Deprotection, Deprotection </answer>
+798,deprotection,Deprotection, Deprotection </answer>
+800,reduction,Reduction, Reduction </answer>
+807,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+809,deprotection,Deprotection, Deprotection </answer>
+810,protection,Deprotection, Deprotection </answer>
+824,deprotection,Deprotection, Deprotection </answer>
+825,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+827,deprotection,Deprotection, Deprotection </answer>
+828,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+829,c-c coupling,C-C Coupling, The answer is: C-C Coupling </answer>
+838,protection,Deprotection, Deprotection </answer>
+840,protection,Deprotection, Deprotection </answer>
+841,deprotection,Deprotection, Deprotection </answer>
+842,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+850,protection,Deprotection, Deprotection </answer>
+851,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+852,deprotection,Deprotection, Deprotection </answer>
+858,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+862,deprotection,Deprotection, Deprotection </answer>
+866,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+869,deprotection,Deprotection, Deprotection </answer>
+871,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+875,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+877,acylation,Acylation, Acylation </answer>
+882,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+883,deprotection,Deprotection, The answer is: Deprotection </answer>
+884,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+889,deprotection,Deprotection, Deprotection </answer>
+900,protection,Deprotection, Deprotection </answer>
+901,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+904,deprotection,Deprotection, Deprotection </answer>
+907,deprotection,Deprotection, Deprotection </answer>
+910,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+912,acylation,Acylation, Acylation </answer>
+917,functional group addition,Functional Group Addition, The name of this chemical reaction is: Functional Group Addition </answer>
+919,deprotection,Deprotection, Deprotection </answer>
+923,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+924,deprotection,Deprotection, Deprotection </answer>
+925,protection,Deprotection, Deprotection </answer>
+929,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+931,deprotection,Deprotection, Deprotection </answer>
+933,deprotection,Deprotection, Deprotection </answer>
+934,c-c coupling,C-C Coupling, C-C Coupling </answer>
+941,deprotection,Deprotection, Deprotection </answer>
+943,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+947,deprotection,Deprotection, Deprotection </answer>
+952,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+953,protection,Deprotection, Deprotection </answer>
+956,protection,Deprotection, Deprotection </answer>
+960,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+963,protection,Deprotection, Deprotection </answer>
+976,protection,Deprotection, Deprotection </answer>
+977,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+985,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+988,deprotection,Deprotection, Deprotection </answer>
+991,acylation,Acylation, Acylation </answer>
+993,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+995,deprotection,Deprotection, Deprotection </answer>
+1022,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1027,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1031,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1032,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1040,deprotection,Deprotection, Deprotection </answer>
+1047,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1054,protection,Deprotection, Deprotection </answer>
+1055,deprotection,Deprotection, Deprotection </answer>
+1057,protection,Deprotection, Deprotection </answer>
+1066,protection,Deprotection, Deprotection </answer>
+1072,deprotection,Deprotection, Deprotection </answer>
+1074,protection,Deprotection, Deprotection </answer>
+1085,protection,Protection, The name of this chemical reaction is: Protection </answer>
+1091,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1098,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1107,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1114,protection,Deprotection, Deprotection </answer>
+1122,protection,Deprotection, Deprotection </answer>
+1126,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1131,deprotection,Deprotection, Deprotection </answer>
+1136,c-c coupling,C-C Coupling, The answer is: C-C Coupling </answer>
+1140,deprotection,Deprotection, Deprotection </answer>
+1142,protection,Deprotection, Deprotection </answer>
+1148,deprotection,Deprotection, Deprotection </answer>
+1151,deprotection,Deprotection, Deprotection </answer>
+1154,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1166,deprotection,Deprotection, Deprotection </answer>
+1175,deprotection,Deprotection, Deprotection </answer>
+1177,protection,Deprotection, Deprotection </answer>
+1180,deprotection,Deprotection, Deprotection </answer>
+1183,deprotection,Deprotection, Deprotection </answer>
+1185,deprotection,Deprotection, Deprotection </answer>
+1186,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1187,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1189,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1193,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1197,protection,Deprotection, Deprotection </answer>
+1200,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1201,protection,Protection, The correct answer is: Protection </answer>
+1205,deprotection,Deprotection, Deprotection </answer>
+1207,deprotection,Deprotection, Deprotection </answer>
+1211,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1224,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1231,deprotection,Deprotection, Deprotection </answer>
+1236,deprotection,Deprotection, Deprotection </answer>
+1242,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1245,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1248,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1249,protection,Deprotection, Deprotection </answer>
+1259,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1262,deprotection,Deprotection, Deprotection </answer>
+1264,protection,Deprotection, Deprotection </answer>
+1268,deprotection,Deprotection, Deprotection </answer>
+1270,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1276,deprotection,Deprotection, Deprotection </answer>
+1277,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1278,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1280,aromatic heterocycle formation,Aromatic Heterocycle Formation, The answer is: Aromatic Heterocycle Formation </answer>
+1285,deprotection,Deprotection, The correct answer is: Deprotection </answer>
+1293,deprotection,Deprotection, Deprotection </answer>
+1303,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1304,protection,Deprotection, Deprotection </answer>
+1305,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1312,deprotection,Deprotection, Deprotection </answer>
+1314,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1317,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1326,deprotection,Deprotection, Deprotection </answer>
+1336,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1340,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1344,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1345,deprotection,Deprotection, Deprotection </answer>
+1355,protection,Deprotection, Deprotection </answer>
+1366,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1370,deprotection,Deprotection, Deprotection </answer>
+1376,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1377,protection,Deprotection, Deprotection </answer>
+1381,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1401,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1403,deprotection,Deprotection, Deprotection </answer>
+1406,deprotection,Deprotection, Deprotection </answer>
+1407,protection,Protection, Protection </answer>
+1408,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1411,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1414,protection,Deprotection, Deprotection </answer>
+1419,acylation,Acylation, Acylation </answer>
+1420,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1430,protection,Deprotection, Deprotection </answer>
+1434,protection,Deprotection, Deprotection </answer>
+1436,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1441,protection,Deprotection, Deprotection </answer>
+1443,deprotection,Deprotection, Deprotection </answer>
+1449,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1450,deprotection,Deprotection, Deprotection </answer>
+1453,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1454,protection,Deprotection, Deprotection </answer>
+1458,acylation,Acylation, Acylation </answer>
+1462,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1463,deprotection,Deprotection, Deprotection </answer>
+1464,deprotection,Deprotection, The answer is: Deprotection </answer>
+1468,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1469,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1471,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1476,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1477,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1482,protection,Deprotection, Deprotection </answer>
+1496,protection,Protection, The name of this chemical reaction is: Protection </answer>
+1500,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1503,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1507,protection,Deprotection, Deprotection </answer>
+1508,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1510,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1512,protection,Protection, Protection </answer>
+1519,deprotection,Deprotection, Deprotection </answer>
+1521,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1522,deprotection,Deprotection, Deprotection </answer>
+1550,deprotection,Deprotection, Deprotection </answer>
+1552,protection,Deprotection, Deprotection </answer>
+1556,protection,Deprotection, Deprotection </answer>
+1562,protection,Deprotection, Deprotection </answer>
+1564,protection,Deprotection, Deprotection </answer>
+1566,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1571,deprotection,Deprotection, Deprotection </answer>
+1587,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1588,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1589,deprotection,Deprotection, Deprotection </answer>
+1590,deprotection,Deprotection, Deprotection </answer>
+1598,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1603,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1614,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1622,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1626,protection,Deprotection, Deprotection </answer>
+1627,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1633,protection,Deprotection, Deprotection </answer>
+1640,deprotection,Deprotection, Deprotection </answer>
+1659,protection,Deprotection, Deprotection </answer>
+1661,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1662,deprotection,Deprotection, Deprotection </answer>
+1665,deprotection,Deprotection, Deprotection </answer>
+1670,protection,Deprotection, Deprotection </answer>
+1680,deprotection,Deprotection, Deprotection </answer>
+1684,deprotection,Deprotection, Deprotection </answer>
+1698,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1706,deprotection,Deprotection, Deprotection </answer>
+1710,deprotection,Deprotection, Deprotection </answer>
+1718,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1719,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1723,deprotection,Deprotection, Deprotection </answer>
+1724,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1737,deprotection,Deprotection, Deprotection </answer>
+1743,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1748,protection,Deprotection, Deprotection </answer>
+1753,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1757,protection,Deprotection, Deprotection </answer>
+1762,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1766,deprotection,Deprotection, Deprotection </answer>
+1768,protection,Deprotection, Deprotection </answer>
+1769,deprotection,Deprotection, Deprotection </answer>
+1772,protection,Deprotection, Deprotection </answer>
+1774,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1781,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1788,protection,Deprotection, Deprotection </answer>
+1791,functional group addition,Functional Group Addition, The answer is: Functional Group Addition </answer>
+1795,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1807,protection,Deprotection, Deprotection </answer>
+1815,protection,Deprotection, Deprotection </answer>
+1822,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1831,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+1833,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1834,deprotection,Deprotection, Deprotection </answer>
+1837,acylation,Acylation, Acylation </answer>
+1849,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1855,protection,Deprotection, Deprotection </answer>
+1861,deprotection,Deprotection, Deprotection </answer>
+1864,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1865,deprotection,Deprotection, The correct answer is: Deprotection </answer>
+1871,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, The answer is: Heteroatom Alkylation and Arylation </answer>
+1875,protection,Deprotection, Deprotection </answer>
+1878,deprotection,Deprotection, Deprotection </answer>
+1892,deprotection,Deprotection, Deprotection </answer>
+1893,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1899,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1904,deprotection,Deprotection, Deprotection </answer>
+1907,deprotection,Deprotection, Deprotection </answer>
+1910,deprotection,Deprotection, Deprotection </answer>
+1921,deprotection,Deprotection, Deprotection </answer>
+1925,protection,Deprotection, Deprotection </answer>
+1926,protection,Deprotection, Deprotection </answer>
+1928,acylation,Acylation, Acylation </answer>
+1929,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1935,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1937,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1942,deprotection,Deprotection, Deprotection </answer>
+1948,acylation,Acylation, Acylation </answer>
+1950,protection,Deprotection, Deprotection </answer>
+1955,acylation,Acylation, Acylation </answer>
+1956,deprotection,Deprotection, Deprotection </answer>
+1965,c-c coupling,C-C Coupling, C-C Coupling </answer>
+1973,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1976,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1985,deprotection,Deprotection, Deprotection </answer>
+1986,functional group addition,Functional Group Addition, The name of this chemical reaction is: Functional Group Addition </answer>
+1995,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2000,protection,Deprotection, Deprotection </answer>
+2006,acylation,Acylation, Acylation </answer>
+2011,deprotection,Deprotection, Deprotection </answer>
+2012,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2014,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2021,deprotection,Deprotection, Deprotection </answer>
+2024,protection,Deprotection, Deprotection </answer>
+2028,deprotection,Deprotection, Deprotection </answer>
+2029,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2035,deprotection,Deprotection, Deprotection </answer>
+2038,acylation,Acylation, Acylation </answer>
+2039,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2042,deprotection,Deprotection, Deprotection </answer>
+2043,protection,Deprotection, Deprotection </answer>
+2044,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2046,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2055,protection,Deprotection, Deprotection </answer>
+2056,protection,Deprotection, Deprotection </answer>
+2059,deprotection,Deprotection, Deprotection </answer>
+2063,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2064,deprotection,Deprotection, Deprotection </answer>
+2068,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2074,protection,Deprotection, Deprotection </answer>
+2077,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2080,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2084,deprotection,Deprotection, Deprotection </answer>
+2086,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2087,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2090,deprotection,Deprotection, The correct answer is: Deprotection </answer>
+2092,protection,Deprotection, Deprotection </answer>
+2093,deprotection,Deprotection, Deprotection </answer>
+2096,deprotection,Deprotection, The correct answer is: Deprotection </answer>
+2100,deprotection,Deprotection, Deprotection </answer>
+2101,deprotection,Deprotection, Deprotection </answer>
+2102,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2103,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2104,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2108,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2109,deprotection,Deprotection, Deprotection </answer>
+2117,protection,Deprotection, Deprotection </answer>
+2122,acylation,Acylation, Acylation </answer>
+2129,protection,Deprotection, Deprotection </answer>
+2134,deprotection,Deprotection, Deprotection </answer>
+2144,protection,Deprotection, Deprotection </answer>
+2157,protection,Protection, Protection </answer>
+2159,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2163,deprotection,Deprotection, Deprotection </answer>
+2165,protection,Deprotection, Deprotection </answer>
+2174,deprotection,Deprotection, Deprotection </answer>
+2176,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2179,deprotection,Deprotection, Deprotection </answer>
+2182,protection,Deprotection, Deprotection </answer>
+2184,protection,Protection, Protection </answer>
+2185,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2195,deprotection,Deprotection, Deprotection </answer>
+2198,deprotection,Deprotection, Deprotection </answer>
+2214,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2223,deprotection,Deprotection, Deprotection </answer>
+2229,deprotection,Deprotection, Deprotection </answer>
+2233,protection,Deprotection, Deprotection </answer>
+2243,deprotection,Deprotection, Deprotection </answer>
+2246,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2251,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2258,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2267,deprotection,Deprotection, Deprotection </answer>
+2269,deprotection,Deprotection, Deprotection </answer>
+2276,protection,Deprotection, The name of this chemical reaction is: Deprotection </answer>
+2277,deprotection,Deprotection, Deprotection </answer>
+2278,deprotection,Deprotection, Deprotection </answer>
+2281,protection,Deprotection, Deprotection </answer>
+2283,protection,Deprotection, Deprotection </answer>
+2287,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2296,deprotection,Deprotection, Deprotection </answer>
+2297,protection,Deprotection, Deprotection </answer>
+2306,deprotection,Deprotection, Deprotection </answer>
+2310,deprotection,Deprotection, Deprotection </answer>
+2316,deprotection,Deprotection, Deprotection </answer>
+2318,deprotection,Deprotection, Deprotection </answer>
+2320,protection,Deprotection, Deprotection </answer>
+2325,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2332,deprotection,Deprotection, Deprotection </answer>
+2336,deprotection,Deprotection, Deprotection </answer>
+2340,deprotection,Deprotection, Deprotection </answer>
+2341,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2342,deprotection,Deprotection, Deprotection </answer>
+2344,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2353,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2362,protection,Protection, Protection </answer>
+2365,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2369,deprotection,Deprotection, Deprotection </answer>
+2372,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2373,deprotection,Deprotection, Deprotection </answer>
+2380,protection,Deprotection, Deprotection </answer>
+2388,deprotection,Deprotection, Deprotection </answer>
+2393,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2396,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2397,acylation,Acylation, Acylation </answer>
+2400,protection,Deprotection, Deprotection </answer>
+2403,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2406,acylation,Acylation, Acylation </answer>
+2408,deprotection,Deprotection, Deprotection </answer>
+2414,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2421,deprotection,Deprotection, Deprotection </answer>
+2422,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2423,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2424,protection,Deprotection, Deprotection </answer>
+2429,deprotection,Deprotection, Deprotection </answer>
+2431,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2433,protection,Deprotection, The name of this chemical reaction is: Deprotection </answer>
+2443,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2449,deprotection,Deprotection, Deprotection </answer>
+2453,protection,Deprotection, Deprotection </answer>
+2463,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2466,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2477,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2487,protection,Deprotection, Deprotection </answer>
+2497,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2499,deprotection,Deprotection, The answer is: Deprotection </answer>
+2500,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2501,protection,Deprotection, Deprotection </answer>
+2512,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2514,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2519,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2520,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+2524,deprotection,Deprotection, Deprotection </answer>
+2530,acylation,Acylation, Acylation </answer>
+2532,deprotection,Deprotection, Deprotection </answer>
+2537,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2538,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2539,protection,Deprotection, Deprotection </answer>
+2541,deprotection,Deprotection, Deprotection </answer>
+2546,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2549,deprotection,Deprotection, Deprotection </answer>
+2550,deprotection,Deprotection, Deprotection </answer>
+2553,protection,Deprotection, Deprotection </answer>
+2555,deprotection,Deprotection, Deprotection </answer>
+2558,deprotection,Deprotection, Deprotection </answer>
+2559,protection,Protection, The answer is: Protection </answer>
+2561,deprotection,Deprotection, Deprotection </answer>
+2562,protection,Deprotection, Deprotection </answer>
+2572,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2573,deprotection,Deprotection, Deprotection </answer>
+2580,deprotection,Deprotection, Deprotection </answer>
+2587,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2602,protection,Deprotection, Deprotection </answer>
+2603,deprotection,Deprotection, Deprotection </answer>
+2608,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2609,deprotection,Deprotection, Deprotection </answer>
+2617,acylation,Acylation, Acylation </answer>
+2619,protection,Protection, Protection </answer>
+2624,deprotection,Deprotection, Deprotection </answer>
+2628,deprotection,Deprotection, Deprotection </answer>
+2631,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2642,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2643,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2644,acylation,Acylation, Acylation </answer>
+2655,acylation,Acylation, Acylation </answer>
+2658,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2660,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2665,deprotection,Deprotection, Deprotection </answer>
+2669,protection,Protection, Protection </answer>
+2676,protection,Deprotection, Deprotection </answer>
+2680,deprotection,Deprotection, Deprotection </answer>
+2686,deprotection,Deprotection, Deprotection </answer>
+2690,protection,Deprotection, Deprotection </answer>
+2697,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2701,deprotection,Deprotection, Deprotection </answer>
+2706,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2713,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2723,protection,Deprotection, Deprotection </answer>
+2724,deprotection,Deprotection, Deprotection </answer>
+2727,protection,Deprotection, Deprotection </answer>
+2729,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2733,deprotection,Deprotection, Deprotection </answer>
+2736,reduction,Reduction, Reduction </answer>
+2738,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2740,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2751,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2754,deprotection,Deprotection, Deprotection </answer>
+2771,protection,Deprotection, Deprotection </answer>
+2773,deprotection,Deprotection, Deprotection </answer>
+2797,deprotection,Deprotection, Deprotection </answer>
+2798,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2803,protection,Deprotection, Deprotection </answer>
+2805,deprotection,Deprotection, Deprotection </answer>
+2809,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2811,c-c coupling,C-C Coupling, C-C Coupling </answer>
+2816,deprotection,Deprotection, Deprotection </answer>
+2818,protection,Deprotection, Deprotection </answer>
+2821,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2824,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2826,deprotection,Deprotection, Deprotection </answer>
+2827,deprotection,Deprotection, Deprotection </answer>
+2831,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2840,deprotection,Deprotection, Deprotection </answer>
+2843,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2847,protection,Deprotection, Deprotection </answer>
+2852,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2856,deprotection,Deprotection, Deprotection </answer>
+2863,deprotection,Deprotection, Deprotection </answer>
+2864,protection,Deprotection, Deprotection </answer>
+2868,deprotection,Deprotection, Deprotection </answer>
+2871,protection,Deprotection, Deprotection </answer>
+2875,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2876,deprotection,Deprotection, Deprotection </answer>
+2883,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2885,acylation,Acylation, Acylation </answer>
+2889,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2891,deprotection,Deprotection, Deprotection </answer>
+2894,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2900,deprotection,Deprotection, Deprotection </answer>
+2908,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2911,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2914,protection,Deprotection, Deprotection </answer>
+2919,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2922,deprotection,Deprotection, Deprotection </answer>
+2930,protection,Deprotection, Deprotection </answer>
+2931,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2933,deprotection,Deprotection, Deprotection </answer>
+2934,deprotection,Deprotection, Deprotection </answer>
+2938,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2952,acylation,Acylation, Acylation </answer>
+2956,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2960,deprotection,Deprotection, Deprotection </answer>
+2965,protection,Deprotection, Deprotection </answer>
+2967,protection,Deprotection, Deprotection </answer>
+2987,protection,Deprotection, Deprotection </answer>
+2990,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>

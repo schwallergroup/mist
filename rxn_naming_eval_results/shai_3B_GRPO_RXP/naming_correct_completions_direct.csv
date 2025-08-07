@@ -1,0 +1,280 @@
+example_idx,gold_answer,predicted_answer,full_completion
+1,protection,Protection, Protection </answer>
+9,reduction,Reduction, Reduction </answer>
+20,protection,Protection, Protection </answer>
+25,protection,Protection, Protection </answer>
+48,protection,Protection, Protection </answer>
+59,protection,Protection, Protection </answer>
+81,reduction,Reduction, Reduction </answer>
+113,reduction,Reduction, Reduction </answer>
+115,functional group interconversion,Functional Group Interconversion, Functional Group Interconversion </answer>
+125,protection,Protection, Protection </answer>
+138,protection,Protection, Protection </answer>
+146,protection,Protection, Protection </answer>
+147,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+154,reduction,Reduction, Reduction </answer>
+157,protection,Protection, Protection </answer>
+172,protection,Protection, Protection </answer>
+214,reduction,Reduction, Reduction </answer>
+233,protection,Protection, Protection </answer>
+244,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+257,reduction,Reduction, Reduction </answer>
+263,acylation,Acylation, Acylation </answer>
+264,reduction,Reduction, Reduction </answer>
+266,protection,Protection, Protection </answer>
+287,acylation,Acylation, Acylation </answer>
+296,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+320,acylation,Acylation, Acylation </answer>
+343,protection,Protection, Protection </answer>
+346,reduction,Reduction, Reduction </answer>
+367,protection,Protection, Protection </answer>
+386,reduction,Reduction, Reduction </answer>
+389,reduction,Reduction, Reduction </answer>
+395,reduction,Reduction, Reduction </answer>
+402,protection,Protection, Protection </answer>
+414,reduction,Reduction, Reduction </answer>
+416,acylation,Acylation, Acylation </answer>
+423,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+462,reduction,Reduction, Reduction </answer>
+467,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+470,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+484,protection,Protection, Protection </answer>
+496,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+500,reduction,Reduction, Reduction </answer>
+549,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+550,reduction,Reduction, Reduction </answer>
+559,protection,Protection, Protection </answer>
+560,protection,Protection, Protection </answer>
+570,reduction,Reduction, Reduction </answer>
+572,protection,Protection, Protection </answer>
+600,protection,Protection, Protection </answer>
+603,protection,Protection, Protection </answer>
+607,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+646,protection,Protection, Protection </answer>
+664,reduction,Reduction, Reduction </answer>
+699,reduction,Reduction, Reduction </answer>
+708,acylation,Acylation, Acylation </answer>
+717,reduction,Reduction, Reduction </answer>
+728,acylation,Acylation, Acylation </answer>
+730,reduction,Reduction, Reduction </answer>
+740,protection,Protection, Protection </answer>
+743,acylation,Acylation, Acylation </answer>
+794,acylation,Acylation, Acylation </answer>
+800,reduction,Reduction, Reduction </answer>
+810,protection,Protection, Protection </answer>
+815,reduction,Reduction, Reduction </answer>
+826,reduction,Reduction, Reduction </answer>
+830,reduction,Reduction, Reduction </answer>
+834,reduction,Reduction, Reduction </answer>
+847,reduction,Reduction, Reduction </answer>
+849,acylation,Acylation, Acylation </answer>
+864,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+865,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+881,reduction,Reduction, Reduction </answer>
+887,reduction,Reduction, Reduction </answer>
+888,protection,Protection, Protection </answer>
+891,protection,Protection, Protection </answer>
+900,protection,Protection, Protection </answer>
+940,reduction,Reduction, Reduction </answer>
+956,protection,Protection, Protection </answer>
+966,reduction,Reduction, Reduction </answer>
+971,reduction,Reduction, Reduction </answer>
+972,reduction,Reduction, Reduction </answer>
+975,protection,Protection, Protection </answer>
+976,protection,Protection, Protection </answer>
+980,reduction,Reduction, Reduction </answer>
+1004,acylation,Acylation, Acylation </answer>
+1033,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1054,protection,Protection, Protection </answer>
+1057,protection,Protection, Protection </answer>
+1061,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1066,protection,Protection, Protection </answer>
+1083,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1087,protection,Protection, Protection </answer>
+1099,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1106,reduction,Reduction, Reduction </answer>
+1118,protection,Protection, Protection </answer>
+1119,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1122,protection,Protection, Protection </answer>
+1141,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1150,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1164,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1177,protection,Protection, Protection </answer>
+1179,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1181,reduction,Reduction, Reduction </answer>
+1184,reduction,Reduction, Reduction </answer>
+1186,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+1190,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1197,protection,Protection, Protection </answer>
+1201,protection,Protection, Protection </answer>
+1215,protection,Protection, Protection </answer>
+1222,reduction,Reduction, Reduction </answer>
+1266,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1283,reduction,Reduction, Reduction </answer>
+1284,reduction,Reduction, Reduction </answer>
+1295,reduction,Reduction, Reduction </answer>
+1297,protection,Protection, Protection </answer>
+1306,acylation,Acylation, Acylation </answer>
+1327,reduction,Reduction, Reduction </answer>
+1359,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1405,acylation,Acylation, Acylation </answer>
+1407,protection,Protection, Protection </answer>
+1417,acylation,Acylation, Acylation </answer>
+1430,protection,Protection, Protection </answer>
+1434,protection,Protection, Protection </answer>
+1451,reduction,Reduction, Reduction </answer>
+1455,protection,Protection, Protection </answer>
+1458,acylation,Acylation, Acylation </answer>
+1467,acylation,Acylation, Acylation </answer>
+1475,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1482,protection,Protection, Protection </answer>
+1494,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1507,protection,Protection, Protection </answer>
+1512,protection,Protection, Protection </answer>
+1513,reduction,Reduction, Reduction </answer>
+1525,reduction,Reduction, Reduction </answer>
+1526,reduction,Reduction, Reduction </answer>
+1537,protection,Protection, Protection </answer>
+1545,protection,Protection, Protection </answer>
+1560,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1609,acylation,Acylation, Acylation </answer>
+1624,acylation,Acylation, Acylation </answer>
+1626,protection,Protection, Protection </answer>
+1632,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1646,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1650,reduction,Reduction, The reaction is: [START_SMILES] CCCCCCCCCCCCCCCCCCCCC(=O)O.O=P([O-])([O-])[O-].O=[Mo]=O [END_SMILES] . The answer is: Reduction</answer>
+1655,protection,Protection, Protection </answer>
+1659,protection,Protection, Protection </answer>
+1669,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1705,protection,Protection, Protection </answer>
+1712,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1713,acylation,Acylation, Acylation </answer>
+1728,acylation,Acylation, Acylation </answer>
+1746,reduction,Reduction, Reduction </answer>
+1749,protection,Protection, Protection </answer>
+1750,reduction,Reduction, Reduction </answer>
+1760,reduction,Reduction, Reduction </answer>
+1768,protection,Protection, Protection </answer>
+1773,reduction,Reduction, Reduction </answer>
+1791,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+1808,acylation,Acylation, Acylation </answer>
+1812,reduction,Reduction, Reduction </answer>
+1815,protection,Protection, Protection </answer>
+1818,acylation,Acylation, Acylation </answer>
+1837,acylation,Acylation, Acylation </answer>
+1866,acylation,Acylation, Acylation </answer>
+1875,protection,Protection, Protection </answer>
+1880,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+1896,protection,Protection, Protection </answer>
+1915,acylation,Acylation, Acylation </answer>
+1925,protection,Protection, Protection </answer>
+1926,protection,Protection, Protection </answer>
+1949,protection,Protection, Protection </answer>
+1951,protection,Protection, Protection </answer>
+1953,reduction,Reduction, Reduction </answer>
+1983,reduction,Reduction, Reduction </answer>
+2000,protection,Protection, Protection </answer>
+2024,protection,Protection, Protection </answer>
+2043,protection,Protection, Protection </answer>
+2051,reduction,Reduction, Reduction </answer>
+2056,protection,Protection, Protection </answer>
+2060,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2061,acylation,Acylation, Acylation </answer>
+2067,protection,Protection, Protection </answer>
+2069,acylation,Acylation, Acylation </answer>
+2083,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2107,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2111,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2114,functional group addition,Functional Group Addition, Functional Group Addition </answer>
+2117,protection,Protection, Protection </answer>
+2118,acylation,Acylation, Acylation </answer>
+2123,reduction,Reduction, Reduction </answer>
+2137,reduction,Reduction, Reduction </answer>
+2165,protection,Protection, Protection </answer>
+2178,protection,Protection, Protection </answer>
+2182,protection,Protection, Protection </answer>
+2186,reduction,Reduction, Reduction </answer>
+2196,reduction,Reduction, Reduction </answer>
+2197,reduction,Reduction, Reduction </answer>
+2227,reduction,Reduction, Reduction </answer>
+2232,protection,Protection, Protection </answer>
+2233,protection,Protection, Protection </answer>
+2237,reduction,Reduction, Reduction </answer>
+2263,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2304,reduction,Reduction, Reduction </answer>
+2307,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2320,protection,Protection, Protection </answer>
+2326,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2328,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2337,reduction,Reduction, Reduction </answer>
+2359,reduction,Reduction, Reduction </answer>
+2364,protection,Protection, Protection </answer>
+2367,reduction,Reduction, Reduction </answer>
+2380,protection,Protection, Protection </answer>
+2397,acylation,Acylation, Acylation </answer>
+2400,protection,Protection, Protection </answer>
+2410,protection,Protection, Protection </answer>
+2415,protection,Protection, Protection </answer>
+2420,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2427,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2450,reduction,Reduction, Reduction </answer>
+2474,protection,Protection, Protection </answer>
+2487,protection,Protection, Protection </answer>
+2489,reduction,Reduction, Reduction </answer>
+2501,protection,Protection, Protection </answer>
+2528,deprotection,Deprotection, Deprotection </answer>
+2551,reduction,Reduction, Reduction </answer>
+2552,acylation,Acylation, Acylation </answer>
+2559,protection,Protection, Protection </answer>
+2562,protection,Protection, Protection </answer>
+2565,reduction,Reduction, Reduction </answer>
+2575,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2583,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2590,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2594,reduction,Reduction, Reduction </answer>
+2614,reduction,Reduction, Reduction </answer>
+2615,acylation,Acylation, Acylation </answer>
+2619,protection,Protection, Protection </answer>
+2632,reduction,Reduction, Reduction </answer>
+2655,acylation,Acylation, Acylation </answer>
+2657,protection,Protection, Protection </answer>
+2664,reduction,Reduction, Reduction </answer>
+2674,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2676,protection,Protection, Protection </answer>
+2679,reduction,Reduction, Reduction </answer>
+2685,acylation,Acylation, Acylation </answer>
+2693,reduction,Reduction, Reduction </answer>
+2694,reduction,Reduction, Reduction </answer>
+2695,acylation,Acylation, Acylation </answer>
+2712,reduction,Reduction, Reduction </answer>
+2713,aromatic heterocycle formation,Aromatic Heterocycle Formation, Aromatic Heterocycle Formation </answer>
+2722,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2723,protection,Protection, Protection </answer>
+2737,protection,Protection, Protection </answer>
+2742,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2749,protection,Protection, Protection </answer>
+2750,protection,Protection, Protection </answer>
+2753,reduction,Reduction, Reduction </answer>
+2758,protection,Protection, Protection </answer>
+2762,reduction,Reduction, Reduction </answer>
+2763,reduction,Reduction, Reduction </answer>
+2764,reduction,Reduction, Reduction </answer>
+2770,reduction,Reduction, Reduction </answer>
+2796,acylation,Acylation, Acylation </answer>
+2818,protection,Protection, Protection </answer>
+2822,reduction,Reduction, Reduction </answer>
+2832,reduction,Reduction, Reduction </answer>
+2839,acylation,Acylation, Acylation </answer>
+2847,protection,Protection, Protection </answer>
+2849,reduction,Reduction, Reduction </answer>
+2854,reduction,Reduction, Reduction </answer>
+2867,protection,Protection, Protection </answer>
+2885,acylation,Acylation, Acylation </answer>
+2940,heteroatom alkylation and arylation,Heteroatom Alkylation and Arylation, Heteroatom Alkylation and Arylation </answer>
+2952,acylation,Acylation, Acylation </answer>
+2965,protection,Protection, Protection </answer>
+2967,protection,Protection, Protection </answer>
+2987,protection,Protection, Protection </answer>
+2991,protection,Protection, Protection </answer>
+2993,reduction,Reduction, Reduction </answer>
+2998,protection,Protection, Protection </answer>

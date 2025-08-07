@@ -81,7 +81,7 @@ def main(args):
     # llm = LLM(model="/data/share/jgoumaz_grpo_models/checkpoints/rxn_naming_409465/checkpoint-200/")  
     # llm = LLM(model="Qwen/Qwen2.5-3B", trust_remote_code=True)
     # llm = LLM(model="/data/share/qwen_pretranined_v6")  
-    llm = LLM(args.model_path)
+    llm = LLM(args.model_path, trust_remote_code=True)
     
     sampling_params = SamplingParams(n=1, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.00, temperature=0.8, top_p=0.80, top_k=20, min_p=0.0, seed=None, stop=[], stop_token_ids=[151643, 151644, 151645], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=4096, min_tokens=0, logprobs=None, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)
     #sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
@@ -119,6 +119,7 @@ def main(args):
         #     "<|im_start|>assistant\n"
         #     "<think>"
         # )
+        
         prompt = f"""<|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
 

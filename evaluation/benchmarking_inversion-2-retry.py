@@ -6,7 +6,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
 
-df = pd.read_csv("/data/david/final_tasks_prompts/dataset_swapped500k_prompt.csv")
+MODEL    = os.environ["MODEL"]
+DATAPATH = os.environ["DATAPATH"]
+OUTDIR   = os.environ["OUTDIR"]
+
+df = pd.read_csv("/capstor/store/cscs/swissai/a131/dsegura/reaction_class_prompts_600k.csv")
 
 df = df.iloc[10_000:].reset_index(drop=True)
 
@@ -24,7 +28,7 @@ all_keys = set().union(*(rec.keys() for rec in test_data))
 print(all_keys)
 
 # Load vLLM model
-llm = LLM(model="/data/share/sft_hf_3/")  
+llm = LLM(model="/capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_3B/pretrained_sft_qwen2.5_3B_epoch8")  
 sampling_params = SamplingParams(n=1, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.00, temperature=0.8, top_p=0.80, top_k=20, min_p=0.0, seed=None, stop=[], stop_token_ids=[151643, 151644, 151645], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=4096, min_tokens=0, logprobs=None, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)
 #sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
 
