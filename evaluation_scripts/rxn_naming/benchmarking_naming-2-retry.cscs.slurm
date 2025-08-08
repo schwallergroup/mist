@@ -27,7 +27,7 @@ pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip show torch vllm;
 
-python evaluation/benchmarking_naming-2-retry.py \
+python evaluation_scripts/rxn_naming/benchmarking_naming-2-retry.py \
     --model $MODEL \
     --data_path $DATAPATH \
     --out_dir $OUTDIR \
