@@ -17,8 +17,8 @@ source ~/.bashrc
 echo "START TIME: $(date)"
 
 MODEL=/capstor/store/cscs/swissai/a131/jmeng/models/pretrained_sft_qwen2.5_3B/pretrained_sft_qwen2.5_3B_epoch8 # Path to your model checkpoint
-DATAPATH=/capstor/store/cscs/swissai/a131/dsegura/reaction_class_prompts_600k.csv # likely you don't need to change this
-OUTDIR=rxn_naming_eval_results/jeffrey_3B # Where do you want to save the evaluation results
+DATAPATH=/capstor/store/cscs/swissai/a131/nnguyenx/benchmark_i2s.pkl # likely you don't need to change this
+OUTDIR=eval_results/iupac_to_smiles/jeffrey_3B_sft # Where do you want to save the evaluation results
 
 conda deactivate;
 cd /Documents/sink;
@@ -27,7 +27,7 @@ pip install hf_transfer gdown levenshtein rdkit wandb exmol;
 pip install -e . --no-deps;
 pip show torch vllm;
 
-python evaluation/benchmarking_naming-2-retry.py \
+python evaluation_scripts/iupac_to_smiles/iupac_to_smiles_benchmark.py \
     --model $MODEL \
     --data_path $DATAPATH \
     --out_dir $OUTDIR \
