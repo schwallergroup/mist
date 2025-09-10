@@ -30,7 +30,7 @@ class ConditionalMaterialGeneration(RLTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.question_template = f"""<|im_start|>assistant\You are a material science expert, and I have a task for you. Given the following elements, please generate valid and novel material from these elements. Show your reasoning in <think>...</think> tags and return the final answer in <material>...</material> tags.<|im_end|>\n<|im_start|>user\{{instruction}}. Please keep your reasoning as concise as possible. For example <material> A A B B B <sg12></material> where A, B refer to elements and <sg12> denotes the space group for example: \n<material> Pa In Tc Tc <sg225></material>.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"""
+        self.question_template = "You are a material science expert, and I have a task for you. Please generate valid and novel material from the provided elements. The elements are {}. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags, for example <answer> A A B B B <sg12></answer> where A, B refer to elements and <sg12> denotes the space group."
         self.log_custom_metrics = True
         self.custom_metrics = {
             'val/rewards': [],
@@ -69,11 +69,11 @@ class ConditionalMaterialGeneration(RLTask):
                 print(pt.keys())
                 print(f"Missing expected key in data: {e}")
 
-        seed = 42
-        random.seed(seed)
+        # seed = 42
+        # random.seed(seed)
         # print(f"\n\n\nproblems size: {len(problems)} solutions size: {len(solutions)}\n\n\n")
-        problems = random.sample(problems, 2200)
-        solutions = random.sample(solutions, 2200)
+        # problems = random.sample(problems, 2200)
+        # solutions = random.sample(solutions, 2200)
         return {
             "problem": problems,
             "solution": solutions,
@@ -99,7 +99,7 @@ class ConditionalMaterialGeneration(RLTask):
         train_dict = self.read_files()
         # print(train_dict)
         train_dataset = Dataset.from_dict(train_dict)
-        print(f"{type(train_dataset)}")
+        # print(f"{type(train_dataset)}")
         seed = 42
         train_test_split = train_dataset.train_test_split(test_size=0.1, seed=seed)
         # train_dataset = train_test_split["train"].unique(column="solution")
@@ -115,11 +115,11 @@ class ConditionalMaterialGeneration(RLTask):
 
         return self.dataset
 
-    def dataset_preprocess(self, tokenizer):
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(x["problem"], tokenizer)
-        )
-        return self.dataset
+    # def dataset_preprocess(self, tokenizer):
+    #     self.dataset = self.dataset.map(
+    #         lambda x: self.generate_prompt(x["problem"], tokenizer)
+    #     )
+    #     return self.dataset
     
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -129,12 +129,12 @@ class ConditionalMaterialGeneration(RLTask):
             reward = 0
 
             # Extract elements from instruction
-            input_pattern = r"Build a material that has\s+(.*)"
+            input_pattern = r"The elements are\s+(.*)"
             match = re.search(input_pattern, c)
             input_elements = match.group(1).split(', ') if match else []
 
             # Extract elements and space group from output
-            output_pattern = r"<material>\s*((?:[A-Z][a-z]?\s*)+?)\s*<sg(\d+)>\s*</material>"
+            output_pattern = r"<answer>\s*((?:[A-Z][a-z]?\s*)+?)\s*<sg(\d+)>\s*</answer>"
             output_matches = re.findall(output_pattern, c)
             if len(output_matches) <= 2:
                 rewards.append(reward)
@@ -153,23 +153,24 @@ class ConditionalMaterialGeneration(RLTask):
 
             # Penalize extra elements not in input
             extra_elements = set(output_elements) - set(input_elements)
-            if extra_elements:
-                # Calculate overuse for extra elements
-                overuse_score = sum(self.element_usage_counter.get(e, 0) for e in extra_elements)
-                max_possible_overuse = len(extra_elements) * self.MAX_TRACKED
+            # if extra_elements:
+            #     reward -= len(extra_elements) * 0.5
+            #     # Calculate overuse for extra elements
+            #     overuse_score = sum(self.element_usage_counter.get(e, 0) for e in extra_elements)
+            #     max_possible_overuse = len(extra_elements) * self.MAX_TRACKED
                 
-                # Normalize penalty between 0 and 2
-                if max_possible_overuse > 0:
-                    normalized_penalty = 2 * (overuse_score / max_possible_overuse)
-                    reward -= normalized_penalty
+            #     # Normalize penalty between 0 and 2
+            #     if max_possible_overuse > 0:
+            #         normalized_penalty = 2 * (overuse_score / max_possible_overuse)
+            #         reward -= normalized_penalty
 
-            # Penalize overused space group
-            overuse_score_sg = self.space_group_usage_counter.get(output_sg, 0)
-            max_possible_overuse_sg = self.MAX_TRACKED
+            # # Penalize overused space group
+            # overuse_score_sg = self.space_group_usage_counter.get(output_sg, 0)
+            # max_possible_overuse_sg = self.MAX_TRACKED
             
-            if max_possible_overuse_sg > 0:
-                normalized_penalty_sg = 2 * (overuse_score_sg / max_possible_overuse_sg)
-                reward -= normalized_penalty_sg
+            # if max_possible_overuse_sg > 0:
+            #     normalized_penalty_sg = 2 * (overuse_score_sg / max_possible_overuse_sg)
+            #     reward -= normalized_penalty_sg
 
             # Check precision
             intersection = set(input_elements) & set(output_elements)
@@ -194,21 +195,21 @@ class ConditionalMaterialGeneration(RLTask):
                 reward += 2
                 self.seen_comps_set.add(comp)
 
-            # Update element and space group usage history
-            self.element_usage_counter.update(output_elements)
-            self.space_group_usage_counter.update([output_sg])
-            self.recent_compositions.append(output_elements)
-            self.recent_space_groups.append(output_sg)
+            # # Update element and space group usage history
+            # self.element_usage_counter.update(output_elements)
+            # self.space_group_usage_counter.update([output_sg])
+            # self.recent_compositions.append(output_elements)
+            # self.recent_space_groups.append(output_sg)
 
-            # Maintain rolling window of last 100 outputs for compositions and space groups
-            if len(self.recent_compositions) > self.MAX_TRACKED:
-                old_elements = self.recent_compositions.pop(0)
-                old_space_group = self.recent_space_groups.pop(0)
-                self.element_usage_counter.subtract(old_elements)
-                self.space_group_usage_counter.subtract([old_space_group])
-                # Remove zero or negative counts
-                self.element_usage_counter += Counter()  # clean up
-                self.space_group_usage_counter += Counter()  # clean up 
+            # # Maintain rolling window of last 100 outputs for compositions and space groups
+            # if len(self.recent_compositions) > self.MAX_TRACKED:
+            #     old_elements = self.recent_compositions.pop(0)
+            #     old_space_group = self.recent_space_groups.pop(0)
+            #     self.element_usage_counter.subtract(old_elements)
+            #     self.space_group_usage_counter.subtract([old_space_group])
+            #     # Remove zero or negative counts
+            #     self.element_usage_counter += Counter()  # clean up
+            #     self.space_group_usage_counter += Counter()  # clean up 
             rewards.append(reward)
             self.custom_metrics['val/rewards'].extend(rewards)
         print(rewards)
