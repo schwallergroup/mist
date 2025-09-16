@@ -2,7 +2,7 @@ import os
 import re
 import random
 from typing import Dict, Optional
-from open_r1.download_data import download_data
+# from open_r1.download_data import download_data
 import pandas as pd
 from datasets import Dataset, DatasetDict
 from rdkit import Chem
@@ -21,11 +21,11 @@ class ConditionalMaterialGeneration(RLTask):
     log_custom_metrics: bool = True
     custom_metrics: dict = field(default_factory=dict)
     seen_comps_set: set = field(default_factory=set)
-    element_usage_counter: Counter = field(default_factory=Counter)
-    space_group_usage_counter: Counter = field(default_factory=Counter)
-    MAX_TRACKED: int = 0
-    recent_compositions: list = field(default_factory=list)
-    recent_space_groups: list = field(default_factory=list)
+    # element_usage_counter: Counter = field(default_factory=Counter)
+    # space_group_usage_counter: Counter = field(default_factory=Counter)
+    # MAX_TRACKED: int = 0
+    # recent_compositions: list = field(default_factory=list)
+    # recent_space_groups: list = field(default_factory=list)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,25 +35,26 @@ class ConditionalMaterialGeneration(RLTask):
         self.custom_metrics = {
             'val/rewards': [],
         }
-        with open("/iopsstor/store/cscs/swissai/a05/chem/comps_used_in_sft.json", "r") as file:
+        with open("/capstor/store/cscs/swissai/a131/jmeng/sink/src/open_r1/tasks/condmatgen/comps_used_in_sft.json", "r") as file:
             seen_comps = json.load(file)
         self.seen_comps_set = set() 
         for comp in seen_comps:
             comp = Composition(comp)
             self.seen_comps_set.add(comp)
 
-        self.element_usage_counter = Counter()
-        self.space_group_usage_counter = Counter()
-        self.recent_compositions = []
-        self.recent_space_groups = []
-        self.MAX_TRACKED = 100
+        # self.element_usage_counter = Counter()
+        # self.space_group_usage_counter = Counter()
+        # self.recent_compositions = []
+        # self.recent_space_groups = []
+        # self.MAX_TRACKED = 100
 
         
 
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def read_files(self) -> Dict:
-        with open(self.dataset_id_or_path, "r") as file:
+        dataset_path = os.path.join(self.dataset_id_or_path, "NatureLM_conditional_1.json")
+        with open(dataset_path, "r") as file:
             data = json.load(file)
 
         # Generate problems using the question template
@@ -63,7 +64,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         for pt in data:
             try:
-                problems.append(self.question_template.format(instruction=pt.get('instruction')))
+                problems.append(self.question_template.format(pt.get('instruction')))
                 solutions.append("")
             except KeyError as e:
                 print(pt.keys())

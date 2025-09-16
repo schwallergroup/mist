@@ -15,3 +15,4 @@ Qwen2.5-3B_pretrained-v2:		/LLM_models/Qwen2.5-3B_pretrained-v2
 Qwen2.5-3B_pretrained-v3:		/LLM_models/Qwen2.5-3B_pretrained-v3
 Qwen2.5-3B_pretrained-v4-cot:		/LLM_models/Qwen2.5-3B_pretrained-v4-cot
 Qwen2.5-3B_pretrained-v6-1:		/LLM_models/Qwen2.5-3B_pretrained-v6-1
+Qwen2.5-3B_pretrained_sft_epoch8:   /capstor/store/cscs/swissai/a131/jmeng/megatron/qwen-ckpts/pretrained_sft_qwen2.5_3B/pretrained_sft_qwen2.5_3B_epoch8

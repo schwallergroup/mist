@@ -7,7 +7,7 @@
 #SBATCH --output=../sink_logs/%x-%j.out
 #SBATCH --err=../sink_logs/%x-%j.err
 #SBATCH --environment=vllm071
-#SBATCH -A a-a131
+#SBATCH -A a131
 
 # Run like:
 # Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
@@ -23,7 +23,7 @@
 set -x -e
 
 source ~/.bashrc
-cd /Documents/sink
+cd /capstor/store/cscs/swissai/a131/jmeng/sink
 echo "START TIME: $(date)"
 
 NUM_NODES=$SLURM_NNODES
@@ -34,7 +34,7 @@ NUM_GPUS_FOR_TRAINING=$(($WORLD_SIZE - 1))
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
-MASTER_PORT=6000
+MASTER_PORT=23456
 
 MODEL_ID=$1
 TASK=$2
@@ -63,7 +63,7 @@ echo "SAMPLING_PARAMS_CONFIG_NAME: ${SAMPLING_PARAMS_CONFIG_NAME}"
 
 MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
-CONFIG_FILE=recipes/$TASK.yaml
+CONFIG_FILE=/capstor/store/cscs/swissai/a131/jmeng/sink/recipes/$TASK.yaml
 
 export HF_HOME=/cache/huggingface
 export WANDB_PROJECT="r1-${TASK%%.*}"
@@ -98,7 +98,7 @@ export CMD=" \
 "
 
 export LAUNCHER="conda deactivate;
-cd /Documents/sink;
+cd /capstor/store/cscs/swissai/a131/jmeng/sink;
 pip install hf_transfer gdown levenshtein smact pymatgen datasets;
 pip install -e . --no-deps;
 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
