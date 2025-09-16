@@ -129,7 +129,6 @@ celerybeat.pid
 
 # Environments
 .env
-.env.local
 .venv
 env/
 venv/
@@ -184,12 +183,9 @@ docs/build/
 # WANDB API KEY (PERSONAL & SECRET) and setup
 wandb_api_key.txt
 kuma.env
-cluster/*.local.env
-cluster/*.local.env.sh
 
 completion_samples/
 output/
 core*
 *.ipynb
-slurm_logs/*.out
-slurm_logs/*.err
+src/open_r1/dataset/
