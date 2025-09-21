@@ -388,15 +388,3 @@ class BinaryCompoundRelaxing(RLTask):
                 metrics['val/accuracy'] = accuracy
                 self.custom_metrics['val/rewards'] = []
         return metrics
-
-Using the fractional coordinates, we can compute the distances between Ti and Ni atoms. Let's start with the first Ti at (0.335, 0.349, 0.316). Let's compute the distance to the nearest Ni. Let's assume Ni is at (0.0263, -0.0047, -0.0301). The distance formula in triclinic is:
-    d = sqrt[(0.335 - 0.0263)Â² + (0.349 + 0.0047)Â² + (0.316 + 0.0301)Â²]
-    d = sqrt[(0.335 - 0.0263)Â² + (0.349 + 0.0047)Â² + (0.316 + 0.0301)Â²]
-             (0.335 - 0.0263) = 0.3087
-
-longer/shorter than
-[0.0617, 0.25, 0.625]
-unit cell volume
-Bond Length
-
-Similarly, the other Fe-S bonds would need to adjust. Let's check another pair: Fe at (0.02498, -0.04894, 0.50441) and S at (0.6288, 0.3088, 0.7722). The dx here is 0.6288 - 0.02498 = 0.50382, dy = 0.3088 - (-0.04894) = 0.35774, dz = 0.7722 - 0.50441 = 0.2678. So distance â<89><88> sqrt(0.50382Â² + 0.35774Â² + 0.2678Â²) â<89><88> sqrt(0.254 + 0.128 + 0.0718) â<89><88> sqrt(0.4538) â<89><88> 0.674 Ã<85>. Still too short. Fe-S bond lengths in FeS are typically 2.3-2.4 Ã<85>, so these are under strain.
