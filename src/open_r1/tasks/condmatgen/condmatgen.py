@@ -1,7 +1,7 @@
 import os
 import re
 import random
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 # from open_r1.download_data import download_data
 import pandas as pd
 from datasets import Dataset, DatasetDict
@@ -21,6 +21,7 @@ class ConditionalMaterialGeneration(RLTask):
     log_custom_metrics: bool = True
     custom_metrics: dict = field(default_factory=dict)
     seen_comps_set: set = field(default_factory=set)
+    random_log: Dict[str, Any] = {}
     # element_usage_counter: Counter = field(default_factory=Counter)
     # space_group_usage_counter: Counter = field(default_factory=Counter)
     # MAX_TRACKED: int = 0
@@ -29,8 +30,11 @@ class ConditionalMaterialGeneration(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.system_prompt = "You are a careful model that must follow the Output Contract exactly.\n\nOUTPUT CONTRACT\n1) You may think only inside <think>...</think>. Keep it short.\n2) Your final answer must be a single line wrapped in <answer>...</answer>.\n3) Inside <answer>, list only element symbols separated by single spaces, followed by a space-group tag <sg###>.\n4) If you generate a chemical formula with subscripts (e.g. Ni₂Fe₄LiO₁₀), you must expand them into repeated symbols (Ni Ni Fe Fe Fe Fe Li O O O O O O O O O O).\n5) Do not include any extra words, punctuation, examples, explanations, or text outside the tags.\n6) After you produce </answer>, you must stop. No tokens are allowed after </answer>.\n\nVALID EXAMPLE (format only):\n<think>brief reasoning</think>\n<answer> Ca O Sn Sn <sg62></answer>\n\nINVALID EXAMPLES:\n- Missing tags\n- Commas, bullets, or explanations inside <answer>\n- Multiple <answer> blocks\n- Extra output after </answer>\n\nAllowed tokens inside <answer>: element symbols (H He Li ... Og), single spaces, and the literal pattern <sg###>."
 
-        self.question_template = "You are a material science expert, and I have a task for you. Please generate valid and novel material from the provided elements. The elements are {}. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags, for example <answer> A A B B B <sg12></answer> where A, B refer to elements and <sg12> denotes the space group."
+        self.question_template = "You are a materials science expert.\nGiven the following elements: {}, propose one chemically valid and novel crystalline compound.\n\nShow your reasoning only inside <think>...</think> tags.\nThen output only the final result inside <answer>...</answer> tags.\n\nInside <answer>, you must expand all stoichiometric subscripts into repeated element symbols (e.g. Al₂O₃ → Al Al O O O).\nThen append exactly one space group tag <sg###>.\n"
+
+
         self.log_custom_metrics = True
         self.custom_metrics = {
             'val/rewards': [],
@@ -53,7 +57,7 @@ class ConditionalMaterialGeneration(RLTask):
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def read_files(self) -> Dict:
-        dataset_path = os.path.join(self.dataset_id_or_path, "NatureLM_conditional_1.json")
+        dataset_path = os.path.join(self.dataset_id_or_path, "NatureLM_conditional_v2.json")
         with open(dataset_path, "r") as file:
             data = json.load(file)
 
@@ -64,7 +68,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         for pt in data:
             try:
-                problems.append(self.question_template.format(pt.get('instruction')))
+                problems.append(pt.get("elements"))
                 solutions.append("")
             except KeyError as e:
                 print(pt.keys())
@@ -82,9 +86,10 @@ class ConditionalMaterialGeneration(RLTask):
     
     def generate_prompt(self, problem, tokenizer, **kwargs):
         r1_prefix = [
+            {"role": "system", "content": self.system_prompt},
             {
                 "role": "user",
-                "content": problem,
+                "content": self.question_template.format(problem),
             },
         ]
         return {
@@ -122,38 +127,88 @@ class ConditionalMaterialGeneration(RLTask):
     #     )
     #     return self.dataset
     
-    def accuracy_reward(self, completions, solution, **kwargs):
+    def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
         rewards = []
 
-        for c in completions:
+        for completion, prompt in zip(completions, prompts):
             reward = 0
 
+            # Format
+            think_start = completion.find("<think>")
+            think_end = completion.find("</think>")
+            answer_start = completion.find("<answer>")
+            answer_end = completion.find("</answer>")
+
+            if think_start != -1:
+                reward += 0.25
+            if think_end != -1:
+                reward += 0.25
+            if answer_start != -1:
+                reward += 0.25
+            if answer_end != -1:
+                reward += 0.25
+            
+            if think_start != -1 and think_end != -1:
+                if think_start < think_end:
+                    reward += 0.25
+            if answer_start != -1 and answer_end != -1:
+                if answer_start < answer_end:
+                    reward += 0.25
+            if think_start != -1 and think_end != -1 and answer_start != -1 and answer_end != -1:
+                if think_start < think_end and answer_start < answer_end and think_end < answer_start:
+                    reward += 1
+                else:
+                    reward -= 1
+            
+            if completion.strip().endswith("</answer>"):
+                reward += 1
+            else:
+                reward -= 2
             # Extract elements from instruction
-            input_pattern = r"The elements are\s+(.*)"
-            match = re.search(input_pattern, c)
+            input_pattern = r"(?i)elements:\s*(.*?)\s*,\s*propose\b"
+            match = re.search(input_pattern, prompt)
             input_elements = match.group(1).split(', ') if match else []
 
             # Extract elements and space group from output
             output_pattern = r"<answer>\s*((?:[A-Z][a-z]?\s*)+?)\s*<sg(\d+)>\s*</answer>"
-            output_matches = re.findall(output_pattern, c)
-            if len(output_matches) <= 2:
+            output_matches = re.findall(output_pattern, completion)
+            if len(output_matches) < 1:
                 rewards.append(reward)
+                # output = {
+                #     "prompt": prompt,
+                #     "input_elements": input_elements,
+                #     "output_matches": output_matches,
+                #     "reward": reward,
+                #     "completion": completion
+                # }
+                # print(output)
                 continue
-
-            reward += 1
+            elif len(output_matches) == 1:
+                reward += 1
+            else:
+                reward -= 1
             elements_str, sg_str = output_matches[-1]
             output_sg = int(sg_str.strip())
 
             if not 1 <= output_sg <= 230:
                 rewards.append(reward)
                 continue
+                # output = {
+                #     "prompt": prompt,
+                #     "input_elements": input_elements,
+                #     "output_matches": output_matches,
+                #     "reward": reward,
+                #     "completion": completion
+                # }
+                # print(output)
             reward += 1
 
             output_elements = elements_str.strip().split()
 
             # Penalize extra elements not in input
             extra_elements = set(output_elements) - set(input_elements)
+            reward -= len(extra_elements) * 0.5
             # if extra_elements:
             #     reward -= len(extra_elements) * 0.5
             #     # Calculate overuse for extra elements
@@ -176,13 +231,24 @@ class ConditionalMaterialGeneration(RLTask):
             # Check precision
             intersection = set(input_elements) & set(output_elements)
             precision = len(intersection) / len(input_elements)
-            reward += precision * 2
+            if precision == 1:
+                reward += 3
+            else:
+                reward += precision
 
             # Try building a composition after applying penalties
             try:
                 comp = Composition(" ".join(output_elements))
                 if not smact_validity(comp):  # your custom function
                     rewards.append(reward)
+                    # output = {
+                    #     "prompt": prompt,
+                    #     "input_elements": input_elements,
+                    #     "output_matches": output_matches,
+                    #     "reward": reward,
+                    #     "completion": completion
+                    # }
+                    # print(output)
                     continue
             except Exception as e:
                 print(f"Invalid composition: {output_elements} -> {e}")
@@ -211,9 +277,23 @@ class ConditionalMaterialGeneration(RLTask):
             #     # Remove zero or negative counts
             #     self.element_usage_counter += Counter()  # clean up
             #     self.space_group_usage_counter += Counter()  # clean up 
+
+            self.random_log = {
+                "prompt": prompt,
+                "output_elements": output_elements,
+                "output_sg": output_sg,
+                "accuracy_reward": reward,
+                "full_completion": completion,
+            }
+            self.good_print(self.random_log)
+            # if reward > 4:
+                # self.good_print(self.random_log)
+            # else:
+                # self.random_print(self.random_log)
+
             rewards.append(reward)
             self.custom_metrics['val/rewards'].extend(rewards)
-        print(rewards)
+        # print(rewards)
         return rewards
 
     def get_metrics(self) -> Dict:

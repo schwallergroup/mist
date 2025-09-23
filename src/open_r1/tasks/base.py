@@ -168,7 +168,7 @@ class RLTask(BaseModel):
         """
         return dict()
 
-    def random_print(self, print_data: dict, out_rate=0.01):
+    def random_print(self, print_data: dict, out_rate=0.1):
         if random.random() < out_rate:  # 1% chance to print a completion
             out = "\n\n=======<RANDOM_RESPONSE>=======\n"
             for k, v in print_data.items():

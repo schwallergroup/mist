@@ -85,7 +85,7 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
+    --output_dir=/capstor/store/cscs/swissai/a131/jmeng/sink/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
     --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --base_model_id=$MODEL_ID \

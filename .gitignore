@@ -189,3 +189,4 @@ output/
 core*
 *.ipynb
 src/open_r1/dataset/
+checkpoints/
