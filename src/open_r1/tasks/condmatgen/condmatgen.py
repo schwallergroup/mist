@@ -30,9 +30,9 @@ class ConditionalMaterialGeneration(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.system_prompt = "You are a careful model that must follow the Output Contract exactly.\n\nOUTPUT CONTRACT\n1) You may think only inside <think>...</think>. Keep it short.\n2) Your final answer must be a single line wrapped in <answer>...</answer>.\n3) Inside <answer>, list only element symbols separated by single spaces, followed by a space-group tag <sg###>.\n4) If you generate a chemical formula with subscripts (e.g. Ni₂Fe₄LiO₁₀), you must expand them into repeated symbols (Ni Ni Fe Fe Fe Fe Li O O O O O O O O O O).\n5) Do not include any extra words, punctuation, examples, explanations, or text outside the tags.\n6) After you produce </answer>, you must stop. No tokens are allowed after </answer>.\n\nVALID EXAMPLE (format only):\n<think>brief reasoning</think>\n<answer> Ca O Sn Sn <sg62></answer>\n\nINVALID EXAMPLES:\n- Missing tags\n- Commas, bullets, or explanations inside <answer>\n- Multiple <answer> blocks\n- Extra output after </answer>\n\nAllowed tokens inside <answer>: element symbols (H He Li ... Og), single spaces, and the literal pattern <sg###>."
+        self.system_prompt = "You are a careful model that must follow the Output Contract exactly.\n\nOUTPUT CONTRACT\n1) You may think only inside <think>...</think>.\n2) Your final answer must be a single line wrapped in <answer>...</answer>.\n3) Inside <answer>, list only element symbols separated by single spaces, followed by a space-group tag <sg space-group number>.\n4) If you generate a chemical formula with subscripts (e.g. Ni₂Fe₄LiO₁₀), you must expand them into repeated symbols (Ni Ni Fe Fe Fe Fe Li O O O O O O O O O O).\n5) Do not include any extra words, punctuation, examples, explanations, or text outside the tags.\n6) After you produce </answer>, you must stop. No tokens are allowed after </answer>.\n\nVALID EXAMPLE (format only):\n<think>reasoning</think>\n<answer> Ca O Sn Sn <sg62></answer>\n\nINVALID EXAMPLES:\n- Missing tags\n- Commas, bullets, or explanations inside <answer>\n- Multiple <answer> blocks\n- Extra output after </answer>\n\nAllowed tokens inside <answer>: element symbols (H He Li ... Og), single spaces, and the literal pattern <sg space-group number>."
 
-        self.question_template = "You are a materials science expert.\nGiven the following elements: {}, propose one chemically valid and novel crystalline compound.\n\nShow your reasoning only inside <think>...</think> tags.\nThen output only the final result inside <answer>...</answer> tags.\n\nInside <answer>, you must expand all stoichiometric subscripts into repeated element symbols (e.g. Al₂O₃ → Al Al O O O).\nThen append exactly one space group tag <sg###>.\n"
+        self.question_template = "You are a materials science expert.\nGiven the following elements: {}, propose one chemically valid and novel crystalline compound."
 
 
         self.log_custom_metrics = True
@@ -165,6 +165,16 @@ class ConditionalMaterialGeneration(RLTask):
                 reward += 1
             else:
                 reward -= 2
+
+            matches = re.findall(r"<think>(.*?)</think>", completion, flags=re.DOTALL)
+            if matches:
+                reasoning_len = len(matches[-1])
+            else:
+                reasoning_len = 0
+
+            if reasoning_len < 500:
+                reward -= 5
+
             # Extract elements from instruction
             input_pattern = r"(?i)elements:\s*(.*?)\s*,\s*propose\b"
             match = re.search(input_pattern, prompt)
@@ -254,8 +264,10 @@ class ConditionalMaterialGeneration(RLTask):
                 print(f"Invalid composition: {output_elements} -> {e}")
                 rewards.append(reward)
                 continue
-
-            reward += 2
+            if precision == 1:
+                reward += 3
+            else:
+                reward += 1
 
             # Novelty bonus
             if comp not in self.seen_comps_set:

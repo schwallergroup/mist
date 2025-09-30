@@ -43,6 +43,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 "n": self.num_generations,  # default from TRL 0.14.0
                 "temperature": args.temperature,  # default from TRL 0.14.0
                 "max_tokens": self.max_completion_length,  # default from TRL 0.14.0
+                "stop": ["</answer>"],
             }
             sampling_params_dict.update(
                 args.sampling_params_config
