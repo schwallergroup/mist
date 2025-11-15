@@ -1,5 +1,5 @@
 sbatch \
-    --account='a-a131' \
+    --account='a131' \
     --nodes=4 \
     --time=05:00:00 \
     --partition=normal \

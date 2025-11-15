@@ -11,13 +11,50 @@ def parse_args():
     parser.add_argument("--model", type=str, required=True, help="Path to the vLLM model checkpoint.")
     parser.add_argument("--data_path", type=str, required=True, help="Path to the input data file (pickle format).")
     parser.add_argument("--out_dir", type=str, default="./output", help="Directory to save the output results.")
+    parser.add_argument("--prompt_style", type=str, default="mist", help="Format of the system prompt to use.")
     return parser.parse_args()
 
-def _evaluate(prompts: list[str], test_data, llm, sampling_params, outpath: str, reasoning=True):
+def generate_prompts(data, is_reasoning: bool, mist_system_prompt: bool = True):
+    if mist_system_prompt:
+        if is_reasoning:
+            return ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituent postion and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace(" <answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<think>' for item in data]
+        
+        else:
+            return ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Just give your answer alone inside the <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace("<answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<answer>' for item in data]
+        
+    else:
+        if is_reasoning:
+            template = (
+                "<|im_start|>assistant\n"
+                "You are an organic chemistry expert and you are tasked with answering the SMILES generation based question below. Show your reasoning in <think>...</think> tags and return the final answer in <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "{}\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<think>"
+            )
+        else:
+            template = (
+                "<|im_start|>assistant\n"
+                "You are an organic chemistry expert and you are tasked with answering the SMILES generation based question below. Output only the final answer and return it in the <answer>...</answer> tags.<|im_end|>\n"
+                "<|im_start|>user\n"
+                "{}\n"
+                "<|im_end|>\n"
+                "<|im_start|>assistant\n"
+                "<answer>"
+            )
+            
+        return [template.format(item[0]['input'].replace("<answer>", "").replace("[START_SMILES] ", "").replace(" [END_MOL]", "")) for item in data]
+
+def _evaluate(prompts: list[str], test_data, llm, sampling_params, outpath: str, reasoning=True, mist_system_prompt=True):
     def extract_smiles(text):
-        if not reasoning:
-            return extract_normal_smiles(text)
-        match = re.search(r'<answer>.*\[START_SMILES\]\s*(.*?)\s*\[END_SMILES\].*</answer>', text)
+        if not reasoning and not text.startswith("<answer>"):
+            # return extract_normal_smiles(text)
+            text = "<answer>" + text
+        if mist_system_prompt:
+            match = re.search(r'<answer>.*\[START_SMILES\]\s*(.*?)\s*\[END_SMILES\].*</answer>', text)
+        else:
+            match = re.search(r'<answer>\s*(.*?)\s*</answer>', text)
         return match.group(1).strip() if match else None
 
     def extract_normal_smiles(text):
@@ -107,14 +144,18 @@ def main(args):
 
 
     # Prepare all prompts
-    direct_prompts = ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Just give your answer alone inside the <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace("<answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<answer>' for item in data]
+    # direct_prompts = ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Just give your answer alone inside the <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace("<answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<answer>' for item in data]
     
-    reasoning_prompts = ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituent postion and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace(" <answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<think>' for item in data]
+    # reasoning_prompts = ['<|im_start|>assistant\You are a useful chemistry assistant and answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituent postion and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\\'+item[0]['input'].replace(" <answer>","")+'<|im_end|>\n<|im_start|>assistant\Your response:\n<think>' for item in data]
     
     # reasoning_prompts= ["<|im_start|>assistant\You are a useful chemistry assistant and answer the question to change IUPAC to SMILES. Reason out your answer inside <think> tags and give your confident final answer inside the answer tags.<|im_end|>\n<|im_start|>user\\"+ item[0]['input'].replace("<answer>","")  +"\nDo only the necessary reasoning and backtracking to get to the final answer<|im_end|>\n<|im_start|>assitant\<think>" for item in data]
     
-    _evaluate(direct_prompts, data, llm, sampling_params, os.path.join(args.out_dir, "direct_output.txt"), reasoning=False)
-    _evaluate(reasoning_prompts, data, llm, sampling_params, os.path.join(args.out_dir, "reasoning_output.txt"), reasoning=True)
+    is_mist_system_prompt = args.prompt_style.lower() == "mist"
+    direct_prompts = generate_prompts(data, is_reasoning=False, mist_system_prompt=is_mist_system_prompt)
+    reasoning_prompts = generate_prompts(data, is_reasoning=True, mist_system_prompt=is_mist_system_prompt)
+    
+    _evaluate(direct_prompts, data, llm, sampling_params, os.path.join(args.out_dir, "direct_output.txt"), reasoning=False, mist_system_prompt=is_mist_system_prompt)
+    _evaluate(reasoning_prompts, data, llm, sampling_params, os.path.join(args.out_dir, "reasoning_output.txt"), reasoning=True, mist_system_prompt=is_mist_system_prompt)
     
 if __name__ == "__main__":
     args = parse_args()
