@@ -99,7 +99,7 @@ Training Details
 
     # Chemical Task arguments
     chem_task: smi_permute
-    dataset_id_or_path: /iopsstor/scratch/cscs/nnguyenx/datasets/sink/CRLLM-PubChem-compounds1M-very_very_simple.csv
+    dataset_id_or_path: ${MIST_DATA_DIR}/CRLLM-PubChem-compounds1M-very_very_simple.csv
     rewards:
     - format
     - accuracy
@@ -159,8 +159,7 @@ Result
 
 Reward Progression
 ^^^^^^^^^^^^^^^^^^
-wandb link: https://wandb.ai/liac/r1-smi_permute/workspace?nw=nwuservunguyen
-Visualize only these runs: grpo-260223, grpo-261194, grpo-262271, grpo-263213
+Representative reward curves from the main smi_permute runs are shown below.
 
 .. image:: ./_static/smi_permute_format_reward.png
    :alt: Format Reward Progression

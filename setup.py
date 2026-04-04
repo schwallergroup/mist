@@ -111,16 +111,15 @@ install_requires = [
 ]
 
 setup(
-    name="open-r1",
+    name="mist",
     version="0.1.0.dev0",  # expected format is one of x.y.z.dev0, or x.y.z.rc1 or x.y.z (no to dashes, yes to dots)
-    author="The Hugging Face team (past and future)",
-    author_email="lewis@huggingface.co",
-    description="Open R1",
+    author="MiST contributors",
+    description="MiST chemical reasoning experiments",
     long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    keywords="llm inference-time compute reasoning",
-    license="Apache",
-    url="https://github.com/huggingface/open-r1",
+    keywords="chemistry llm reasoning mist",
+    license="Apache-2.0",
+    url="https://github.com/schwallergroup/mist",
     package_dir={"": "src"},
     packages=find_packages("src"),
     zip_safe=False,

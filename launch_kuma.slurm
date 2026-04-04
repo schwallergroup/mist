@@ -5,14 +5,14 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=64
-#SBATCH --output=../sink_logs/%x-%j.out
-#SBATCH --err=../sink_logs/%x-%j.err
+#SBATCH --output=slurm_logs/%x-%j.out
+#SBATCH --err=slurm_logs/%x-%j.err
 #SBATCH --partition=h100
 #SBATCH -A liac
 
 # Run like:
-# Example 1: sbatch launch.slurm Qwen2.5-0.5B canonmc
-# Example 2: sbatch launch.slurm Qwen2.5-0.5B canonmc base
+# Example 1: sbatch launch_kuma.slurm Qwen2.5-0.5B canonmc
+# Example 2: sbatch launch_kuma.slurm Qwen2.5-0.5B canonmc base
 # Argument 1: model id (from model_paths.txt)
 # Argument 2: task name (in folder recipes)
 # Argument 3 (optional): job_id to continue training from (if none, the default is 0)
@@ -23,12 +23,13 @@
 
 set -x -e
 
-# Load kuma environment variables
-source kuma.env
-CONTAINER_PATH=/work/liac/sink/containers/vllm-openai_v0.7.1.sif
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "${REPO_ROOT}/cluster/common.sh"
+CONTAINER_PATH="${MIST_CONTAINER_PATH}"
 
 source ~/.bashrc
-cd ${KUMA_FOLDER_DOCUMENTS}/sink
+cd "${MIST_REPO_ROOT}"
 echo "START TIME: $(date)"
 
 NUM_NODES=$SLURM_NNODES
@@ -66,13 +67,13 @@ echo "TASK_MODE: ${TASK_MODE}"
 echo "SAMPLING_PARAMS_CONFIG_NAME: ${SAMPLING_PARAMS_CONFIG_NAME}"
 
 
-MODEL=$(grep "^${MODEL_ID}:" model_paths.txt | cut -d':' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+MODEL=$(mist_resolve_model_path "${MODEL_ID}")
 MODEL_NAME=$(echo $MODEL | sed -E 's/.*models--(.*)--(.*)\/snapshots.*/\1\/\2/' | sed 's/--/\//')
 CONFIG_FILE=recipes/$TASK.yaml
 
-export HF_HOME=/cache/huggingface
+export HF_HOME="${MIST_HF_HOME}"
 export WANDB_PROJECT="r1-${TASK%%.*}"
-export WANDB_API_KEY=$(cat wandb_api_key.txt)
+export WANDB_API_KEY=$(cat "${MIST_WANDB_API_KEY_FILE}")
 
 export NCCL_TIMEOUT=3600
 export TORCH_DISTRIBUTED_TIMEOUT=3600
@@ -90,7 +91,7 @@ export CUDA_LAUNCH_BLOCKING=1
 export CMD=" \
     src/open_r1/run_r1_grpo.py --config $CONFIG_FILE \
     --model_name_or_path=$MODEL \
-    --output_dir=/cache/checkpoints/${MODEL_ID}/${RESUME_JOB_ID} \
+    --output_dir=${MIST_CHECKPOINT_DIR}/${MODEL_ID}/${RESUME_JOB_ID} \
     --run_name grpo-${MODEL_ID}${TASK_SUFFIX}${TASK_MODE_SUFFIX}-${SLURM_JOB_ID}_from_${RESUME_JOB_ID} \
     --base_model_name=$MODEL_NAME \
     --base_model_id=$MODEL_ID \
@@ -102,7 +103,7 @@ export CMD=" \
     --sampling_params_config_name=$SAMPLING_PARAMS_CONFIG_NAME \
 "
 
-export LAUNCHER="cd /Documents/sink;
+export LAUNCHER="cd ${MIST_REPO_ROOT};
 pip install hf_transfer rdkit levenshtein wandb gdown;
 pip install -e .;
 pip install -U trl==0.14.0 transformers==4.48.2 pandas==2.0.0;
@@ -119,7 +120,7 @@ HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=inf
    --tee 3 \
 "
 
-export WANDBLOG="wandb sync \$(cat ../sink_logs/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
+export WANDBLOG="wandb sync \$(cat ${MIST_LOG_DIR}/grpo-chem-${SLURM_JOB_ID}.out | grep 'saved locally' | awk '{print \$8}')"
 
 export NCCL_ASYNC_ERROR_HANDLING=1
 
@@ -134,9 +135,9 @@ SRUN_ARGS=" \
     --bind /scratch \
     --bind /home \
     --bind /work \
-    --mount type=bind,src=${KUMA_FOLDER_LLM_MODELS},dst=/LLM_models \
-    --mount type=bind,src=${KUMA_FOLDER_DOCUMENTS},dst=/Documents \
-    --mount type=bind,src=${KUMA_FOLDER_CACHE},dst=/cache \
+    --mount type=bind,src=${MIST_MODELS_DIR},dst=/LLM_models \
+    --mount type=bind,src=${MIST_REPO_ROOT%/*},dst=/Documents \
+    --mount type=bind,src=${MIST_CACHE_DIR},dst=/cache \
     ${CONTAINER_PATH} \
 "
 

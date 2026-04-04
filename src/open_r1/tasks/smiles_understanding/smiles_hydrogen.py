@@ -9,6 +9,8 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, RDLogger
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask
 from ..task_utils import compute_lcs_length, compute_levenshtein_distance, compute_tanimoto_similarity
 
@@ -67,7 +69,7 @@ class SmilesHydrogen(RLTask):
         """Load and return the complete dataset."""
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M_hydrogen.csv
 
-        df = pd.read_csv(self.dataset_id_or_path)
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
         # Only keep the rows where SMILES_Hs only contains character insertions compared to SMILES_noHs
         df = df[df["levenshtein_distance"] == df["length_diff"]]
 

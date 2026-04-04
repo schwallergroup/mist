@@ -8,6 +8,7 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
 from open_r1.download_data import download_data
+from open_r1.paths import expand_path
 
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_sim
@@ -24,11 +25,26 @@ class ForwardReaction(SMILESBasedTask):
     random_log: Dict[str, Any] = {}
     printed_sample_prompt: bool = False
 
+    @staticmethod
+    def _has_local_reaction_files(dataset_dir: str) -> bool:
+        required_files = [
+            "src-train.txt",
+            "tgt-train.txt",
+            "src-test.txt",
+            "tgt-test.txt",
+        ]
+        return all(
+            os.path.exists(os.path.join(dataset_dir, filename))
+            for filename in required_files
+        )
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.dataset_id_or_path = expand_path(self.dataset_id_or_path)
         if not os.path.exists(self.dataset_id_or_path):
             os.makedirs(self.dataset_id_or_path)
-        download_data(self.dataset_id_or_path)
+        if not self._has_local_reaction_files(self.dataset_id_or_path):
+            download_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(
             self.dataset_id_or_path, "src-train.txt"

@@ -8,6 +8,8 @@ from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_sim
 
@@ -50,7 +52,7 @@ class Iupac2Smiles(SMILESBasedTask):
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.dataset_id_or_path)
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
         df = df.drop_duplicates(subset=["SMILES"])
         train_dict = {
             "problem": df["IUPAC"].tolist(),

@@ -6,6 +6,7 @@ from typing import List
 
 from datasets import Dataset, DatasetDict
 
+from open_r1.paths import expand_path
 from open_r1.tasks.base import RLTask
 
 
@@ -100,30 +101,32 @@ class KineticDataClassification(RLTask):
             DatasetDict: Dataset with 'train' and 'test' splits
         """
 
+        dataset_root = expand_path(self.dataset_id_or_path)
+
         # Assume the dataset is in the same directory as the script
         x1_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x1_train_M1_M20_train_val_test_set_part_0.pkl",
         )
         x2_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x2_train_M1_M20_train_val_test_set_part_0.pkl",
         )
         y_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "y_train_M1_M20_train_val_test_set_part_0.pkl",
         )
 
         x1_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x1_val_M1_M20_train_val_test_set_part_0.pkl",
         )
         x2_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x2_val_M1_M20_train_val_test_set_part_0.pkl",
         )
         y_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "y_val_M1_M20_train_val_test_set_part_0.pkl",
         )
 

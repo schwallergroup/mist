@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "sink"
+project = "MiST"
 copyright = "2025, Andres M Bran"
 author = "Andres M Bran"
 
