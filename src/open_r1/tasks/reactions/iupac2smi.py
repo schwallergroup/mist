@@ -21,20 +21,20 @@ class Iupac2Smiles(SMILESBasedTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if self.task_mode == 'base':
+        if self.task_mode == "base":
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule {}.<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
-        
-        elif self.task_mode == 'tagged':
+
+        elif self.task_mode == "tagged":
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think> Okay"
-        
-        elif self.task_mode == 'tagged_no_okay':
+
+        elif self.task_mode == "tagged_no_okay":
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
-            
-        elif self.task_mode == 'tagged_no_okay_short':
+
+        elif self.task_mode == "tagged_no_okay_short":
             self.question_template = "<|im_start|>assistant\You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags. Keep the total length of your response, both reasoning and answer, no more than 4000 words.<|im_end|>\n<|im_start|>user\Please write the SMILES representation of the molecule [START_MOL] {} [END_MOL].<|im_end|>\n<|im_start|>assistant\Your response:\n<think>"
-        
-        elif self.task_mode == 'qwen_base':
-            
+
+        elif self.task_mode == "qwen_base":
+
             self.question_template = (
                 "<|im_start|>assistant\n"
                 "You are an useful chemistry assistant and you need to answer the SMILES generation based question below. Think your answer in steps in terms of molecule substituents position and SMILES structures inside the <think>...</think> tags and then give your final answer inside <answer>...</answer> tags.<|im_end|>\n"
@@ -44,8 +44,8 @@ class Iupac2Smiles(SMILESBasedTask):
                 "<|im_start|>assistant\n"
                 "<think>"
             )
-            
-        elif self.task_mode == 'no_instruct':
+
+        elif self.task_mode == "no_instruct":
             self.question_template = (
                 "Question: You are an expert in Cheminformatics, who is very familiar with Simplified Molecular Input Line Entry System (SMILES) notation, and here's a task for you. "
                 "Given a molecule with the IUPAC name as below, please provide the corresponding SMILES notation.\n"
@@ -54,11 +54,9 @@ class Iupac2Smiles(SMILESBasedTask):
                 # "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> CN1C=C... </answer>. Think step by step inside <think> tags."
             )
         else:
-            raise ValueError(
-                f"Unknown task mode: {self.task_mode}. Supported modes: base, tagged, no_instruct"
-            )
+            raise ValueError(f"Unknown task mode: {self.task_mode}. Supported modes: base, tagged, no_instruct")
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
-        
+
         # self.custom_metrics = {
         #     "n_samples": 0,
         #     "n_waits": [],
@@ -93,11 +91,8 @@ class Iupac2Smiles(SMILESBasedTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
-    
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that completion is same as ground truth."""
@@ -135,9 +130,7 @@ class Iupac2Smiles(SMILESBasedTask):
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer)
-            answer_score = (
-                tanimoto_score(answer_smiles, ref) if answer_smiles else -0.5
-            )
+            answer_score = tanimoto_score(answer_smiles, ref) if answer_smiles else -0.5
             if answer_score == 1.0:
                 answer_reward = 1.0  # massive bonus for truly correct answer
             elif answer_score < 0:
@@ -177,7 +170,7 @@ class Iupac2Smiles(SMILESBasedTask):
             self.custom_metrics["answer_tanimoto"].append(answer_score)
 
         return rewards
-    
+
     def reasoning_reward(self, completions, solution, prompts, **kwargs):
         """Reward function - check that reasoning is same as ground truth."""
         rewards = []
@@ -187,11 +180,7 @@ class Iupac2Smiles(SMILESBasedTask):
             reasoning_smiles = self.extract_smiles(reasoning)
             scores = [tanimoto_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
-            best_smiles_reasoning = (
-                reasoning_smiles[scores.index(max_score)]
-                if max_score in scores
-                else "None"
-            )
+            best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else "None"
             reasoning_score = max_score
             if reasoning_score == 1.0:
                 reasoning_reward = 1.0
@@ -202,7 +191,7 @@ class Iupac2Smiles(SMILESBasedTask):
 
             self.custom_metrics["reasoning_reward"].append(reasoning_reward)
             self.custom_metrics["reasoning_tanimoto"].append(reasoning_score)
-            
+
             rewards.append(reasoning_reward)
 
         return rewards

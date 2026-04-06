@@ -1,12 +1,18 @@
 """Custom evaluation tasks for Chemical Reasoning."""
 
-from lighteval.tasks.requests import Doc
-from lighteval.metrics.utils.metric_utils import MetricCategory, MetricUseCase, SampleLevelMetric, SampleLevelMetricGrouping
-from lighteval.tasks.lighteval_task import LightevalTaskConfig, LightevalTask
-
 import numpy as np
-from open_r1.tasks.task_utils import compute_tanimoto_similarity
+
+from lighteval.metrics.utils.metric_utils import (
+    MetricCategory,
+    MetricUseCase,
+    SampleLevelMetric,
+    SampleLevelMetricGrouping,
+)
+from lighteval.tasks.lighteval_task import LightevalTask, LightevalTaskConfig
+from lighteval.tasks.requests import Doc
 from open_r1.tasks import Iupac2Smiles
+from open_r1.tasks.task_utils import compute_tanimoto_similarity
+
 
 task_mode = "tagged"
 test_data_path = "test_data.iupacsm.jsonl"
@@ -14,6 +20,7 @@ generation_size = 4096
 num_samples = 10
 
 task = Iupac2Smiles(task_mode=task_mode)
+
 
 def prompt_fn(line, task_name: str = None):
     return Doc(
@@ -23,12 +30,13 @@ def prompt_fn(line, task_name: str = None):
         gold_index=0,
     )
 
+
 def mol_exact_match(predictions: list[str], formatted_doc: Doc, **kwargs) -> bool:
-# def mol_exact_match(golds: list[str], predictions: list[str], **kwargs) -> bool:
+    # def mol_exact_match(golds: list[str], predictions: list[str], **kwargs) -> bool:
     """
     Check if the predicted SMILES is exactly the same as the gold standard.
     """
-    pred = predictions[0] # top-1 only
+    pred = predictions[0]  # top-1 only
     pred = task.extract_smiles_from_answer(task.preprocess_response(pred))
     tanimoto_sim = compute_tanimoto_similarity(formatted_doc.get_golds()[0], pred)
     if tanimoto_sim is None:
@@ -39,6 +47,7 @@ def mol_exact_match(predictions: list[str], formatted_doc: Doc, **kwargs) -> boo
         acc = 0
     tanimoto_sim = 0 if tanimoto_sim is None else tanimoto_sim
     return {"acc": acc, "tanimoto_sim": tanimoto_sim}
+
 
 # def aggregate_fn(results: list[dict], **kwargs) -> dict:
 #     """
@@ -63,13 +72,13 @@ iupacsm_task = LightevalTaskConfig(
     prompt_function=prompt_fn,
     hf_repo=test_data_path,
     hf_subset="default",
-    hf_avail_splits=['test'],
-    evaluation_splits=['test'],
+    hf_avail_splits=["test"],
+    evaluation_splits=["test"],
     few_shots_split=None,
     few_shots_select=None,
     generation_size=generation_size,
     num_samples=num_samples,
-    metric=[sample_level_metric], 
+    metric=[sample_level_metric],
 )
 
 TASKS_TABLE = [

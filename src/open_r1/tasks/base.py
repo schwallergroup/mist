@@ -10,12 +10,12 @@ import re
 from dataclasses import field
 from typing import Any, Dict, Optional
 
-from datasets import load_dataset
 import numpy as np
+from datasets import load_dataset
 from rdkit import Chem, RDLogger
+from transformers import AutoTokenizer
 
 from pydantic import BaseModel, Field
-from transformers import AutoTokenizer
 
 RDLogger.DisableLog("rdApp.*")
 
@@ -146,7 +146,7 @@ class RLTask(BaseModel):
             except Exception:
                 rewards.append(0.0)
         return rewards
-    
+
     def format_continuous_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
@@ -161,12 +161,9 @@ class RLTask(BaseModel):
         # Reward goal: ensure a good format
         # Reward range: -1 to 1
 
-
         completions = self.preprocess_completions(completions)  # TODO: modify if needed for your task
 
-
         rewards = []
-
 
         for completion_id, completion in enumerate(completions):
             current_reward = 0.0
@@ -219,16 +216,16 @@ class RLTask(BaseModel):
             rewards.append(current_reward)
 
         return rewards
-    
+
     def preprocess_completions(self, completions: list[str]):
         res = []
         for completion in completions:
             if not completion.startswith("<think>"):
                 completion = "<think>" + completion
-                
+
             res.append(completion)
         return res
-    
+
     def length_control_reward(self, completions, **kwargs):
         r"""Reward function that checks for length of the completion.
         Args:
@@ -239,22 +236,22 @@ class RLTask(BaseModel):
         Returns:
             list[float]: Reward scores
         """
-        min_length=2000
-        max_length=4000
-        std=500
-        
+        min_length = 2000
+        max_length = 4000
+        std = 500
+
         tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-3B-Instruct")
-        var = std ** 2
+        var = std**2
         res = []
-        
+
         for completion in completions:
             length = len(tokenizer.tokenize(completion))
             if not completion.strip().endswith("</answer>"):
                 reward = 0.0
             elif length < min_length:
-                reward = np.exp(-(min_length - length)**2 / (2 * var))
+                reward = np.exp(-((min_length - length) ** 2) / (2 * var))
             elif length > max_length:
-                reward = np.exp(-(length - max_length)**2 / (2 * var))
+                reward = np.exp(-((length - max_length) ** 2) / (2 * var))
             else:
                 reward = 1.0
             res.append(reward)
@@ -312,6 +309,7 @@ class SMILESBasedTask(RLTask):
         "reasoning_tanimoto": [],
         "answer_tanimoto": [],
     }
+
     def _post_process_smiles(self, smiles):
         smiles = re.sub(r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles)
         smiles = re.sub(r"\[CH\d?\]", "C", smiles)
@@ -334,14 +332,14 @@ class SMILESBasedTask(RLTask):
         smiles = [self._post_process_smiles(s) for s in smiles]
         smiles = [s for s in smiles if Chem.MolFromSmiles(s)]
         return smiles
-    
+
     def _extract_smiles_in_tags(self, completion: str, **kwargs):
         smiles = re.findall(r"\[START_SMILES\](.*?)\[END_SMILES\]", completion)
         smiles = [s.replace(" ", "") for s in smiles]
         return smiles
-    
+
     def extract_smiles(self, completion: str, **kwargs):
-        if 'tagged' in self.task_mode:
+        if "tagged" in self.task_mode:
             return self._extract_smiles_in_tags(completion, **kwargs)
         else:
             return self._extract_smiles_by_rdkit(completion, **kwargs)
@@ -362,7 +360,7 @@ class SMILESBasedTask(RLTask):
     #         return m.groups()[1]
     #     else:
     #         return "NONE"
-    
+
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
         if not response.startswith("<think>"):
@@ -373,14 +371,14 @@ class SMILESBasedTask(RLTask):
             return answer[-1].strip()
         else:
             return "NONE"
-        
+
     def get_metrics(self):
         metrics = {}
-        if self.custom_metrics['n_samples'] > 0:
-            metrics['n_samples'] = self.custom_metrics['n_samples']
+        if self.custom_metrics["n_samples"] > 0:
+            metrics["n_samples"] = self.custom_metrics["n_samples"]
             for k, v in self.custom_metrics.items():
-                if k != 'n_samples' and v:
+                if k != "n_samples" and v:
                     metrics[k] = sum(v) / len(v)
                     self.custom_metrics[k] = []
-        
+
         return metrics
