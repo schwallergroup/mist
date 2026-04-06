@@ -1,0 +1,1 @@
+"""Crystal structure task package."""
