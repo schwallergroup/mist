@@ -12,8 +12,6 @@ from datasets import Dataset, DatasetDict
 from rdkit import Chem
 
 import requests
-from pymatgen.core import Composition
-from smact.screening import smact_validity
 
 from ..base import RLTask
 
@@ -44,6 +42,8 @@ class ConditionalMaterialGeneration(RLTask):
             "/capstor/store/cscs/swissai/a131/jmeng/sink/src/open_r1/tasks/condmatgen/comps_used_in_sft.json", "r"
         ) as file:
             seen_comps = json.load(file)
+        from pymatgen.core import Composition
+
         self.seen_comps_set = set()
         for comp in seen_comps:
             comp = Composition(comp)
@@ -245,6 +245,9 @@ class ConditionalMaterialGeneration(RLTask):
 
             # Try building a composition after applying penalties
             try:
+                from pymatgen.core import Composition
+                from smact.screening import smact_validity
+
                 comp = Composition(" ".join(output_elements))
                 if not smact_validity(comp):  # your custom function
                     rewards.append(reward)

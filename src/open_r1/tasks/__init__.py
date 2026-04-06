@@ -1,4 +1,3 @@
-from .condmatgen.condmatgen import ConditionalMaterialGeneration
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
@@ -18,5 +17,10 @@ CHEMTASKS = {
     "iupacsm": Iupac2Smiles,
     "smhydrogen": SmilesHydrogen,
     "kinetic": KineticDataClassification,
-    "condmatgen": ConditionalMaterialGeneration,
 }
+
+try:
+    from .condmatgen.condmatgen import ConditionalMaterialGeneration
+    CHEMTASKS["condmatgen"] = ConditionalMaterialGeneration
+except ImportError:
+    pass
