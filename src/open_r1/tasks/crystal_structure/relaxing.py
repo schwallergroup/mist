@@ -69,7 +69,6 @@ class BinaryCompoundRelaxing(RLTask):
 
         cls._mace_device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        print(f"Using MACE device: {cls._mace_device}")
         return cls._mace_device
 
     @classmethod
@@ -172,8 +171,7 @@ class BinaryCompoundRelaxing(RLTask):
                 sanitized = sanitize_cif(cif_content)
                 try:
                     return Structure.from_str(sanitized, fmt="cif")
-                except Exception as e:
-                    print(f"Error parsing LLM‐generated structure: {e}")
+                except Exception:
                     return None
 
             def compare_internal_energy(cif1, cif2):
@@ -185,8 +183,6 @@ class BinaryCompoundRelaxing(RLTask):
                 atoms2.calc = calc
                 e1 = atoms1.get_potential_energy() / len(atoms1)
                 e2 = atoms2.get_potential_energy() / len(atoms2)
-                print("Original per‐atom energy:", e1)
-                print("LLM per‐atom energy:", e2)
                 if e1 < e2:
                     return 0.5
                 elif e1 > e2:
@@ -196,13 +192,11 @@ class BinaryCompoundRelaxing(RLTask):
 
             gt_cif = ground_truth_dict
             if not gt_cif:
-                print("No ground truth CIF provided.")
                 return 0
             # first, reformat / deserialize via tokenizer
             try:
                 answer_cif = cif_tokenizer.deserialize(answer_cif, gt_cif)
-            except Exception as e:
-                print("Tokenization error:", e)
+            except Exception:
                 return 0
 
             # quick gemmi checks
@@ -211,15 +205,13 @@ class BinaryCompoundRelaxing(RLTask):
                     doc = gemmi.cif.read_string(s)
                     doc.check_for_missing_values()
                     doc.check_for_duplicates()
-            except Exception as e:
-                print("CIF validation error:", e, "\n GT:", gt_cif, "\n answer_cif", answer_cif)
+            except Exception:
                 return 0
 
             # parse Pymatgen structures
             try:
-                dft_struct = Structure.from_str(gt_cif, fmt="cif")
-            except Exception as e:
-                print("Error parsing DFT structure:", e)
+                Structure.from_str(gt_cif, fmt="cif")
+            except Exception:
                 return 0
 
             llm_struct = parse_llm_structure(answer_cif)
@@ -235,27 +227,20 @@ class BinaryCompoundRelaxing(RLTask):
         rewards = []
         # Here task is simple: check that the smiles is the same as the target s
         for content, sol in zip(completions, solution):
-            print(f"\n\n=======<RESPONSE>=======\n" f"#answer_text: {content}\n")
             content = self.preprocess_response(content)
-            print("#llm generated cif: ", content)
-            print(f"\n# ground_truth: {sol}\n")
             if content == "NONE":
                 rewards.append(0)
-                print("content NONE reward 0")
                 continue
 
             # server_url = os.environ.get("SERVER_URL", "http://10.197.48.175:9001/compute_score")
             if content == sol:
-                print("content == init cif reward 0")
                 rewards.append(0)
                 continue
 
             try:
                 reward = compute_internal_score(content, sol)
-                print("all good reward: ", reward)
                 rewards.append(reward)
-            except Exception as e:
-                print("compute_internal_score failed: ", e)
+            except Exception:
                 rewards.append(0)
         if self.log_custom_metrics:
             self.custom_metrics["val/rewards"].extend(rewards)
