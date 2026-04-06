@@ -1,31 +1,22 @@
 import os
 
-
 if __name__ == "__main__":
     # Check if the script is in the sink directory
-    path_script = (
-        os.path.abspath(__file__).replace("\\", "/").replace("//", "/")
-    )
-    assert (
-        path_script.split("/")[-2] == "sink"
-    ), f"The script is not in the sink directory: {path_script}"
+    path_script = os.path.abspath(__file__).replace("\\", "/").replace("//", "/")
+    assert path_script.split("/")[-2] == "sink", f"The script is not in the sink directory: {path_script}"
 
     # Get username
     username = os.getlogin()
 
     # Create .cache directory in scratch
     path_scratch = f"/iopsstor/scratch/cscs/{username}"
-    assert os.path.isdir(
-        path_scratch
-    ), f"The user's scratch directory does not exist: {path_scratch}"
+    assert os.path.isdir(path_scratch), f"The user's scratch directory does not exist: {path_scratch}"
     if os.path.isdir(f"{path_scratch}/.cache") is False:
         os.mkdir(f"{path_scratch}/.cache")
 
     # Create environment in .edf folder
     path_home = f"/users/{username}"
-    assert os.path.isdir(
-        path_home
-    ), f"The user's home directory does not exist: {path_home}"
+    assert os.path.isdir(path_home), f"The user's home directory does not exist: {path_home}"
     if os.path.isdir(f"{path_home}/.edf") is False:
         os.mkdir(f"{path_home}/.edf")
     path_environment = f"{path_home}/.edf/vllm071.toml"
@@ -57,9 +48,7 @@ if __name__ == "__main__":
             if len(wandb_api_key) == 0:
                 wandb_api_key_needed = True
     if wandb_api_key_needed:
-        wandb_api_key = input(
-            "Please enter your WANDB API key (found in https://wandb.ai/settings): "
-        ).strip()
+        wandb_api_key = input("Please enter your WANDB API key (found in https://wandb.ai/settings): ").strip()
         with open("wandb_api_key.txt", "w") as f:
             f.write(wandb_api_key)
         input(

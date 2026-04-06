@@ -2,8 +2,6 @@ import re
 from pathlib import Path
 
 import pytest
-from transformers import AutoTokenizer
-
 import yaml
 from kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics
 
@@ -58,6 +56,8 @@ response_correct_format = """
 
 class TestAccuracyReward:
     def setup_method(self):
+        from transformers import AutoTokenizer
+
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic.yaml"
         config = load_config(config_path)
