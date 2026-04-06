@@ -5,13 +5,10 @@ import random
 import re
 from typing import Any, Dict, Optional
 
-import pandas as pd
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
-from tqdm import tqdm
 
-import exmol
 from open_r1.download_data import download_data
 
 from ..base import RLTask, SMILESBasedTask
@@ -56,11 +53,15 @@ class ForwardReaction(SMILESBasedTask):
 
         self.mol_to_fgs_file = os.path.join(self.dataset_id_or_path, "fgs.csv")
         if os.path.exists(self.mol_to_fgs_file):
+            import pandas as pd
+
             mol_to_fgs_df = pd.read_csv(self.mol_to_fgs_file)
             self.mol_to_fgs = {row.smiles: row.fgs.split(".") for row in mol_to_fgs_df.itertuples()}
 
         self.mol_to_name_file = os.path.join(self.dataset_id_or_path, "iupac_names.csv")
         if os.path.exists(self.mol_to_name_file):
+            import pandas as pd
+
             mol_to_names_df = pd.read_csv(self.mol_to_name_file)
             self.mol_to_names = {row.smiles: row.iupac for row in mol_to_names_df.itertuples()}
 
@@ -152,6 +153,8 @@ class ForwardReaction(SMILESBasedTask):
             if reactant in self.mol_to_fgs:
                 fgs = self.mol_to_fgs[reactant]
             else:
+                import exmol
+
                 fgs = exmol.get_functional_groups(reactant, cutoff=500)
                 if fgs:
                     self.mol_to_fgs[reactant] = ".".join(fgs)
@@ -210,6 +213,8 @@ class ForwardReaction(SMILESBasedTask):
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
+        from tqdm import tqdm
+
         with open(src_file, "r", encoding="utf-8") as f:
             problems = [
                 self.question_template_format(self.process_line(line))

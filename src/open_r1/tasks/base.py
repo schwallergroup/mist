@@ -13,7 +13,6 @@ from typing import Any, Dict, Optional
 import numpy as np
 from datasets import load_dataset
 from rdkit import Chem, RDLogger
-from transformers import AutoTokenizer
 
 from pydantic import BaseModel, Field
 
@@ -236,6 +235,8 @@ class RLTask(BaseModel):
         Returns:
             list[float]: Reward scores
         """
+        from transformers import AutoTokenizer
+
         min_length = 2000
         max_length = 4000
         std = 500
