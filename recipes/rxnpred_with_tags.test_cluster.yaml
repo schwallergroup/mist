@@ -10,9 +10,7 @@ chem_task: rxnpred_with_tags
 dataset_id_or_path: ${MIST_DATA_DIR}/rxnpred/USPTO_480k_clean
 rewards:
 - format
-- accuracy
-# - reasoning_steps
-# - tanimoto_accuracy
+- tanimoto_accuracy
 
 
 # Lora Arguments

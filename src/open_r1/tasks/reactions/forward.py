@@ -180,6 +180,37 @@ class ForwardReaction(SMILESBasedTask):
 
         return rewards
 
+    def tanimoto_accuracy_reward(self, completions, solution, **kwargs):
+        """Paper reward: discrete {-1, -0.5, +1} based on exact SMILES match.
+
+        R_acc(a) = -1   if answer cannot be parsed or is not a valid SMILES
+                   -0.5  if answer is a valid molecule different from ground truth
+                   +1    if answer corresponds to the ground truth molecule
+        """
+        answers = [self.preprocess_response(c) for c in completions]
+        rewards = []
+        for answer, ref in zip(answers, solution):
+            if answer == "NONE":
+                rewards.append(-1.0)
+                continue
+            answer_smiles = self.extract_smiles(answer)
+            if not answer_smiles:
+                rewards.append(-1.0)
+                continue
+            pred = max(answer_smiles, key=len)
+            pred_mol = Chem.MolFromSmiles(pred)
+            ref_mol = Chem.MolFromSmiles(ref)
+            if pred_mol is None or ref_mol is None:
+                rewards.append(-1.0)
+                continue
+            pred_canon = Chem.MolToSmiles(pred_mol)
+            ref_canon = Chem.MolToSmiles(ref_mol)
+            if pred_canon == ref_canon:
+                rewards.append(1.0)
+            else:
+                rewards.append(-0.5)
+        return rewards
+
 
 class ForwardReactionWithTags(ForwardReaction):
     def __init__(self, **kwargs):
