@@ -1,21 +1,26 @@
 import os
 import re
+from dataclasses import field
+from io import StringIO
 from random import random
 from typing import Dict, Optional
-from open_r1.download_data import download_data
+
 import pandas as pd
 from datasets import Dataset, DatasetDict
-from open_r1.tasks.base import RLTask
-from dataclasses import field
-from ase.io import read
+
 import gemmi
-from io import StringIO
+from ase.io import read
 from mace.calculators import mace_mp
-from pymatgen.core import Structure
+from open_r1.download_data import download_data
+from open_r1.tasks.base import RLTask
 from pymatgen.analysis.structure_matcher import StructureMatcher
+from pymatgen.core import Structure
+
 from .AIRS_preporcess._tokenizer import CIFTokenizer
 
 cif_tokenizer = CIFTokenizer()
+
+
 class BinaryCompoundRelaxing(RLTask):
     src_train_file: str = ""
     tgt_train_file: str = ""
@@ -31,22 +36,10 @@ class BinaryCompoundRelaxing(RLTask):
             os.makedirs(self.dataset_id_or_path)
         download_data(self.dataset_id_or_path)
 
-        self.src_train_file = os.path.join(
-            self.dataset_id_or_path, "src-train.txt"
-        )
-        self.tgt_train_file = os.path.join(
-            self.dataset_id_or_path, "tgt-train.txt"
-        )
-        self.src_test_file = (
-            os.path.join(self.dataset_id_or_path, "src-test.txt")
-            if "src-test.txt"
-            else None
-        )
-        self.tgt_test_file = (
-            os.path.join(self.dataset_id_or_path, "tgt-test.txt")
-            if "tgt-test.txt"
-            else None
-        )
+        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
+        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
+        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
+        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
             "system You are a seasoned crystallographic structure analysis expert. "
             "Your task is to relax a binary compound to a stable state.\n"
@@ -62,13 +55,14 @@ class BinaryCompoundRelaxing(RLTask):
         )
         self.log_custom_metrics = True
         self.custom_metrics = {
-            'val/rewards': [],
+            "val/rewards": [],
         }
 
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/binary_compound_relaxing
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
+
         def read_records(file_path: str) -> list:
             """Helper function to read multi-line records separated by blank lines."""
             with open(file_path, "r", encoding="utf-8") as f:
@@ -85,6 +79,7 @@ class BinaryCompoundRelaxing(RLTask):
             if current_record:  # Append the last record if file doesn't end with blank line
                 records.append("\n".join(current_record))
             return records
+
         # Read records from source and target files
         src_records = read_records(src_file)
         tgt_records = read_records(tgt_file)
@@ -116,14 +111,13 @@ class BinaryCompoundRelaxing(RLTask):
             test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
 
         return self.dataset
-    
+
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
+
         def compute_internal_score(answer_cif, ground_truth_dict, alpha=5.0):
             def sanitize_cif(cif_str):
                 lines = cif_str.splitlines()
@@ -149,6 +143,7 @@ class BinaryCompoundRelaxing(RLTask):
                     else:
                         new_lines.append(line)
                 return "\n".join(new_lines)
+
             def parse_llm_structure(cif_content):
                 sanitized = sanitize_cif(cif_content)
                 try:
@@ -156,11 +151,12 @@ class BinaryCompoundRelaxing(RLTask):
                 except Exception as e:
                     print(f"Error parsing LLM‐generated structure: {e}")
                     return None
+
             def compare_internal_energy(cif1, cif2):
                 # uses ASE + MACE to get per‐atom potential energies
-                atoms1 = read(StringIO(cif1), format='cif')
-                atoms2 = read(StringIO(cif2), format='cif')
-                calc = mace_mp(model="large", device='cuda')
+                atoms1 = read(StringIO(cif1), format="cif")
+                atoms2 = read(StringIO(cif2), format="cif")
+                calc = mace_mp(model="large", device="cuda")
                 atoms1.calc = calc
                 atoms2.calc = calc
                 e1 = atoms1.get_potential_energy() / len(atoms1)
@@ -170,9 +166,10 @@ class BinaryCompoundRelaxing(RLTask):
                 if e1 < e2:
                     return 0.5
                 elif e1 > e2:
-                    return  1
+                    return 1
                 else:
                     return 0
+
             gt_cif = ground_truth_dict
             if not gt_cif:
                 print("No ground truth CIF provided.")
@@ -191,7 +188,7 @@ class BinaryCompoundRelaxing(RLTask):
                     doc.check_for_missing_values()
                     doc.check_for_duplicates()
             except Exception as e:
-                print("CIF validation error:", e, '\n GT:', gt_cif, '\n answer_cif', answer_cif)
+                print("CIF validation error:", e, "\n GT:", gt_cif, "\n answer_cif", answer_cif)
                 return 0
 
             # parse Pymatgen structures
@@ -210,37 +207,36 @@ class BinaryCompoundRelaxing(RLTask):
 
             # choose which to return (here using energy check as original)
             return energy_reward
+
         rewards = []
         # Here task is simple: check that the smiles is the same as the target s
         for content, sol in zip(completions, solution):
-            print(f"\n\n=======<RESPONSE>=======\n"
-                f"#answer_text: {content}\n"
-            )
+            print(f"\n\n=======<RESPONSE>=======\n" f"#answer_text: {content}\n")
             content = self.preprocess_response(content)
             print("#llm generated cif: ", content)
             print(f"\n# ground_truth: {sol}\n")
             if content == "NONE":
                 rewards.append(0)
-                print('content NONE reward 0')
+                print("content NONE reward 0")
                 continue
 
             # server_url = os.environ.get("SERVER_URL", "http://10.197.48.175:9001/compute_score")
             if content == sol:
-                print('content == init cif reward 0')
+                print("content == init cif reward 0")
                 rewards.append(0)
                 continue
-            
+
             try:
                 reward = compute_internal_score(content, sol)
-                print('all good reward: ', reward)
+                print("all good reward: ", reward)
                 rewards.append(reward)
             except Exception as e:
-                print('compute_internal_score failed: ', e)
+                print("compute_internal_score failed: ", e)
                 rewards.append(0)
         if self.log_custom_metrics:
-            self.custom_metrics['val/rewards'].extend(rewards)
+            self.custom_metrics["val/rewards"].extend(rewards)
         return rewards
-    
+
     def format_reward(self, completions, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
@@ -255,7 +251,233 @@ class BinaryCompoundRelaxing(RLTask):
         # detect malformed or missing tags
         tag_regex = re.compile(r"<think>(.*?)</think>\s*<answer>(.*?)</answer>", re.DOTALL)
         space_groups = [
-            "P6/mmm", "Imma", "P4_32_12", "P4_2/mnm", "Fd-3m", "P3m1", "P-3", "P4mm", "P4_332", "P4/nnc", "P2_12_12", "Pnn2", "Pbcn", "P4_2/n", "Cm", "R3m", "Cmce", "Aea2", "P-42_1m", "P-42m", "P2_13", "R-3", "Fm-3", "Cmm2", "Pn-3n", "P6/mcc", "P-6m2", "P3_2", "P-3m1", "P3_212", "I23", "P-62m", "P4_2nm", "Pma2", "Pmma", "I-42m", "P-31c", "Pa-3", "Pmmn", "Pmmm", "P4_2/ncm", "I4/mcm", "I-4m2", "P3_1", "Pcc2", "Cmcm", "I222", "Fddd", "P312", "Cccm", "P6_1", "F-43c", "P6_322", "Pm-3", "P3_121", "P6_4", "Ia-3d", "Pm-3m", "P2_1/c", "C222_1", "Pc", "P4/n", "Pba2", "Ama2", "Pbcm", "P31m", "Pcca", "P222", "P-43n", "Pccm", "P6_422", "F23", "P42_12", "C222", "Pnnn", "P6_3cm", "P4_12_12", "P6/m", "Fmm2", "I4_1/a", "P4/mbm", "Pmn2_1", "P4_2bc", "P4_22_12", "I-43d", "I4/m", "P4bm", "Fdd2", "P3", "P6_122", "Pnc2", "P4_2/mcm", "P4_122", "Cmc2_1", "P-6c2", "R32", "P4_1", "P4_232", "Pnna", "P422", "Pban", "Cc", "I4_122", "P6_3/m", "P6_3mc", "I4_1/amd", "P4_2", "P4/nmm", "Pmna", "P4/m", "Fm-3m", "P4/mmm", "Imm2", "P4/ncc", "P-62c", "Ima2", "P6_5", "P2/c", "P4/nbm", "Ibam", "P6_522", "P6_3/mmc", "I4/mmm", "Fmmm", "P2/m", "P-4b2", "I-4", "C2/m", "P4_2/mmc", "P4", "Fd-3c", "P4_3", "P2_1/m", "I-43m", "P-42c", "F4_132", "Pm", "Pccn", "P-4n2", "P4_132", "P23", "I4cm", "R3c", "Amm2", "Immm", "Iba2", "I4", "Fd-3", "P1", "Pbam", "P4_2/nbc", "Im-3", "P4_2/nnm", "Pmc2_1", "P-31m", "R-3m", "Ia-3", "P622", "F222", "P2", "P-1", "Pmm2", "P-4", "Aem2", "P6_222", "P-3c1", "P4_322", "I422", "Pnma", "P6_3", "P3c1", "Pn-3", "P4nc", "P-6", "P4/mcc", "I2_12_12_1", "P4_2/mbc", "P31c", "Ccc2", "P4_2/nmc", "P6_3/mcm", "C2", "Pbca", "P-4c2", "I4_1cd", "P2_1", "P3_112", "P4_2mc", "Pn-3m", "C2/c", "R3", "P-43m", "I432", "P222_1", "I-42d", "I-4c2", "P6cc", "P6_2", "P3_221", "P321", "Pca2_1", "I4_1/acd", "I4_132", "F432", "Pna2_1", "Ccce", "Ibca", "P4/mnc", "I4_1md", "P2_12_12_1", "R-3c", "I2_13", "P-4m2", "Pm-3n", "I4mm", "F-43m", "Pnnm", "P-42_1c", "Cmmm", "P6mm", "P4_2cm", "P4_2/m", "Im-3m", "Fm-3c", "I4_1", "P4cc", "Cmme"
+            "P6/mmm",
+            "Imma",
+            "P4_32_12",
+            "P4_2/mnm",
+            "Fd-3m",
+            "P3m1",
+            "P-3",
+            "P4mm",
+            "P4_332",
+            "P4/nnc",
+            "P2_12_12",
+            "Pnn2",
+            "Pbcn",
+            "P4_2/n",
+            "Cm",
+            "R3m",
+            "Cmce",
+            "Aea2",
+            "P-42_1m",
+            "P-42m",
+            "P2_13",
+            "R-3",
+            "Fm-3",
+            "Cmm2",
+            "Pn-3n",
+            "P6/mcc",
+            "P-6m2",
+            "P3_2",
+            "P-3m1",
+            "P3_212",
+            "I23",
+            "P-62m",
+            "P4_2nm",
+            "Pma2",
+            "Pmma",
+            "I-42m",
+            "P-31c",
+            "Pa-3",
+            "Pmmn",
+            "Pmmm",
+            "P4_2/ncm",
+            "I4/mcm",
+            "I-4m2",
+            "P3_1",
+            "Pcc2",
+            "Cmcm",
+            "I222",
+            "Fddd",
+            "P312",
+            "Cccm",
+            "P6_1",
+            "F-43c",
+            "P6_322",
+            "Pm-3",
+            "P3_121",
+            "P6_4",
+            "Ia-3d",
+            "Pm-3m",
+            "P2_1/c",
+            "C222_1",
+            "Pc",
+            "P4/n",
+            "Pba2",
+            "Ama2",
+            "Pbcm",
+            "P31m",
+            "Pcca",
+            "P222",
+            "P-43n",
+            "Pccm",
+            "P6_422",
+            "F23",
+            "P42_12",
+            "C222",
+            "Pnnn",
+            "P6_3cm",
+            "P4_12_12",
+            "P6/m",
+            "Fmm2",
+            "I4_1/a",
+            "P4/mbm",
+            "Pmn2_1",
+            "P4_2bc",
+            "P4_22_12",
+            "I-43d",
+            "I4/m",
+            "P4bm",
+            "Fdd2",
+            "P3",
+            "P6_122",
+            "Pnc2",
+            "P4_2/mcm",
+            "P4_122",
+            "Cmc2_1",
+            "P-6c2",
+            "R32",
+            "P4_1",
+            "P4_232",
+            "Pnna",
+            "P422",
+            "Pban",
+            "Cc",
+            "I4_122",
+            "P6_3/m",
+            "P6_3mc",
+            "I4_1/amd",
+            "P4_2",
+            "P4/nmm",
+            "Pmna",
+            "P4/m",
+            "Fm-3m",
+            "P4/mmm",
+            "Imm2",
+            "P4/ncc",
+            "P-62c",
+            "Ima2",
+            "P6_5",
+            "P2/c",
+            "P4/nbm",
+            "Ibam",
+            "P6_522",
+            "P6_3/mmc",
+            "I4/mmm",
+            "Fmmm",
+            "P2/m",
+            "P-4b2",
+            "I-4",
+            "C2/m",
+            "P4_2/mmc",
+            "P4",
+            "Fd-3c",
+            "P4_3",
+            "P2_1/m",
+            "I-43m",
+            "P-42c",
+            "F4_132",
+            "Pm",
+            "Pccn",
+            "P-4n2",
+            "P4_132",
+            "P23",
+            "I4cm",
+            "R3c",
+            "Amm2",
+            "Immm",
+            "Iba2",
+            "I4",
+            "Fd-3",
+            "P1",
+            "Pbam",
+            "P4_2/nbc",
+            "Im-3",
+            "P4_2/nnm",
+            "Pmc2_1",
+            "P-31m",
+            "R-3m",
+            "Ia-3",
+            "P622",
+            "F222",
+            "P2",
+            "P-1",
+            "Pmm2",
+            "P-4",
+            "Aem2",
+            "P6_222",
+            "P-3c1",
+            "P4_322",
+            "I422",
+            "Pnma",
+            "P6_3",
+            "P3c1",
+            "Pn-3",
+            "P4nc",
+            "P-6",
+            "P4/mcc",
+            "I2_12_12_1",
+            "P4_2/mbc",
+            "P31c",
+            "Ccc2",
+            "P4_2/nmc",
+            "P6_3/mcm",
+            "C2",
+            "Pbca",
+            "P-4c2",
+            "I4_1cd",
+            "P2_1",
+            "P3_112",
+            "P4_2mc",
+            "Pn-3m",
+            "C2/c",
+            "R3",
+            "P-43m",
+            "I432",
+            "P222_1",
+            "I-42d",
+            "I-4c2",
+            "P6cc",
+            "P6_2",
+            "P3_221",
+            "P321",
+            "Pca2_1",
+            "I4_1/acd",
+            "I4_132",
+            "F432",
+            "Pna2_1",
+            "Ccce",
+            "Ibca",
+            "P4/mnc",
+            "I4_1md",
+            "P2_12_12_1",
+            "R-3c",
+            "I2_13",
+            "P-4m2",
+            "Pm-3n",
+            "I4mm",
+            "F-43m",
+            "Pnnm",
+            "P-42_1c",
+            "Cmmm",
+            "P6mm",
+            "P4_2cm",
+            "P4_2/m",
+            "Im-3m",
+            "Fm-3c",
+            "I4_1",
+            "P4cc",
+            "Cmme",
         ]
         escaped = [re.escape(sg) for sg in space_groups]
         pattern = r"\b(?:" + "|".join(escaped) + r")\b"
@@ -269,12 +491,12 @@ class BinaryCompoundRelaxing(RLTask):
             r"bond\s+length|bond\s+angle|volume|Wyckoff|"
             r"atomic\s+positions|occupancy|site\s+multiplicity"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         math_pattern = re.compile(
             # looks for sqrt(…), (…)^2, (…)=(…), or simple a±b/c etc.
             r"(?:sqrt\s*\(|\([^)]*\)\s*\^\s*2|[0-9\.\)]+\s*[\+\-\*/=]\s*[0-9\.\(])",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         position_pattern = re.compile(
             r"\b("
@@ -282,46 +504,43 @@ class BinaryCompoundRelaxing(RLTask):
             r"atomic\s+position|fractional\s+coord(?:inate)?s?|"
             r"xyz|uvw"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
-        lattice_angle_pattern = re.compile(
-            r"\b(a=|b=|c=|c/a|gamma\s*=?\s*\d+(\.\d+)?°?)\b",
-            re.IGNORECASE
-        )
+        lattice_angle_pattern = re.compile(r"\b(a=|b=|c=|c/a|gamma\s*=?\s*\d+(\.\d+)?°?)\b", re.IGNORECASE)
         crystallographic_pattern = re.compile(
             r"\b("
             r"Wyckoff|multiplicity|asymmetric unit|mirror plane|inversion center|"
             r"Bravais lattice|primitive cell|supercell"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         energy_force_pattern = re.compile(
             r"\b("
             r"formation energy|total energy|enthalpy|residual force|stress|"
             r"converged energy|converged stress|force\s*<\s*0\.01\s*eV/Å"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         dynamical_pattern = re.compile(
             r"\b("
             r"phonon dispersion|imaginary mode|soft mode|dynamical stability|"
             r"elastic constant|Born criteria"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         classification_pattern = re.compile(
             r"\b("
             r"perovskite|spinel|rocksalt|layered oxide|phase transition|"
             r"Jahn[- ]Teller distortion|olivine|rutile"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         chemical_pattern = re.compile(
             r"\b("
             r"bond length|bond angle|electronegativity|Bader charge|"
             r"electron localization|coordination number|coordination environment|ionic radius"
             r")\b",
-            re.IGNORECASE
+            re.IGNORECASE,
         )
 
         for completion in completions:
@@ -380,11 +599,11 @@ class BinaryCompoundRelaxing(RLTask):
         """
         metrics = dict()
         if self.log_custom_metrics:
-            rewards = self.custom_metrics['val/rewards']
+            rewards = self.custom_metrics["val/rewards"]
             if rewards:
                 correct_count = sum(1 for r in rewards if r == 1)
                 total_count = len(rewards)
                 accuracy = correct_count / total_count if total_count > 0 else 0.0
-                metrics['val/accuracy'] = accuracy
-                self.custom_metrics['val/rewards'] = []
+                metrics["val/accuracy"] = accuracy
+                self.custom_metrics["val/rewards"] = []
         return metrics

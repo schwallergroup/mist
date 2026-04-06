@@ -1,16 +1,18 @@
-import os
-import re
-import random
-from typing import Dict, Optional
-from open_r1.download_data import download_data
-from datasets import Dataset, DatasetDict
-from ..base import RLTask
-from dataclasses import field
-from collections import Counter
-from smact.screening import smact_validity
-from pymatgen.core import Composition
 import json
+import os
+import random
+import re
+from collections import Counter
+from dataclasses import field
+from typing import Dict, Optional
 
+from datasets import Dataset, DatasetDict
+
+from open_r1.download_data import download_data
+from pymatgen.core import Composition
+from smact.screening import smact_validity
+
+from ..base import RLTask
 
 
 class ConditionalMaterialGeneration(RLTask):
@@ -30,11 +32,11 @@ class ConditionalMaterialGeneration(RLTask):
         self.question_template = f"""<|im_start|>assistant\You are a material science expert, and I have a task for you. Given the following elements, please generate valid and novel material from these elements. Show your reasoning in <think>...</think> tags and return the final answer in <material>...</material> tags.<|im_end|>\n<|im_start|>user\{{instruction}}. Please keep your reasoning as concise as possible. For example <material> A A B B B <sg12></material> where A, B refer to elements and <sg12> denotes the space group for example: \n<material> Pa In Tc Tc <sg225></material>.<|im_end|>\n<|im_start|>assistant\Response:\n<think>"""
         self.log_custom_metrics = True
         self.custom_metrics = {
-            'val/rewards': [],
+            "val/rewards": [],
         }
         with open("/iopsstor/store/cscs/swissai/a05/chem/comps_used_in_sft.json", "r") as file:
             seen_comps = json.load(file)
-        self.seen_comps_set = set() 
+        self.seen_comps_set = set()
         for comp in seen_comps:
             comp = Composition(comp)
             self.seen_comps_set.add(comp)
@@ -57,7 +59,7 @@ class ConditionalMaterialGeneration(RLTask):
 
         for pt in data:
             try:
-                problems.append(self.question_template.format(instruction=pt.get('instruction')))
+                problems.append(self.question_template.format(instruction=pt.get("instruction")))
                 solutions.append("")
             except KeyError as e:
                 print(pt.keys())
@@ -72,7 +74,7 @@ class ConditionalMaterialGeneration(RLTask):
             "problem": problems,
             "solution": solutions,
         }
-    
+
     def generate_prompt(self, problem, tokenizer, **kwargs):
         r1_prefix = [
             {
@@ -81,9 +83,7 @@ class ConditionalMaterialGeneration(RLTask):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "problem": problem,
         }
 
@@ -100,33 +100,29 @@ class ConditionalMaterialGeneration(RLTask):
         train_dataset = train_test_split["train"]
         test_dataset = train_test_split["test"]
         print(f"{type(test_dataset)} {type(train_dataset)}")
-    
+
         # Combine into DatasetDict
         # print(train_dataset)
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
 
         return self.dataset
 
     def dataset_preprocess(self, tokenizer):
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(x["problem"], tokenizer)
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
-    
+
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
         rewards = []
         print("========<RESPONSE>=======")
-        print('completions: ', completions)
+        print("completions: ", completions)
         for c in completions:
             reward = 0
 
             # Extract elements from instruction
             input_pattern = r"Build a material that has\s+(.*)"
             match = re.search(input_pattern, c)
-            input_elements = match.group(1).split(', ') if match else []
+            input_elements = match.group(1).split(", ") if match else []
 
             # Extract elements and space group from output
             output_pattern = r"<material>\s*((?:[A-Z][a-z]?\s*)+?)\s*<sg(\d+)>\s*</material>"
@@ -152,7 +148,7 @@ class ConditionalMaterialGeneration(RLTask):
                 # Calculate overuse for extra elements
                 overuse_score = sum(self.element_usage_counter.get(e, 0) for e in extra_elements)
                 max_possible_overuse = len(extra_elements) * self.MAX_TRACKED
-                
+
                 # Normalize penalty between 0 and 2
                 if max_possible_overuse > 0:
                     normalized_penalty = 2 * (overuse_score / max_possible_overuse)
@@ -161,7 +157,7 @@ class ConditionalMaterialGeneration(RLTask):
             # Penalize overused space group
             overuse_score_sg = self.space_group_usage_counter.get(output_sg, 0)
             max_possible_overuse_sg = self.MAX_TRACKED
-            
+
             if max_possible_overuse_sg > 0:
                 normalized_penalty_sg = 2 * (overuse_score_sg / max_possible_overuse_sg)
                 reward -= normalized_penalty_sg
@@ -203,9 +199,9 @@ class ConditionalMaterialGeneration(RLTask):
                 self.space_group_usage_counter.subtract([old_space_group])
                 # Remove zero or negative counts
                 self.element_usage_counter += Counter()  # clean up
-                self.space_group_usage_counter += Counter()  # clean up 
+                self.space_group_usage_counter += Counter()  # clean up
             rewards.append(reward)
-            self.custom_metrics['val/rewards'].extend(rewards)
+            self.custom_metrics["val/rewards"].extend(rewards)
         print(rewards)
         return rewards
 
@@ -216,11 +212,11 @@ class ConditionalMaterialGeneration(RLTask):
         """
         metrics = dict()
         if self.log_custom_metrics:
-            rewards = self.custom_metrics['val/rewards']
+            rewards = self.custom_metrics["val/rewards"]
             if rewards:
                 correct_count = sum(1 for r in rewards if r == 1)
                 total_count = len(rewards)
                 accuracy = correct_count / total_count if total_count > 0 else 0.0
-                metrics['val/accuracy'] = accuracy
-                self.custom_metrics['val/rewards'] = []
+                metrics["val/accuracy"] = accuracy
+                self.custom_metrics["val/rewards"] = []
         return metrics

@@ -1,24 +1,26 @@
-from flask import Flask, request, jsonify
 import gc
 import random
 from io import StringIO
-from pymatgen.core import Structure
-from pymatgen.analysis.structure_matcher import StructureMatcher
+
 import gemmi
-from pymatgen.io.cif import CifWriter
 from AIRS_preporcess._tokenizer import CIFTokenizer
-from mace.calculators import mace_mp
 from ase.io import read
+from flask import Flask, jsonify, request
+from mace.calculators import mace_mp
+from pymatgen.analysis.structure_matcher import StructureMatcher
+from pymatgen.core import Structure
+from pymatgen.io.cif import CifWriter
+
 
 def compare_internal_energy(cif1, cif2):
-    atoms1 = read(StringIO(cif1),format='cif')
-    atoms2 = read(StringIO(cif2),format='cif')
-    calc = mace_mp(model="large", device='cuda')
+    atoms1 = read(StringIO(cif1), format="cif")
+    atoms2 = read(StringIO(cif2), format="cif")
+    calc = mace_mp(model="large", device="cuda")
     atoms1.calc = calc
     atoms2.calc = calc
     energy1_total = atoms1.get_potential_energy()
     energy2_total = atoms2.get_potential_energy()
-    
+
     energy1_per_atom = energy1_total / len(atoms1)
     energy2_per_atom = energy2_total / len(atoms2)
     print(";;;;;;;;;;;;;;;;;;;;;")
@@ -32,23 +34,25 @@ def compare_internal_energy(cif1, cif2):
     else:
         return -10
 
+
 app = Flask(__name__)
 cif_tokenizer = CIFTokenizer()
 
+
 def parse_llm_structure(answer_text):
-    """
-    """
+    """ """
     try:
         return Structure.from_str(answer_text, fmt="cif")
     except Exception as e:
         print("Error in parse_llm_structure:", e)
         return None
 
+
 def compute_score(answer_text, ground_truth, alpha=5.0):
     """
     Calculate the score based on the structure match:
         Logic description:
-        
+
     """
     try:
         answer_text = cif_tokenizer.deserialize(answer_text, ground_truth.get("ground_truth", ""))
@@ -60,7 +64,7 @@ def compute_score(answer_text, ground_truth, alpha=5.0):
         print("-------------- START ------------------")
         print("answer_text:", answer_text)
         print("ground_cif:", ground_truth.get("ground_truth", ""))
-    
+
     dft_cif = ground_truth.get("ground_truth", "")
     if not dft_cif:
         print("No ground truth CIF content provided.")
@@ -101,7 +105,7 @@ def compute_score(answer_text, ground_truth, alpha=5.0):
         reward = compare_internal_energy(dft_cif, answer_text)
     except Exception as e:
         print("**************************")
-        print('CALC ERROR:', e)
+        print("CALC ERROR:", e)
         print("**************************")
         print("-------------- END ------------------")
         return reward
@@ -111,7 +115,8 @@ def compute_score(answer_text, ground_truth, alpha=5.0):
         print("-------------- END ------------------")
     return reward
 
-@app.route('/compute_score', methods=['POST'])
+
+@app.route("/compute_score", methods=["POST"])
 def compute_score_endpoint():
     """
     The interface /compute_score receives POST requests, and the JSON format content needs to include:
@@ -124,16 +129,17 @@ def compute_score_endpoint():
     data = request.get_json()
     if not data:
         return jsonify({"error": "No JSON data provided"}), 400
-    
+
     answer_text = data.get("answer_text", "")
     ground_truth = data.get("ground_truth", {})
-    
+
     if not answer_text or not ground_truth:
         return jsonify({"error": "Missing required fields: answer_text and ground_truth"}), 400
-    
+
     reward = compute_score(answer_text, ground_truth)
     gc.collect()
     return jsonify({"reward": reward})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9001, debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=9001, debug=True)
