@@ -9,6 +9,8 @@ from kinetic_data_category_classification_with_metrics import (
     KineticDataCategoryClassificationWithRawDataMetrics,
 )
 
+transformers = pytest.importorskip("transformers")
+
 
 def load_config(config_path: str) -> dict:
     """Load configuration from YAML file"""
@@ -58,8 +60,6 @@ response_correct_format = """
 
 class TestKineticDataCategoryClassificationWithMetrics:
     def setup_method(self):
-        from transformers import AutoTokenizer
-
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
         config = load_config(config_path)
@@ -73,7 +73,7 @@ class TestKineticDataCategoryClassificationWithMetrics:
             tf32=config["tf32"],
         )
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             "/work/liac/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa",
             revision=config["model_revision"],
             trust_remote_code=False,
@@ -207,8 +207,6 @@ class TestKineticDataCategoryClassificationWithMetrics:
 
 class TestKineticDataCategoryClassificationWithRawDataMetrics(TestKineticDataCategoryClassificationWithMetrics):
     def setup_method(self):
-        from transformers import AutoTokenizer
-
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
         config = load_config(config_path)
@@ -222,7 +220,7 @@ class TestKineticDataCategoryClassificationWithRawDataMetrics(TestKineticDataCat
             tf32=config["tf32"],
         )
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             "/work/liac/LLM_models/models--deepseek-ai--DeepSeek-R1-Distill-Qwen-1.5B/snapshots/530ca3e1ad39d440e182c2e4317aa40f012512fa",
             revision=config["model_revision"],
             trust_remote_code=False,
