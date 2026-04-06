@@ -34,12 +34,8 @@ class BinaryCompoundRelaxing(RLTask):
             os.makedirs(self.dataset_id_or_path)
         download_data(self.dataset_id_or_path)
 
-        self.src_train_file = os.path.join(
-            self.dataset_id_or_path, "src-train.txt"
-        )
-        self.tgt_train_file = os.path.join(
-            self.dataset_id_or_path, "tgt-train.txt"
-        )
+        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
+        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
         src_test_path = os.path.join(self.dataset_id_or_path, "src-test.txt")
         tgt_test_path = os.path.join(self.dataset_id_or_path, "tgt-test.txt")
         self.src_test_file = src_test_path if os.path.exists(src_test_path) else None
@@ -182,8 +178,8 @@ class BinaryCompoundRelaxing(RLTask):
 
             def compare_internal_energy(cif1, cif2):
                 # uses ASE + MACE to get per‐atom potential energies
-                atoms1 = ase_read(StringIO(cif1), format='cif')
-                atoms2 = ase_read(StringIO(cif2), format='cif')
+                atoms1 = ase_read(StringIO(cif1), format="cif")
+                atoms2 = ase_read(StringIO(cif2), format="cif")
                 calc = self._get_mace_calculator()
                 atoms1.calc = calc
                 atoms2.calc = calc

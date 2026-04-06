@@ -1,7 +1,6 @@
 import math
 import os
 import re
-import math
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -523,6 +522,7 @@ class CIFTokenizer:
             extracted_data["atoms"].append({"type": atom_type, "num": num_atoms, "coordinates": (x, y, z)})
 
         return extracted_data
+
 
 if __name__ == "__main__":
     llm_output = """
