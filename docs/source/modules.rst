@@ -18,3 +18,4 @@ Modules Reference
    tasks/rxn_truefalse
    tasks/template
    tasks/smi_permute
+   tasks/condmatgen

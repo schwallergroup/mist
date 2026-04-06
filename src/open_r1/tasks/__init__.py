@@ -10,6 +10,11 @@ from .reactions.reaction_truefalse import ReactionTrueFalse
 from .reactions.smi_permute import PermuteSmiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
 
+try:
+    from .condmatgen.condmatgen import ConditionalMaterialGeneration
+except ImportError:
+    ConditionalMaterialGeneration = None
+
 # Task keys as specified in the task recipes and documentation
 CHEMTASKS = {
     "rxnpred_with_tags": ForwardReactionWithTags,
@@ -26,3 +31,6 @@ CHEMTASKS = {
     "rxn_naming": Smiles2Name,
     "rxn_truefalse": ReactionTrueFalse,
 }
+
+if ConditionalMaterialGeneration is not None:
+    CHEMTASKS["condmatgen"] = ConditionalMaterialGeneration
