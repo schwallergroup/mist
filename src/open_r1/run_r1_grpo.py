@@ -4,7 +4,6 @@ from datetime import datetime
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
-from paths import expand_path
 from tasks import CHEMTASKS
 from trl import GRPOConfig, ModelConfig, TrlParser, get_peft_config
 from utils import (
@@ -104,7 +103,6 @@ def grpo_function(model_args: ModelConfig, training_args: GRPOConfig):
 def main():
     parser = TrlParser((ModelConfig, ExtendedGRPOConfig))
     model_args, training_args = parser.parse_args_and_config()
-    training_args.dataset_id_or_path = expand_path(training_args.dataset_id_or_path)
     training_args = load_sampling_params_config(training_args)  # Load sampling parameters
     grpo_function(model_args, training_args)
 
