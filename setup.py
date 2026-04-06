@@ -41,6 +41,7 @@ if stale_egg_info.exists():
 #   * If a dependency is fast-moving (e.g. transformers), pin to the exact version
 _deps = [
     "accelerate>=1.2.1",
+    "ase",
     "bitsandbytes>=0.43.0",
     "black>=24.4.2",
     "datasets>=3.2.0",
@@ -48,17 +49,21 @@ _deps = [
     "distilabel[vllm,ray,openai]>=1.5.2",
     "einops>=0.8.0",
     "flake8>=6.0.0",
+    "gemmi",
     "hf_transfer>=0.1.4",
     "huggingface-hub[cli]>=0.19.2,<1.0",
     "isort>=5.12.0",
     "liger_kernel==0.5.2",
     "lighteval @ git+https://github.com/huggingface/lighteval.git@4f381b352c0e467b5870a97d41cb66b487a2c503#egg=lighteval[math]",
+    "mace-torch",
     "math-verify>=0.3.2",  # Used for math verification in grpo
     "packaging>=23.0",
     "parameterized>=0.9.0",
+    "pymatgen",
     "pytest",
     "safetensors>=0.3.3",
     "sentencepiece>=0.1.99",
+    "smact",
     "torch>=2.5.1",
     "transformers @ git+https://github.com/huggingface/transformers.git@main",
     "trl @ git+https://github.com/huggingface/trl.git@main",
@@ -89,16 +94,21 @@ extras["dev"] = extras["quality"] + extras["tests"] + extras["eval"]
 # core dependencies shared across the whole project - keep this to a bare minimum :)
 install_requires = [
     deps["accelerate"],
+    deps["ase"],
     deps["bitsandbytes"],
     deps["einops"],
     deps["datasets"],
     deps["deepspeed"],
+    deps["gemmi"],
     deps["hf_transfer"],
     deps["huggingface-hub"],
     deps["liger_kernel"],
+    deps["mace-torch"],
+    deps["pymatgen"],
     deps["packaging"],  # utilities from PyPA to e.g., compare versions
     deps["safetensors"],
     deps["sentencepiece"],
+    deps["smact"],
     deps["transformers"],
     deps["trl"],
 ]
@@ -115,6 +125,11 @@ setup(
     url="https://github.com/schwallergroup/mist",
     package_dir={"": "src"},
     packages=find_packages("src"),
+    package_data={
+        "open_r1.dataset": ["spacegroups.txt"],
+        "open_r1.tasks.smiles_understanding": ["smiles_hydrogen_prompt_guiding.json"],
+        "open_r1.tasks.crystal_structure.AIRS_preporcess": ["spacegroups.txt"],
+    },
     zip_safe=False,
     extras_require=extras,
     python_requires=">=3.10.9",
