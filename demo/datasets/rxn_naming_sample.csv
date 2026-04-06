@@ -19,3 +19,33 @@ CCBr.NaOH>>CCOH.NaBr,Functional Group Interconversion
 c1ccncc1.BrCH2CH3>>c1cc[nH+](CC)cc1.[Br-],Heteroatom Alkylation and Arylation
 CC(=O)CC(=O)OCC>>CC1=CC(=O)OC1,Aromatic Heterocycle Formation
 CC(=O)OCC(=O)C>>CC(OH)=CHC(=O)C,Miscellaneous
+CC(=O)Cl.CCO>>CC(=O)OCC.Cl,Acylation
+CC(=O)O.NCC>>CC(=O)NCC.O,Acylation
+c1ccc(-c2ccccc2)cc1,C-C Coupling
+CCO.CC=O>>CC(O)CC,Functional Group Addition
+CC(=O)OC(C)=O>>CC(=O)O,Deprotection
+CCOC(=O)C>>CCO.CC(=O)O,Functional Group Interconversion
+CCN.ClC(=O)c1ccccc1>>CCN(C(=O)c1ccccc1),Acylation
+CC=CC>>CCCC,Reduction
+c1ccncc1.CC(=O)Cl>>CC(=O)c1ccncc1,C-C Coupling
+CC(=O)OCC.NaOH>>CC(=O)[O-].[Na+].CCO,Deprotection
+CCO.TsCl>>CC(OTs),Protection
+c1ccc(N)cc1.Ac2O>>c1ccc(NC(=O)C)cc1,Protection
+CCOC(=O)CC(=O)OCC.NaOEt>>CCOC(=O)C(Na)C(=O)OCC,Heteroatom Alkylation and Arylation
+CC(=O)c1ccccc1.[H][H]>>CC(O)c1ccccc1,Reduction
+c1ccoc1.Cl2>>c1cc(Cl)oc1,Aromatic Heterocycle Formation
+CC=O.CH2N2>>CCC(=O),Miscellaneous
+CCBr.NaOH>>CCOH.NaBr,Functional Group Interconversion
+c1ccncc1.BrCH2CH3>>c1cc[nH+](CC)cc1.[Br-],Heteroatom Alkylation and Arylation
+CC(=O)CC(=O)OCC>>CC1=CC(=O)OC1,Aromatic Heterocycle Formation
+CC(=O)OCC(=O)C>>CC(OH)=CHC(=O)C,Miscellaneous
+CC(=O)Cl.CCO>>CC(=O)OCC.Cl,Acylation
+CC(=O)O.NCC>>CC(=O)NCC.O,Acylation
+c1ccc(-c2ccccc2)cc1,C-C Coupling
+CCO.CC=O>>CC(O)CC,Functional Group Addition
+CC(=O)OC(C)=O>>CC(=O)O,Deprotection
+CCOC(=O)C>>CCO.CC(=O)O,Functional Group Interconversion
+CCN.ClC(=O)c1ccccc1>>CCN(C(=O)c1ccccc1),Acylation
+CC=CC>>CCCC,Reduction
+c1ccncc1.CC(=O)Cl>>CC(=O)c1ccncc1,C-C Coupling
+CC(=O)OCC.NaOH>>CC(=O)[O-].[Na+].CCO,Deprotection
