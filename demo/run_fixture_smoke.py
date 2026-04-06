@@ -43,6 +43,9 @@ def main():
         "rxn_truefalse": datasets_dir / "rxn_truefalse_sample.csv",
     }
 
+    if "condmatgen" in CHEMTASKS:
+        task_configs["condmatgen"] = demo_dir / "condmatgen_tiny"
+
     summary = {}
     for task_name, dataset_path in task_configs.items():
         task_class = CHEMTASKS[task_name]
