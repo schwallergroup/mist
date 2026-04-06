@@ -1,0 +1,48 @@
+serialized_cif formula Na 1_int Cl 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 5.64000000 b 5.64000000 c 5.64000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Na 4_int 0.00000000 0.00000000 0.00000000
+Cl 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Mg 1_int O 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 4.21200000 b 4.21200000 c 4.21200000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Mg 4_int 0.00000000 0.00000000 0.00000000
+O 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Ca 1_int O 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 4.81100000 b 4.81100000 c 4.81100000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Ca 4_int 0.00000000 0.00000000 0.00000000
+O 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Zn 1_int S 1_int
+space_group_symbol F-43m_sg
+lattice_parameters a 5.40900000 b 5.40900000 c 5.40900000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Zn 4_int 0.00000000 0.00000000 0.00000000
+S 4_int 0.25000000 0.25000000 0.25000000
+
+serialized_cif formula Li 1_int F 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 4.02800000 b 4.02800000 c 4.02800000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Li 4_int 0.00000000 0.00000000 0.00000000
+F 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula K 1_int Br 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 6.59500000 b 6.59500000 c 6.59500000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+K 4_int 0.00000000 0.00000000 0.00000000
+Br 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Ba 1_int O 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 5.51800000 b 5.51800000 c 5.51800000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Ba 4_int 0.00000000 0.00000000 0.00000000
+O 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Sr 1_int O 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 5.15900000 b 5.15900000 c 5.15900000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Sr 4_int 0.00000000 0.00000000 0.00000000
+O 4_int 0.50000000 0.50000000 0.50000000
+

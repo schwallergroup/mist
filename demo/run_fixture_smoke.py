@@ -43,6 +43,10 @@ def main():
         "rxn_truefalse": datasets_dir / "rxn_truefalse_sample.csv",
     }
 
+    # Tasks with heavy optional dependencies — only test if registered
+    if "crystalrelax" in CHEMTASKS:
+        task_configs["crystalrelax"] = demo_dir / "crystalrelax_tiny"
+
     summary = {}
     for task_name, dataset_path in task_configs.items():
         task_class = CHEMTASKS[task_name]

@@ -29,12 +29,19 @@ class BinaryCompoundRelaxing(RLTask):
     log_custom_metrics: bool = True
     custom_metrics: dict = field(default_factory=dict)
 
+    @staticmethod
+    def _has_local_files(dataset_dir: str) -> bool:
+        return os.path.exists(os.path.join(dataset_dir, "src-train.txt")) and os.path.exists(
+            os.path.join(dataset_dir, "tgt-train.txt")
+        )
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dataset_id_or_path = expand_path(self.dataset_id_or_path)
         if not os.path.exists(self.dataset_id_or_path):
             os.makedirs(self.dataset_id_or_path)
-        download_data(self.dataset_id_or_path)
+        if not self._has_local_files(self.dataset_id_or_path):
+            download_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
