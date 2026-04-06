@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 from transformers import AutoTokenizer
 
@@ -15,7 +14,6 @@ from utils import (
     load_sampling_params_config,
     setup_logger,
 )
-
 
 logger = setup_logger(__name__)
 

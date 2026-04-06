@@ -17,7 +17,6 @@ from open_r1.download_data import download_data
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_score
 
-
 # def tanimoto_score(mol1: str, mol2: str, beta=1):
 #     if (
 #         Chem.MolFromSmiles(mol1) is None

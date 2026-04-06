@@ -13,7 +13,6 @@ from lighteval.tasks.requests import Doc
 from open_r1.tasks import Iupac2Smiles
 from open_r1.tasks.task_utils import compute_tanimoto_similarity
 
-
 task_mode = "tagged"
 test_data_path = "test_data.iupacsm.jsonl"
 generation_size = 4096

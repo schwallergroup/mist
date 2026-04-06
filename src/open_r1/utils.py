@@ -13,7 +13,6 @@ from pydantic import Field
 from trl import GRPOConfig, GRPOTrainer
 from vllm import SamplingParams
 
-
 MetricFunc = Callable[[], dict]
 
 
