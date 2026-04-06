@@ -37,6 +37,10 @@ def main():
         "smi_permute": datasets_dir / "CRLLM-PubChem-compounds1M-very_very_simple.sample.csv",
         "smhydrogen": datasets_dir / "CRLLM-PubChem-compounds1M_hydrogen.sample.csv",
         "kinetic": kinetic_dir,
+        "rxn_inversion": datasets_dir / "rxn_inversion_sample.csv",
+        "rxn_replacement": datasets_dir / "rxn_inversion_sample.csv",
+        "rxn_naming": datasets_dir / "rxn_naming_sample.csv",
+        "rxn_truefalse": datasets_dir / "rxn_truefalse_sample.csv",
     }
 
     summary = {}
