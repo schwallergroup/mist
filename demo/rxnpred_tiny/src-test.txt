@@ -1,0 +1,10 @@
+CO.C
+CC.N
+CCO.C
+CCC.N
+CCO.O
+CCCl.N
+CCBr.O
+CCS.N
+CCF.N
+CCOC.N

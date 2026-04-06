@@ -6,6 +6,7 @@ from typing import List
 
 from datasets import Dataset, DatasetDict
 
+from open_r1.paths import expand_path
 from open_r1.tasks.base import RLTask
 
 
@@ -100,30 +101,32 @@ class KineticDataClassification(RLTask):
             DatasetDict: Dataset with 'train' and 'test' splits
         """
 
+        dataset_root = expand_path(self.dataset_id_or_path)
+
         # Assume the dataset is in the same directory as the script
         x1_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x1_train_M1_M20_train_val_test_set_part_0.pkl",
         )
         x2_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x2_train_M1_M20_train_val_test_set_part_0.pkl",
         )
         y_train_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "y_train_M1_M20_train_val_test_set_part_0.pkl",
         )
 
         x1_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x1_val_M1_M20_train_val_test_set_part_0.pkl",
         )
         x2_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "x2_val_M1_M20_train_val_test_set_part_0.pkl",
         )
         y_test_path = os.path.join(
-            self.dataset_id_or_path,
+            dataset_root,
             "y_val_M1_M20_train_val_test_set_part_0.pkl",
         )
 
@@ -198,34 +201,20 @@ class KineticDataClassification(RLTask):
 
         train_dict = {
             "problem": [
-                prompt_template_data.format(
-                    **self.generate_data_pass_to_prompt(i, is_test=False)
-                )
+                prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=False))
                 for i in range(self.x1_train.shape[0])
             ],
-            "solution": [
-                "M" + str(int(y[0]) + 1) for y in self.y_train.tolist()
-            ],
-            "options": [
-                ["M" + str(i) for i in range(1, 21)]
-                for _ in range(self.x1_train.shape[0])
-            ],
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_train.tolist()],
+            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_train.shape[0])],
         }
 
         test_dict = {
             "problem": [
-                prompt_template_data.format(
-                    **self.generate_data_pass_to_prompt(i, is_test=True)
-                )
+                prompt_template_data.format(**self.generate_data_pass_to_prompt(i, is_test=True))
                 for i in range(self.x1_test.shape[0])
             ],
-            "solution": [
-                "M" + str(int(y[0]) + 1) for y in self.y_test.tolist()
-            ],
-            "options": [
-                ["M" + str(i) for i in range(1, 21)]
-                for _ in range(self.x1_test.shape[0])
-            ],
+            "solution": ["M" + str(int(y[0]) + 1) for y in self.y_test.tolist()],
+            "options": [["M" + str(i) for i in range(1, 21)] for _ in range(self.x1_test.shape[0])],
         }
 
         self.dataset = DatasetDict(
@@ -352,27 +341,19 @@ class KineticDataClassification(RLTask):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "problem": problem,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(50000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(10000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
         )
 
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(x["problem"], tokenizer)
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
 
     def preprocess_response(self, response):

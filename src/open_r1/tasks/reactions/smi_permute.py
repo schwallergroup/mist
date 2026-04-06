@@ -9,6 +9,8 @@ from Levenshtein import ratio as levenshtein_ratio
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask
 
 
@@ -43,12 +45,8 @@ class PermuteSmiles(RLTask):
             # "Do not write anything else outside of the tags.\n"
             "Here is the SMILES that you need to work on: [START_SMILES] {} [END_SMILES]. "
         )
-        self.question_template = self.question_template.replace(
-            "[START_SMILES] ", ""
-        )
-        self.question_template = self.question_template.replace(
-            " [END_SMILES]", ""
-        )
+        self.question_template = self.question_template.replace("[START_SMILES] ", "")
+        self.question_template = self.question_template.replace(" [END_SMILES]", "")
 
         self.custom_metrics = {
             "n_samples": 0,
@@ -65,7 +63,7 @@ class PermuteSmiles(RLTask):
 
     def load(self):
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.dataset_id_or_path)
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
         df = df.drop_duplicates(subset=["SMILES"])
         train_dict = {
             "problem": df["SMILES"].tolist(),
@@ -77,9 +75,7 @@ class PermuteSmiles(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions: list[str], solution, **kwargs):
@@ -130,23 +126,15 @@ class PermuteSmiles(RLTask):
             return 1 - levenshtein_ratio(mol1, mol2)
 
         def _calc_score(mol1: str, mol2: str, beta=30):
-            if (
-                Chem.MolFromSmiles(mol1) is None
-                or Chem.MolFromSmiles(mol2) is None
-            ):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
                 return 0.0
             edit_distance = _edit_distance(mol1, mol2)
             edit_distance = min(edit_distance, 0.3)
-            return (
-                edit_distance ** (1 + (1 - _tanimoto_sim(mol1, mol2)) * beta)
-                / 0.3
-            )
+            return edit_distance ** (1 + (1 - _tanimoto_sim(mol1, mol2)) * beta) / 0.3
 
         def _extract_smiles(completion: str):
             def _post_process_smiles(smiles):
-                smiles = re.sub(
-                    r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles
-                )
+                smiles = re.sub(r"(?<=[A-Za-z]|\)|\])-(?=[A-Za-z]|\(|\[)", "", smiles)
                 smiles = re.sub(r"\[CH\d?\]", "C", smiles)
                 smiles = re.sub(
                     r"\[(?:Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p)\]",
@@ -185,17 +173,11 @@ class PermuteSmiles(RLTask):
             scores = [_calc_score(smi, ref) for smi in smiles]
             max_score = max(scores) if scores else -0.5
             reasoning_score = max_score
-            best_smiles_reasoning = (
-                smiles[scores.index(max_score)]
-                if max_score in scores
-                else "None"
-            )
+            best_smiles_reasoning = smiles[scores.index(max_score)] if max_score in scores else "None"
 
             answer = self.preprocess_response(completion)
             answer_smiles = _extract_smiles_from_answer(answer, ref)
-            answer_score = (
-                _calc_score(answer_smiles, ref) if answer_smiles else 0
-            )
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
 
             reward = reasoning_score + answer_score
 
@@ -229,9 +211,7 @@ class PermuteSmiles(RLTask):
         for completion in completions:
             if not completion.startswith("<think>"):
                 completion = "<think>" + completion
-            reasoning = re.search(
-                r"<think>(.*?)<\/think>", completion, re.DOTALL
-            )
+            reasoning = re.search(r"<think>(.*?)<\/think>", completion, re.DOTALL)
             if reasoning is None:
                 rewards.append(0.0)
                 continue

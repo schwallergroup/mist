@@ -2,8 +2,11 @@ import os
 
 import gdown
 
+from .paths import expand_path
+
 
 def download_data(data_path="data/USPTO"):
+    data_path = expand_path(data_path)
     # links from https://github.com/coleygroup/Graph2SMILES/blob/main/scripts/download_raw_data.py
     USPTO_480k_links = [
         (

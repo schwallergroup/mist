@@ -5,7 +5,6 @@ Task utilitary functions
 from rdkit import Chem, DataStructs, RDLogger
 from rdkit.Chem import AllChem
 
-
 RDLogger.DisableLog("rdApp.*")
 
 

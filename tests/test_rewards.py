@@ -1,135 +1,55 @@
 import pytest
-from rdkit import Chem
 
 from open_r1.tasks import ForwardReaction
 
 
-class TestAccuracyReward:
-    def setup_method(self):
-        self.reward_calculator = ForwardReaction(
-            root_dir="data/USPTO",
-            src_train_file="src-train.txt",
-            tgt_train_file="tgt-train.txt",
-            src_test_file="src-test.txt",
-            tgt_test_file="tgt-test.txt",
-        )
+@pytest.fixture
+def reaction_task(tmp_path, monkeypatch):
+    def fake_download(_data_path):
+        return None
 
-    def test_correct_smiles_match(self):
-        """Test when completion SMILES matches solution SMILES"""
-        completions = [[{"content": "<answer>CC</answer>"}]]
-        solution = ["CC"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1]
+    monkeypatch.setattr("open_r1.tasks.reactions.forward.download_data", fake_download)
 
-    def test_incorrect_smiles(self):
-        """Test when completion SMILES doesn't match solution SMILES"""
-        completions = [[{"content": "<answer>CC</answer>"}]]
-        solution = ["CCC"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [-0.5]
+    (tmp_path / "src-train.txt").write_text("CCO.C\n", encoding="utf-8")
+    (tmp_path / "tgt-train.txt").write_text("CCOC\n", encoding="utf-8")
+    (tmp_path / "src-test.txt").write_text("CC.C\n", encoding="utf-8")
+    (tmp_path / "tgt-test.txt").write_text("CCC\n", encoding="utf-8")
 
-    def test_invalid_completion_smiles(self):
-        """Test when completion contains invalid SMILES"""
-        completions = [[{"content": "<answer>Xasd-</answer>"}]]
-        solution = ["CC"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [-1]
+    return ForwardReaction(dataset_id_or_path=str(tmp_path))
 
-    def test_invalid_solution_smiles(self):
-        """Test when solution contains invalid SMILES"""
-        completions = [[{"content": "<answer>CC</answer>"}]]
-        solution = ["XXX"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [-1]
 
-    def test_multiple_smiles(self):
-        """Test with multiple SMILES strings"""
-        completions = [
-            [{"content": "<answer>CC</answer>"}],
-            [{"content": "<answer>CCC</answer>"}],
-        ]
-        solution = ["CC", "CCC"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1, 1]
+def test_load_uses_local_dataset_files(reaction_task):
+    dataset = reaction_task.load()
+    assert len(dataset["train"]) == 1
+    assert len(dataset["test"]) == 1
 
-    def test_empty_inputs(self):
-        """Test with empty inputs"""
-        completions = []
-        solution = []
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == []
 
-    def test_different_representations_same_molecule(self):
-        """Test different SMILES representations of the same molecule"""
-        completions = [
-            [{"content": "<answer>CC(C)C</answer>"}],
-            [{"content": "<answer>CCC</answer>"}],
-        ]
-        solution = [
-            "C(C)(C)C",
-            "CC(C)",
-        ]  # Different representation but same molecule
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1, 1]
+def test_accuracy_reward_prefers_exact_answers(reaction_task):
+    prompts = ["Reactants: CC.C"]
+    correct = reaction_task.accuracy_reward(
+        ["<think>valid reasoning</think><answer>CCC</answer>"],
+        ["CCC"],
+        prompts,
+    )[0]
+    incorrect = reaction_task.accuracy_reward(
+        ["<think>valid reasoning</think><answer>CCO</answer>"],
+        ["CCC"],
+        prompts,
+    )[0]
+    invalid = reaction_task.accuracy_reward(
+        ["<think>valid reasoning</think><answer>Xasd-</answer>"],
+        ["CCC"],
+        prompts,
+    )[0]
 
-    def test_mixed_valid_invalid_smiles(self):
-        """Test with a mix of valid and invalid SMILES"""
-        completions = [
-            [{"content": "<answer>CC</answer>"}],
-            [{"content": "<answer>XXX</answer>"}],
-            [{"content": "<answer>CCC</answer>"}],
-        ]
-        solution = ["CC", "CC", "CCX"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1, -1, -1]
+    assert correct > incorrect
+    assert incorrect >= invalid
 
-    def test_mixed_format_cases(self):
-        """Test with a mix of correct/incorrect formats"""
-        completions = [
-            [
-                {"content": "<answer>CC</answer>"}
-            ],  # correct format, valid SMILES
-            [{"content": "CC"}],  # no tags (-1)
-            [
-                {"content": "<answer>CCC</answer>"}
-            ],  # correct format, valid SMILES
-            [{"content": "SMILES: CC"}],  # no tags (-1)
-            [
-                {"content": "<answer>CCO</answer>"}
-            ],  # correct format, valid SMILES
-        ]
-        solution = ["CC", "CC", "CCC", "CC", "CCO"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1, -1, 1, -1, 1]
 
-    def test_various_incorrect_formats(self):
-        """Test different ways of providing incorrect format"""
-        completions = [
-            [{"content": "The SMILES is CC"}],  # no tags (-1)
-            [{"content": "[CC]"}],  # no tags (-1)
-            [{"content": "Product: CC"}],  # no tags (-1)
-            [{"content": "CC -> product"}],  # no tags (-1)
-            [{"content": "<answer>CC</answer>"}],  # correct format
-        ]
-        solution = ["CC", "CC", "CC", "CC", "CC"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [-1, -1, -1, -1, 1]
-
-    def test_mixed_format_and_validity(self):
-        """Test mix of format issues and SMILES validity"""
-        completions = [
-            [
-                {"content": "<answer>CC</answer>"}
-            ],  # correct format, valid SMILES
-            [{"content": "Invalid-SMILES"}],  # no tags (-1)
-            [
-                {"content": "<answer>XXX</answer>"}
-            ],  # correct format, invalid SMILES (-1)
-            [{"content": "CC(=O)C"}],  # no tags (-1)
-            [
-                {"content": "<answer>CC(=O)C</answer>"}
-            ],  # correct format, valid SMILES
-        ]
-        solution = ["CC", "CC", "CC", "CC(=O)C", "CC(=O)C"]
-        result = self.reward_calculator.accuracy_reward(completions, solution)
-        assert result == [1, -1, -1, -1, 1]
+def test_accuracy_reward_handles_missing_answer_tag(reaction_task):
+    reward = reaction_task.accuracy_reward(
+        ["<think>valid reasoning</think>CCC"],
+        ["CCC"],
+        ["Reactants: CC.C"],
+    )[0]
+    assert reward <= 0

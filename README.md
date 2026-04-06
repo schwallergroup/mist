@@ -1,43 +1,109 @@
-# Sink
+# MiST
 
-Chemical reasoning emerges from RL in simple chemical tasks.
+Code for the MiST chemical reasoning experiments, including task definitions,
+GRPO training recipes, evaluation utilities, and cluster launchers used in the
+paper.
 
-This repo is heavily based on [Open-R1](https://github.com/huggingface/open-r1), an open reproduction of DeepSeek-R1, from the HF Team.
+The reinforcement learning stack in this repository builds on
+[Open-R1](https://github.com/huggingface/open-r1), with MiST-specific task
+implementations, recipes, and reproducibility tooling layered on top.
+
+## System Requirements
+
+- Python 3.10 or newer
+- Linux is the primary target environment for training and evaluation
+- Shell utilities compatible with `bash`
+- Python dependencies listed in `setup.py` and `dev-requirements.txt`
+
+The repository targets Python `>=3.10.9` in packaging metadata. Cluster
+launchers are intended for Linux HPC environments such as SwissAI / CSCS and
+Kuma. For the lightweight demo included with this repository, a standard CPU
+workstation is sufficient.
+
+The SCS diagnostic requires `vllm` plus a model that can be loaded by vLLM. For
+the full 10k-row benchmark run, use at least one CUDA-capable GPU and
+preferably a multi-GPU Linux environment.
+
+### Tested Environments
+
+- Full training workflows were developed for Linux HPC environments on SwissAI /
+  CSCS and Kuma.
+- The lightweight demo is designed to run from a standard local Python
+  environment with the dependencies listed in `dev-requirements.txt`.
+
+## Installation
+
+Create a Python environment and install the dependencies required for the
+lightweight demo:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r dev-requirements.txt
+pip install -e . --no-deps
+```
+
+For full GRPO training and large-scale evaluation, use the cluster-specific
+setup described below and install the complete training dependencies defined in
+`setup.py`.
+
+For the SCS diagnostic or any workflow that relies on `vllm`, install the full
+project dependencies instead of the lightweight demo-only environment:
+
+```bash
+pip install -e .
+```
 
 
-## 🔥 How to
+## Setup
 
 > [!IMPORTANT]  
-> Clone this repo into `$HOME/`. This partition has no cleaning policy and your code should be stored there. You can clone it into `$HOME/`, `$HOME/Documents/` or into any other folder of your choice.
+> Cluster-specific paths should live in `.env.local`, not in committed files.
+> See [`cluster/README.md`](cluster/README.md) and the example env files for
+> CSCS and Kuma.
 
-Run the following script to setup all the necessary files/environments and follow the instructions. It will set you up for running jobs on the CSCS or Kuma cluster.
+Run one of the setup scripts if you want a starter `.env.local` for a supported
+cluster:
 ```bash
 python3 CSCS_setup.py
 # or
 python3 kuma_setup.py
 ```
 
-**Cluster-specific launch files (used in the example below):**
-- **If you are using CSCS cluster, you need to use `launch_CSCS.slurm` instead of `launch.slurm`.**
-- **If you are using kuma cluster, you need to use `launch_kuma.slurm` instead of `launch.slurm`.**
+For a manual setup, define at least:
 
-After this, you'll be able to run jobs as shown below. `[MODEL]` is any model specified in `model_paths.txt` (e.g. Qwen2.5-3B) and `[TASK]` is the short-name for task as specified under `recipes/` (without the suffix `.yaml`).
 ```bash
-sbatch launch.slurm [MODEL] [TASK]
+export MIST_MODELS_DIR=/path/to/models
+export MIST_DATA_DIR=/path/to/data
+export MIST_CACHE_DIR=/path/to/cache
+```
+
+The recipes and model registry expand these variables automatically.
+
+**Supported cluster launchers:**
+- `launch_CSCS.slurm` for SwissAI / CSCS
+- `launch_kuma.slurm` for Kuma
+
+`[MODEL]` is any model specified in `model_paths.txt` (for example
+`Qwen2.5-3B`) and `[TASK]` is the recipe short name under `recipes/` (without
+the suffix `.yaml`).
+```bash
+sbatch launch_CSCS.slurm [MODEL] [TASK]
 
 # Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml
-sbatch launch.slurm Qwen2.5-3B rxnpred
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred
 ```
 
 A third optional parameter is `[RESUME_JOB_ID]`. It is used if you would like to continue the training of a previous job. `[RESUME_JOB_ID]` should contain the job ID of the previous job you want to continue from. If you want to start a run from scratch (without using a previous run checkpoint), then you can set this parameter to 0 (however it is not necessary since the default value is 0 if the parameter is omitted).
 ```bash
-sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID]
+sbatch launch_CSCS.slurm [MODEL] [TASK] [RESUME_JOB_ID]
 
 # Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, continuing from job ID 123456
-sbatch launch.slurm Qwen2.5-3B rxnpred 123456
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 123456
 
 # Example: launch from scratch
-sbatch launch.slurm Qwen2.5-3B rxnpred 0
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 0
 ```
 
 A fourth optional parameter is `[TASK_MODE]`, it can be used if you would like to use a specific mode in a task directly from the launch SLURM script. The goal of `[TASK_MODE]` is to allow to run the same recipe file with the same Task class with some small differences (without rewriting multiple subclasses of the same class), for example:
@@ -53,20 +119,20 @@ Notes:
 - You can completely omit this fourth parameter, and it won't affect anything if you don't use it. The default value for `[TASK_MODE]` is `"base"`.
 - The `task_mode` parameter should never be specified in a recipe file.
 ```bash
-sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
+sbatch launch_CSCS.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE]
 
 # Example: launch a job for training Qwen2.5-3B as specified in recipes/rxnpred.yaml, running from scratch with task mode "base"
-sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 0 base
 ```
 
 A fifth optional parameter is `[SAMPLING_PARAMS_CONFIG_NAME]`, it can be used if you would like to use a specific sampling parameters configuration file during an experiment (it will overwrite the default sampling parameters).
 - You can check the documentation about the "Sampling parameters" in the documentation for more information.
 - This parameter should be the name of the sampling parameters configuration file (without the suffix `.json`). These files are found in the folder `sampling_params/`.
 ```bash
-sbatch launch.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE] [SAMPLING_PARAMS_CONFIG_NAME]
+sbatch launch_CSCS.slurm [MODEL] [TASK] [RESUME_JOB_ID] [TASK_MODE] [SAMPLING_PARAMS_CONFIG_NAME]
 
 # Example: launch a job for training Qwen2.5-3B_pretrained-v4-cot as specified in recipes/rxnpred.yaml, running from scratch with task mode "base" and uusing the sampling parameters specified in sampling_params/pretrained_models_v1.json
-sbatch launch.slurm Qwen2.5-3B_pretrained-v4-cot rxnpred 0 base pretrained_models_v1
+sbatch launch_CSCS.slurm Qwen2.5-3B_pretrained-v4-cot rxnpred 0 base pretrained_models_v1
 ```
 
 Since the default values are:
@@ -76,10 +142,10 @@ Since the default values are:
 
 The 4 following commands are equivalent:
 ```bash
-sbatch launch.slurm Qwen2.5-3B rxnpred
-sbatch launch.slurm Qwen2.5-3B rxnpred 0
-sbatch launch.slurm Qwen2.5-3B rxnpred 0 base
-sbatch launch.slurm Qwen2.5-3B rxnpred 0 base default
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 0
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 0 base
+sbatch launch_CSCS.slurm Qwen2.5-3B rxnpred 0 base default
 ```
 As a final note, remind that the parameter order is important. If you want to use the last parameters, it is necessary to specify the previous parameters as well (you can use the default values written above).
 
@@ -95,9 +161,186 @@ python -m http.server -d build/html
 
 Then open `http://localhost:8000` in your browser.
 
+## Demo
+
+This repository includes lightweight reviewer fixtures under `demo/`.
+
+- `demo/rxnpred_tiny/` provides a 40-train / 10-test reaction-prediction
+  example.
+- `demo/datasets/` provides 50-row PubChem-derived CSV slices for the
+  IUPAC/SMILES, canonicalization, permutation, and hydrogen tasks.
+- `demo/make_kinetic_tiny.py` generates a 40-train / 10-validation synthetic
+  kinetic bundle in the same on-disk format expected by the kinetic task
+  loader.
+
+Run the demo from the repository root:
+
+```bash
+PYTHONPATH=src python demo/run_demo.py
+```
+
+Expected output:
+
+```json
+{
+  "train_examples": 2,
+  "test_examples": 2,
+  "solutions": [
+    "COC",
+    "CCNC"
+  ],
+  "rewards": [
+    4.0,
+    4.0
+  ]
+}
+```
+
+The demo exercises dataset loading and reward evaluation on a tiny bundled
+dataset without requiring GPUs or cluster infrastructure.
+
+To smoke-test the dataset loaders across multiple tasks, run:
+
+```bash
+PYTHONPATH=src python demo/run_fixture_smoke.py
+```
+
+This second script exercises the local fixtures for:
+
+- `rxnpred`
+- `iupacsm`
+- `iupacsm_with_tags`
+- `canonic`
+- `canonmc`
+- `smi_permute`
+- `smhydrogen`
+- `kinetic`
+
+See `demo/README.md` for fixture provenance and notes about which datasets were
+and were not present in the current Figshare bundle. A task-to-fixture mapping
+is also provided in `demo/fixture_manifest.csv`.
+
+## Submission and Release Inventory
+
+For the Nature software checklist and the public release, use the release
+tracking files under `release/`:
+
+- `release/submission_package_checklist.md` tracks which checklist items are
+  already covered by the repository and which assets must still be exported.
+- `release/figshare_upload_manifest.csv` lists the planned GitHub and Figshare
+  artifacts for code, datasets, manifests, and model snapshots.
+- `release/dataset_components.csv` is the detailed working index for the
+  datasets and derived components referenced in the manuscript.
+
+## Reproducing Manuscript Results
+
+The repository contains the task code, recipes, and launcher examples used for
+the MiST GRPO experiments. Full reproduction of the training results reported
+in the manuscript requires a Linux multi-GPU environment and the datasets
+described in the manuscript appendix.
+
+### SCS Diagnostic
+
+The key SMILES Competence Score (SCS) workflow is implemented in
+`src/open_r1/diagnostic/smiles_competence.py`.
+
+Before running SCS, install the full project dependencies so that `vllm` is
+available:
+
+```bash
+pip install -e .
+```
+
+For a small reviewer smoke test on the bundled 50-row fixture:
+
+```bash
+PYTHONPATH=src python src/open_r1/diagnostic/smiles_competence.py \
+  --model /path/to/model \
+  --data-path demo/datasets/CRLLM-PubChem-compounds1M.sample.csv \
+  --output-dir output/scs-smoke \
+  --num-rows 50 \
+  --tensor-parallel-size 1
+```
+
+This writes:
+
+- `output/scs-smoke/lps_canonical.csv`
+- `output/scs-smoke/lps_random.csv`
+- `output/scs-smoke/lps_corrupt.csv`
+- `output/scs-smoke/summary.json`
+
+For the full 10k-example diagnostic run described in the manuscript:
+
+```bash
+PYTHONPATH=src python src/open_r1/diagnostic/smiles_competence.py \
+  --model /path/to/model \
+  --data-path "${MIST_DATA_DIR}/CRLLM-PubChem-compounds1M.csv" \
+  --output-dir "${MIST_OUTPUT_DIR}/scs/full" \
+  --num-rows 10000 \
+  --tensor-parallel-size 1
+```
+
+For a multi-GPU cluster launch on CSCS-style infrastructure:
+
+```bash
+sbatch launch_diagnostics.slurm Qwen2.5-3B
+```
+
+The diagnostics launcher also accepts optional overrides:
+
+```bash
+sbatch launch_diagnostics.slurm Qwen2.5-3B \
+  "${MIST_DATA_DIR}/CRLLM-PubChem-compounds1M.csv" \
+  10000 \
+  "${MIST_OUTPUT_DIR}/scs/qwen25-3b" \
+  4
+```
+
+At a minimum, full reproduction requires:
+
+- the released MiST code in this repository
+- the released datasets and derived task splits listed in `release/`
+- the model paths or MiST checkpoints referenced in `model_paths.txt`
+- a cluster environment compatible with the provided CSCS or Kuma launchers
+
+For release tracking, see:
+
+- `release/release_scope.md`
+- `release/dataset_components.csv`
+- `release/reviewer_runs.md`
+
+### Training Scope
+
+GRPO training is covered by this repository and the cluster launchers above.
+The mid-training / pretraining pipeline is only partially represented here at
+the moment: the final public release still needs the preprocessing scripts,
+manifests, and split definitions tracked under `release/`.
+
+### Single-GPU RL Smoke Run
+
+For a minimal end-to-end GRPO smoke run on a single GPU, use the bundled
+50-example reaction-prediction fixture and the smoke accelerate config:
+
+```bash
+accelerate launch --config_file configs/smoke_single_gpu.yaml \
+  src/open_r1/run_r1_grpo.py \
+  --config recipes/rxnpred.smoke.yaml \
+  --model_name_or_path Qwen/Qwen2.5-3B \
+  --output_dir output/rxnpred-smoke \
+  --run_name rxnpred-smoke-qwen25-3b \
+  --base_model_name Qwen/Qwen2.5-3B \
+  --base_model_id Qwen/Qwen2.5-3B
+```
+
+This smoke path does not require a MiST checkpoint. It is intended to validate
+that the GRPO loop, task loading, reward wiring, and checkpoint output all work
+with any compatible base model that fits on the available GPU.
+
 ## Contributing New Tasks
 
-**Sink** is designed to be easily extensible with new chemistry tasks suitable for reasoning. Each task inherits from the base `RLTask` class and implements specific logic for data handling and reward calculation.
+**MiST** is designed to be easily extensible with new chemistry tasks suitable
+for reasoning. Each task inherits from the base `RLTask` class and implements
+specific logic for data handling and reward calculation.
 
 ### Creating a New Task
 
@@ -218,7 +461,7 @@ To specify a recipe for your task, copy from `recipes/template.yaml` and modify 
 ```yaml
 # recipes/my_task.yaml
 chem_task: my_task
-dataset_id_or_path: /iopsstor/store/cscs/swissai/a05/...  # can be a HF dataset
+dataset_id_or_path: ${MIST_DATA_DIR}/my_dataset.csv  # can also be a HF dataset id
 rewards:
 - accuracy
 - format
@@ -287,4 +530,4 @@ It is possible to modify the sampling parameters used during the training by wri
   - The default sampling parameters have been modified for custom pretrained models that specifically need a different configuration (these models can't be used with the default configuration).
 - `sampling_params/*.json`: These files contain the sampling parameters configurations.
   - **/!\ The 'default' configuration is a reserved keyword. You can't create a file called `sampling_params/default.json`. Please use a different naming, the default configuration should never be modified.**
-  - You can create a new configuration file if you want to experiment with different sampling parameters. In that case, do not modify the file `sampling_params/model_default_sampling_params.txt` which contain the default configurations only. You can give the name of your sampling parameters configuration (without the suffix '.json') during the launch of the SLURM job (see above in the launch.slurm section at the start of the documentation).
+  - You can create a new configuration file if you want to experiment with different sampling parameters. In that case, do not modify the file `sampling_params/model_default_sampling_params.txt` which contain the default configurations only. You can give the name of your sampling parameters configuration (without the suffix '.json') during the launch of the SLURM job (see the launcher examples at the start of the documentation).

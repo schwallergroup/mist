@@ -7,6 +7,8 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 from rdkit import Chem
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask
 
 
@@ -24,7 +26,7 @@ class CanonicalizeSmiles(RLTask):
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.dataset_id_or_path)
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
         train_dict = {
             "problem": df["SMILES_variant1"].tolist(),
             "solution": df["SMILES"].tolist(),
@@ -35,9 +37,7 @@ class CanonicalizeSmiles(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
@@ -58,13 +58,9 @@ class CanonicalizeSmiles(RLTask):
             else:
                 # It gets a point if when we canonicalize it, it's the same
                 try:
-                    completion_mol = Chem.MolToSmiles(
-                        Chem.MolFromSmiles(content)
-                    )
+                    completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
                     if completion_mol == sol:
-                        rewards.append(
-                            0.2
-                        )  # as it didnt directly predict the correct canonical smiles
+                        rewards.append(0.2)  # as it didnt directly predict the correct canonical smiles
                     else:
                         rewards.append(-0.5)  # at least its a valid smiles
                 except:

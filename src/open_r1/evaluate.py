@@ -23,7 +23,6 @@ from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.requests import Doc
 from lighteval.utils.language import Language
 
-
 latex_gold_metric = multilingual_extractive_match_metric(
     language=Language.ENGLISH,
     fallback_mode="first_match",

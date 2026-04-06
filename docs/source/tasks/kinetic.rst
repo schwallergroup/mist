@@ -319,7 +319,7 @@ Result
 
 Reward Progression
 ^^^^^^^^^^^^
-wandb link: https://wandb.ai/liac/r1-kinetic/runs/4vuycvw2?nw=nwuserryokuroki
+Representative reward curves from the main kinetic runs are shown below.
 
 .. image:: ./_static/kinetic_format_reward.png
    :alt: Reward Progression
@@ -395,5 +395,4 @@ The following is the final response on the log. Several observations can be made
 
    After evaluating all, it seems M20 is the most likely candidate, as it involves a complex catalytic cycle with product formation early.
    </think>
-
 
