@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask
 
 
@@ -38,10 +40,9 @@ class SmilesInversion(RLTask):
     def load(self) -> DatasetDict:
         "loading & preping the dataset"
 
-        df = pd.read_csv(self.dataset_id_or_path)
-        shuffled = [
-            np.random.permutation(row).tolist() for row in df[["true_reaction", "fake1", "fake2", "fake3"]].values
-        ]
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
+        rng = np.random.RandomState(42)
+        shuffled = [rng.permutation(row).tolist() for row in df[["true_reaction", "fake1", "fake2", "fake3"]].values]
         train_dict = {
             "solution": df["true_reaction"].tolist(),
             "options": shuffled,

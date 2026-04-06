@@ -501,10 +501,19 @@ When creating a new task, ensure:
 
 ### Current Tasks
 
-- **Forward Reaction**: Chemical reaction product prediction
-- [Add your task here]
+- **Forward Reaction** (`rxnpred`): Chemical reaction product prediction
+- **IUPAC to SMILES** (`iupacsm`): Convert IUPAC names to SMILES notation
+- **Canonicalize SMILES** (`canonic`): SMILES canonicalization
+- **Canonicalize SMILES MCQA** (`canonmc`): Multiple-choice SMILES canonicalization
+- **SMILES Permutation** (`smi_permute`): Generate alternative SMILES for same molecule
+- **SMILES Hydrogen** (`smhydrogen`): Add/remove implicit hydrogens
+- **Kinetic Classification** (`kinetic`): Kinetic reaction mechanism classification
+- **Reaction Inversion** (`rxn_inversion`): MCQ — identify correct reaction among inverted fakes
+- **Reaction Replacement** (`rxn_replacement`): MCQ — identify correct reaction among modified fakes
+- **Reaction Naming** (`rxn_naming`): Classify reactions into 10 named categories
+- **Reaction True/False** (`rxn_truefalse`): Binary reaction validity classification
 
-For detailed examples and API reference, please check the [documentation](link-to-docs).
+For detailed examples and API reference, see the [documentation](docs/source/).
 
 ### Models
 The list of models can be found in the file `model_paths.txt`.

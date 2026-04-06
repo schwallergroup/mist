@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
+from open_r1.paths import expand_path
+
 from ..base import RLTask
 
 
@@ -33,7 +35,7 @@ class ReactionTrueFalse(RLTask):
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
-        df = pd.read_csv(self.dataset_id_or_path)
+        df = pd.read_csv(expand_path(self.dataset_id_or_path))
         train_dict = {"problem": df["reaction"].tolist(), "solution": df["label"].tolist()}
         train_dataset = Dataset.from_dict(train_dict)
         train_test_split_seed = 42
