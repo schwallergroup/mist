@@ -10,16 +10,25 @@ if str(SRC_ROOT) not in sys.path:
 
 from open_r1 import tasks
 from open_r1.tasks import CHEMTASKS
-from open_r1.tasks.base import RLTask
+
+try:
+    from open_r1.tasks.base import RLTask
+
+    _HAS_RLTASK = True
+except ImportError:
+    _HAS_RLTASK = False
 
 
 def verify_tasks():
-    # Get all RLTask subclasses
-    task_classes = [
-        name
-        for name, obj in inspect.getmembers(tasks)
-        if inspect.isclass(obj) and issubclass(obj, RLTask) and obj is not RLTask
-    ]
+    # Get all RLTask subclasses (only if the base class could be imported)
+    if _HAS_RLTASK:
+        task_classes = [
+            name
+            for name, obj in inspect.getmembers(tasks)
+            if inspect.isclass(obj) and issubclass(obj, RLTask) and obj is not RLTask
+        ]
+    else:
+        task_classes = None
 
     # Base paths
     recipes_path = "recipes"
@@ -28,7 +37,11 @@ def verify_tasks():
     missing_files = []
 
     for task_key, task_class in CHEMTASKS.items():
-        if task_class.__name__ not in task_classes:
+        # If the task class could not be imported (heavy deps missing), skip the
+        # subclass check but still verify that recipe and doc files exist.
+        if task_class is None:
+            pass  # skip subclass check when import failed
+        elif task_classes is not None and task_class.__name__ not in task_classes:
             missing_files.append(f"Task `{task_key}` is not a subclass of RLTask")
             continue
 
