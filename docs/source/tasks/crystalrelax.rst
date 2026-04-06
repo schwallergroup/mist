@@ -18,10 +18,9 @@ The `BinaryCompoundRelaxing` task guides a language model through multiple steps
 Features
 --------
 
-- Reads and processes variations of SMILES notations from a dataset
-- Converts varying SMILES strings into a canonical form
-- Uses a template to guide the model in understanding how to format the response
-- Features reward functions based on exact match and validity of SMILES
+- Uses an m2s-style serialized CIF representation as the task input and expected output format
+- Prompts the model to provide crystallographic reasoning inside ``<think>`` tags and the final relaxed structure inside ``<answer>`` tags
+- Evaluates predictions with structure deserialization, CIF validity checks, and an energy-based reward computed from the generated and reference structures
 
 Usage Example
 -------------
