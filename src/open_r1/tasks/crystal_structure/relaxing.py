@@ -16,12 +16,16 @@ from open_r1.tasks.base import RLTask
 from pymatgen.analysis.structure_matcher import StructureMatcher
 from pymatgen.core import Structure
 
+import torch
 from .AIRS_preporcess._tokenizer import CIFTokenizer
 
 cif_tokenizer = CIFTokenizer()
 
 
 class BinaryCompoundRelaxing(RLTask):
+    _mace_calculator = None
+    _mace_device = None
+
     src_train_file: str = ""
     tgt_train_file: str = ""
     src_test_file: str = ""
@@ -36,10 +40,16 @@ class BinaryCompoundRelaxing(RLTask):
             os.makedirs(self.dataset_id_or_path)
         download_data(self.dataset_id_or_path)
 
-        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
-        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
-        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
-        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
+        self.src_train_file = os.path.join(
+            self.dataset_id_or_path, "src-train.txt"
+        )
+        self.tgt_train_file = os.path.join(
+            self.dataset_id_or_path, "tgt-train.txt"
+        )
+        src_test_path = os.path.join(self.dataset_id_or_path, "src-test.txt")
+        tgt_test_path = os.path.join(self.dataset_id_or_path, "tgt-test.txt")
+        self.src_test_file = src_test_path if os.path.exists(src_test_path) else None
+        self.tgt_test_file = tgt_test_path if os.path.exists(tgt_test_path) else None
         self.question_template = (
             "system You are a seasoned crystallographic structure analysis expert. "
             "Your task is to relax a binary compound to a stable state.\n"
@@ -59,6 +69,22 @@ class BinaryCompoundRelaxing(RLTask):
         }
 
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/binary_compound_relaxing
+
+    @classmethod
+    def _get_mace_device(cls) -> str:
+        if cls._mace_device is not None:
+            return cls._mace_device
+
+        cls._mace_device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        print(f"Using MACE device: {cls._mace_device}")
+        return cls._mace_device
+
+    @classmethod
+    def _get_mace_calculator(cls):
+        if cls._mace_calculator is None:
+            cls._mace_calculator = mace_mp(model="large", device=cls._get_mace_device())
+        return cls._mace_calculator
 
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
@@ -154,9 +180,9 @@ class BinaryCompoundRelaxing(RLTask):
 
             def compare_internal_energy(cif1, cif2):
                 # uses ASE + MACE to get per‐atom potential energies
-                atoms1 = read(StringIO(cif1), format="cif")
-                atoms2 = read(StringIO(cif2), format="cif")
-                calc = mace_mp(model="large", device="cuda")
+                atoms1 = read(StringIO(cif1), format='cif')
+                atoms2 = read(StringIO(cif2), format='cif')
+                calc = self._get_mace_calculator()
                 atoms1.calc = calc
                 atoms2.calc = calc
                 e1 = atoms1.get_potential_energy() / len(atoms1)
