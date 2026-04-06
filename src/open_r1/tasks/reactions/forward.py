@@ -45,8 +45,10 @@ class ForwardReaction(SMILESBasedTask):
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
-        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
-        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
+        src_test_path = os.path.join(self.dataset_id_or_path, "src-test.txt")
+        tgt_test_path = os.path.join(self.dataset_id_or_path, "tgt-test.txt")
+        self.src_test_file = src_test_path if os.path.exists(src_test_path) else None
+        self.tgt_test_file = tgt_test_path if os.path.exists(tgt_test_path) else None
         self.question_template = (
             "You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "

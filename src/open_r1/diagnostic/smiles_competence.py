@@ -73,10 +73,56 @@ class LogprobStat(BaseModel):
     smiles: str
 
 
+def _find_smiles_token_span(prompt_text, token_ids, logprobs_list):
+    """Find the token index span corresponding to the SMILES between the
+    [BEGIN_SMILES] and [END_SMILES] markers.  Falls back to a heuristic trim
+    of the first 12 and last 5 tokens when markers are not decodable."""
+    # Decode each token to locate the boundary markers
+    decoded = []
+    for idx, (lp, tid) in enumerate(zip(logprobs_list, token_ids)):
+        if lp is None:
+            decoded.append((idx, ""))
+            continue
+        entry = lp.get(tid)
+        decoded.append((idx, entry.decoded_token if entry else ""))
+
+    joined = "".join(t for _, t in decoded)
+    # Find markers in the concatenated decoded text
+    begin_tag = "[BEGIN_SMILES]"
+    end_tag = "[END_SMILES]"
+    begin_pos = joined.find(begin_tag)
+    end_pos = joined.find(end_tag)
+
+    if begin_pos == -1 or end_pos == -1:
+        # Fallback: assume template has ~12 prefix tokens and ~5 suffix tokens
+        return 12, len(token_ids) - 5
+
+    # Walk through decoded tokens to find the indices that bracket the SMILES
+    running = 0
+    start_idx = None
+    end_idx = None
+    for idx, tok_text in decoded:
+        prev_running = running
+        running += len(tok_text)
+        # The SMILES starts after the space following [BEGIN_SMILES]
+        if start_idx is None and running > begin_pos + len(begin_tag):
+            start_idx = idx
+        # The SMILES ends where [END_SMILES] begins
+        if end_idx is None and running >= end_pos:
+            end_idx = idx
+            break
+
+    if start_idx is None or end_idx is None:
+        return 12, len(token_ids) - 5
+
+    return start_idx, end_idx
+
+
 def process_generation_output(out):
     try:
-        smiles_tokens = out.prompt_token_ids[12:-5]
-        logprobs = out.prompt_logprobs[12:-5]
+        start, end = _find_smiles_token_span(out.prompt, out.prompt_token_ids, out.prompt_logprobs)
+        smiles_tokens = out.prompt_token_ids[start:end]
+        logprobs = out.prompt_logprobs[start:end]
 
         token_logprobs = [values[token_id].logprob for values, token_id in zip(logprobs, smiles_tokens)]
         token_ranks = [values[token_id].rank for values, token_id in zip(logprobs, smiles_tokens)]
@@ -89,11 +135,14 @@ def process_generation_output(out):
             n_tokens=len(smiles_tokens),
             smiles=smiles,
         ).model_dump()
-    except Exception:
+    except Exception as exc:
+        import sys
+
+        print(f"WARNING: process_generation_output failed: {exc}", file=sys.stderr)
         return LogprobStat(
-            mean_logprob=0.0,
-            mean_rank=0.0,
-            n_tokens=1000,
+            mean_logprob=float("nan"),
+            mean_rank=float("nan"),
+            n_tokens=0,
             smiles="",
         ).model_dump()
 
@@ -152,7 +201,8 @@ def ensure_output_dir(path):
 
 
 def expand_path(path):
-    return Path(os.path.expandvars(str(path))).expanduser()
+    """Expand env vars and ~ in a path, returning a Path object."""
+    return Path(os.path.expandvars(str(path))).expanduser() if path else Path(".")
 
 
 def run_scs(

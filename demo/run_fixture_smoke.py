@@ -1,5 +1,9 @@
 import json
+import sys
 from pathlib import Path
+
+# Ensure demo/ is on sys.path so make_kinetic_tiny can be imported
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from make_kinetic_tiny import ensure_kinetic_tiny
 from open_r1.tasks import CHEMTASKS

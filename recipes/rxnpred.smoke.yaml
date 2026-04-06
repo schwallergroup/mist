@@ -8,7 +8,7 @@ tf32: false
 
 # Chemical Task arguments
 chem_task: rxnpred
-dataset_id_or_path: ${MIST_REPO_ROOT}/demo/rxnpred_tiny
+dataset_id_or_path: demo/rxnpred_tiny
 rewards:
 - format
 - accuracy
