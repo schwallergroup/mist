@@ -8,7 +8,6 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
 from open_r1.download_data import download_data
-from open_r1.paths import expand_path
 
 from ..base import RLTask, SMILESBasedTask
 from .utils import tanimoto_sim
@@ -25,30 +24,16 @@ class ForwardReaction(SMILESBasedTask):
     random_log: Dict[str, Any] = {}
     printed_sample_prompt: bool = False
 
-    @staticmethod
-    def _has_local_reaction_files(dataset_dir: str) -> bool:
-        required_files = [
-            "src-train.txt",
-            "tgt-train.txt",
-            "src-test.txt",
-            "tgt-test.txt",
-        ]
-        return all(os.path.exists(os.path.join(dataset_dir, filename)) for filename in required_files)
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.dataset_id_or_path = expand_path(self.dataset_id_or_path)
         if not os.path.exists(self.dataset_id_or_path):
             os.makedirs(self.dataset_id_or_path)
-        if not self._has_local_reaction_files(self.dataset_id_or_path):
-            download_data(self.dataset_id_or_path)
+        download_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
-        src_test_path = os.path.join(self.dataset_id_or_path, "src-test.txt")
-        tgt_test_path = os.path.join(self.dataset_id_or_path, "tgt-test.txt")
-        self.src_test_file = src_test_path if os.path.exists(src_test_path) else None
-        self.tgt_test_file = tgt_test_path if os.path.exists(tgt_test_path) else None
+        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
+        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
             "You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
