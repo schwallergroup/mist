@@ -1,8 +1,10 @@
-import numpy as np
-from scipy.stats import linregress
-from typing import Dict, Any
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+
+from scipy.stats import linregress
 
 
 class KineticMetricsCalculator:
@@ -25,17 +27,26 @@ class KineticMetricsCalculator:
                 "catalyst_activity_half_life": self._calc_activity_half_life(run_data),
                 "Keq": self._calc_Keq(run_data),
                 "SP_mid_ratio": self._calc_SP_mid_ratio(run_data),
-                "mass_gap_mid": self._calc_mass_gap_mid(run_data)
+                "mass_gap_mid": self._calc_mass_gap_mid(run_data),
             }
         return metrics
 
     def summarize_metrics_for_ml(self) -> Dict[str, float]:
         metrics = self.calculate_all_metrics()
-        numeric_metrics = ["TOF", "TON", "catalyst_stability", "induction_period",
-                           "mass_balance_gap", "deactivation_rate_constant",
-                           "time_max_curvature", "active_catalyst_fraction",
-                           "catalyst_activity_half_life", "Keq",
-                           "SP_mid_ratio", "mass_gap_mid"]
+        numeric_metrics = [
+            "TOF",
+            "TON",
+            "catalyst_stability",
+            "induction_period",
+            "mass_balance_gap",
+            "deactivation_rate_constant",
+            "time_max_curvature",
+            "active_catalyst_fraction",
+            "catalyst_activity_half_life",
+            "Keq",
+            "SP_mid_ratio",
+            "mass_gap_mid",
+        ]
 
         summary = {}
         for metric in numeric_metrics:
@@ -55,14 +66,14 @@ class KineticMetricsCalculator:
     def _calc_reaction_order(self, run_data):
         t = np.array(run_data["time_data"])
         s = np.array(run_data["substrate_data"])
-        
+
         zero_order_fit = linregress(t, s)
         first_order_fit = linregress(t, np.log(np.clip(s, 1e-8, None)))
-        second_order_fit = linregress(t, 1/np.clip(s, 1e-8, None))
-        
+        second_order_fit = linregress(t, 1 / np.clip(s, 1e-8, None))
+
         fits = [abs(zero_order_fit.rvalue), abs(first_order_fit.rvalue), abs(second_order_fit.rvalue)]
         order = np.argmax(fits)
-        
+
         return ["zero-order", "first-order", "second-order"][order]
 
     def _calc_tof(self, run_data):

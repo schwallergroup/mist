@@ -13,7 +13,6 @@ from pydantic import Field
 from trl import GRPOConfig, GRPOTrainer
 from vllm import SamplingParams
 
-
 MetricFunc = Callable[[], dict]
 
 
@@ -44,44 +43,25 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             "buffer": [],
             "good_completions": [],
         }
-        if (
-            self.logging_completions["save_completions_min_reward_threshold"]
-            is None
-        ):
+        if self.logging_completions["save_completions_min_reward_threshold"] is None:
             # If min_reward is None (default, not provided), use the adaptive mode
-            self.logging_completions[
-                "save_completions_min_reward_threshold"
-            ] = -1e6
-            self.logging_completions[
-                "save_completions_min_reward_adaptive"
-            ] = True
+            self.logging_completions["save_completions_min_reward_threshold"] = -1e6
+            self.logging_completions["save_completions_min_reward_adaptive"] = True
             assert (
-                self.logging_completions[
-                    "save_completions_top_reward_percentage"
-                ]
-                is not None
+                self.logging_completions["save_completions_top_reward_percentage"] is not None
             ), "[ExtendedGRPOTrainer.__init__] save_completions_top_reward_percentage should not be None if min_reward is None (adaptive mode)"
             assert (
-                0
-                < self.logging_completions[
-                    "save_completions_top_reward_percentage"
-                ]
-                <= 1
+                0 < self.logging_completions["save_completions_top_reward_percentage"] <= 1
             ), "[ExtendedGRPOTrainer.__init__] save_completions_top_reward_percentage should be in (0, 1] (if min_reward is None, adaptive mode)"
         if self.logging_completions["save_completions"]:
-            if (
-                os.path.isdir(self.logging_completions["save_completions_dir"])
-                is False
-            ):
+            if os.path.isdir(self.logging_completions["save_completions_dir"]) is False:
                 os.makedirs(
                     self.logging_completions["save_completions_dir"],
                     exist_ok=True,
                 )
 
             def _reward_func_wrapper(reward_func):
-                @functools.wraps(
-                    reward_func
-                )  # used to keep the original function name (reward_func.__name__)
+                @functools.wraps(reward_func)  # used to keep the original function name (reward_func.__name__)
                 def reward_func_wrapper(*args, **kwargs):
                     reward_key = f"_reward/{reward_func.__name__}"
                     assert (
@@ -92,9 +72,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                         **kwargs,
                         reward_key: rewards,
                     }
-                    self.logging_completions["buffer"].append(
-                        logged_completions
-                    )
+                    self.logging_completions["buffer"].append(logged_completions)
                     return rewards
 
                 return reward_func_wrapper
@@ -126,9 +104,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 args.sampling_params_config
             )  # added from the sampling_params config -> overwrite default values
             self.sampling_params = SamplingParams(**sampling_params_dict)
-        print(
-            f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}"
-        )
+        print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
 
     def add_custom_metrics(self):
         # Additional logging
@@ -138,9 +114,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             for metric_name, metric_value in metrics.items():
                 if mode in self._metrics.keys():
                     # Compatible with the current version 'main' of trl repository
-                    self._metrics[mode][f"custom/{metric_name}"].append(
-                        metric_value
-                    )
+                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
                 else:
                     # Compatible with the "older versions" of trl repository (0.14.0 included)
                     self._metrics[f"custom/{metric_name}"].append(metric_value)
@@ -152,39 +126,19 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         # Check the number of new completions
         assert (
-            len(
-                set(
-                    [
-                        len(b[k])
-                        for b in self.logging_completions["buffer"]
-                        for k in b
-                    ]
-                )
-            )
-            == 1
+            len(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b])) == 1
         ), "[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same length for all logged completions"
-        n_new_completions = list(
-            set(
-                [
-                    len(b[k])
-                    for b in self.logging_completions["buffer"]
-                    for k in b
-                ]
-            )
-        )[0]
+        n_new_completions = list(set([len(b[k]) for b in self.logging_completions["buffer"] for k in b]))[0]
 
         # Merge self.logging_completions["buffer"] into logged_completions_buffer
         logged_completions_buffer = dict()
-        for i, logged_completions in enumerate(
-            self.logging_completions["buffer"]
-        ):
+        for i, logged_completions in enumerate(self.logging_completions["buffer"]):
             for key, value in logged_completions.items():
                 if key not in logged_completions_buffer:
                     logged_completions_buffer[key] = logged_completions[key]
                 else:
                     assert (
-                        logged_completions_buffer[key]
-                        == logged_completions[key]
+                        logged_completions_buffer[key] == logged_completions[key]
                     ), f"[ExtendedGRPOTrainer.log_good_completions] Logged completions buffer elements should have the same value for all logged completions (key: {key})"
         self.logging_completions["buffer"] = []
 
@@ -206,22 +160,14 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         logged_completions_buffer["_completion_id"] = list(
             range(
                 self.logging_completions["n_completions"] + 1,
-                self.logging_completions["n_completions"]
-                + n_new_completions
-                + 1,
+                self.logging_completions["n_completions"] + n_new_completions + 1,
             )
         )
-        logged_completions_buffer["_global_step"] = [
-            self.state.global_step
-        ] * n_new_completions
+        logged_completions_buffer["_global_step"] = [self.state.global_step] * n_new_completions
         self.logging_completions["n_completions"] += n_new_completions
 
         # Processing of the rewards (in logged_completions_buffer)
-        reward_keys = [
-            k
-            for k in list(logged_completions_buffer.keys())
-            if k.startswith("_reward/")
-        ]
+        reward_keys = [k for k in list(logged_completions_buffer.keys()) if k.startswith("_reward/")]
         assert (
             "reward" not in reward_keys
         ), f"[ExtendedGRPOTrainer.log_good_completions] 'reward' key should not always be in reward_keys"
@@ -229,25 +175,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         for i in range(n_new_completions):
             _rewards = dict()
             for reward_key in reward_keys:
-                _rewards[reward_key.split("/", 1)[1]] = (
-                    logged_completions_buffer[reward_key][i]
-                )
+                _rewards[reward_key.split("/", 1)[1]] = logged_completions_buffer[reward_key][i]
             _rewards["reward"] = sum(list(_rewards.values()))
             logged_completions_buffer["_rewards"].append(_rewards)
 
         # Update min_reward_seen & max_reward_seen
-        min_reward_seen = min(
-            [
-                _rewards["reward"]
-                for _rewards in logged_completions_buffer["_rewards"]
-            ]
-        )
-        max_reward_seen = max(
-            [
-                _rewards["reward"]
-                for _rewards in logged_completions_buffer["_rewards"]
-            ]
-        )
+        min_reward_seen = min([_rewards["reward"] for _rewards in logged_completions_buffer["_rewards"]])
+        max_reward_seen = max([_rewards["reward"] for _rewards in logged_completions_buffer["_rewards"]])
         if self.logging_completions["min_reward_seen"] is None:
             self.logging_completions["min_reward_seen"] = min_reward_seen
         else:
@@ -263,23 +197,13 @@ class ExtendedGRPOTrainer(GRPOTrainer):
 
         # Update save_completions_min_reward_threshold (if save_completions_min_reward_adaptive is True)
         if self.logging_completions["save_completions_min_reward_adaptive"]:
-            reward_range = (
-                self.logging_completions["max_reward_seen"]
-                - self.logging_completions["min_reward_seen"]
-            )
+            reward_range = self.logging_completions["max_reward_seen"] - self.logging_completions["min_reward_seen"]
             new_save_completions_min_reward_threshold = (
                 self.logging_completions["max_reward_seen"]
-                - self.logging_completions[
-                    "save_completions_top_reward_percentage"
-                ]
-                * reward_range
+                - self.logging_completions["save_completions_top_reward_percentage"] * reward_range
             )
-            self.logging_completions[
-                "save_completions_min_reward_threshold"
-            ] = max(
-                self.logging_completions[
-                    "save_completions_min_reward_threshold"
-                ],
+            self.logging_completions["save_completions_min_reward_threshold"] = max(
+                self.logging_completions["save_completions_min_reward_threshold"],
                 new_save_completions_min_reward_threshold,
             )
 
@@ -290,48 +214,31 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 len(logged_completions_buffer[k]) == n_new_completions
             ), f"[ExtendedGRPOTrainer.log_good_completions] logged_completions_buffer[{k}] should have the same length as n_new_completions ({n_new_completions})"
         logged_completions_buffer = [
-            {k: logged_completions_buffer[k][i] for k in logged_keys}
-            for i in range(n_new_completions)
+            {k: logged_completions_buffer[k][i] for k in logged_keys} for i in range(n_new_completions)
         ]
 
         # Remove bad completions (below min_reward)
-        min_reward_threshold = self.logging_completions[
-            "save_completions_min_reward_threshold"
-        ]
+        min_reward_threshold = self.logging_completions["save_completions_min_reward_threshold"]
         logged_completions_buffer = [
-            x
-            for x in logged_completions_buffer
-            if x["_rewards"]["reward"] >= min_reward_threshold
+            x for x in logged_completions_buffer if x["_rewards"]["reward"] >= min_reward_threshold
         ]
 
         # Add good completions to the list (and remove bad completions)
-        self.logging_completions["good_completions"].extend(
-            logged_completions_buffer
-        )
+        self.logging_completions["good_completions"].extend(logged_completions_buffer)
         self.logging_completions["good_completions"] = [
-            x
-            for x in self.logging_completions["good_completions"]
-            if x["_rewards"]["reward"] >= min_reward_threshold
+            x for x in self.logging_completions["good_completions"] if x["_rewards"]["reward"] >= min_reward_threshold
         ]
 
         # Save metadata
         metadata = {
             "save_completions": self.logging_completions["save_completions"],
-            "save_completions_dir": self.logging_completions[
-                "save_completions_dir"
-            ],
-            "save_completions_min_reward_threshold": self.logging_completions[
-                "save_completions_min_reward_threshold"
-            ],
-            "save_completions_min_reward_adaptive": self.logging_completions[
-                "save_completions_min_reward_adaptive"
-            ],
+            "save_completions_dir": self.logging_completions["save_completions_dir"],
+            "save_completions_min_reward_threshold": self.logging_completions["save_completions_min_reward_threshold"],
+            "save_completions_min_reward_adaptive": self.logging_completions["save_completions_min_reward_adaptive"],
             "save_completions_top_reward_percentage": self.logging_completions[
                 "save_completions_top_reward_percentage"
             ],
-            "save_completions_chunk_size": self.logging_completions[
-                "save_completions_chunk_size"
-            ],
+            "save_completions_chunk_size": self.logging_completions["save_completions_chunk_size"],
             "current_chunk_id": self.logging_completions["current_chunk_id"],
             "n_completions": self.logging_completions["n_completions"],
             "min_reward_seen": self.logging_completions["min_reward_seen"],
@@ -359,10 +266,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
         )
 
         # If the chunk size is reached, empty the good completions list & increment the chunk id
-        if (
-            len(good_completions)
-            >= self.logging_completions["save_completions_chunk_size"]
-        ):
+        if len(good_completions) >= self.logging_completions["save_completions_chunk_size"]:
             self.logging_completions["current_chunk_id"] += 1
             self.logging_completions["good_completions"] = []
 
@@ -446,9 +350,7 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
 
     # Read model_default_sampling_params.txt
     model_default_sampling_params = dict()
-    with open(
-        f"{sampling_params_dir}/model_default_sampling_params.txt", mode="r"
-    ) as f:
+    with open(f"{sampling_params_dir}/model_default_sampling_params.txt", mode="r") as f:
         for line in f:
             if ":" not in line:
                 continue
@@ -465,16 +367,12 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
                 assert os.path.isfile(
                     f"{sampling_params_dir}/{sampling_params_config_name}.json"
                 ), f"Invalid format in model_default_sampling_params.txt -> sampling_params_config_name ({sampling_params_config_name}.json) does not exist"
-            model_default_sampling_params[model_id] = (
-                sampling_params_config_name
-            )
+            model_default_sampling_params[model_id] = sampling_params_config_name
 
     # Update training_args.sampling_params_config_name (if needed)
     if training_args.sampling_params_config_name == "default":
         if training_args.base_model_id in model_default_sampling_params:
-            training_args.sampling_params_config_name = (
-                model_default_sampling_params[training_args.base_model_id]
-            )
+            training_args.sampling_params_config_name = model_default_sampling_params[training_args.base_model_id]
 
     # Update training_args.sampling_params_config (if needed)
     if training_args.sampling_params_config_name != "default":

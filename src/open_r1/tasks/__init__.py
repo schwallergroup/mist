@@ -1,11 +1,9 @@
 from .kinetic_data.kinetic_data_category_classification_with_metrics import (
     KineticDataCategoryClassificationWithMetrics,
-    KineticDataCategoryClassificationWithRawDataMetrics
+    KineticDataCategoryClassificationWithRawDataMetrics,
 )
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
-from .kinetic_data.kinetic_data_classification_with_metrics import (
-    KineticDataClassificationWithMetrics,
-)
+from .kinetic_data.kinetic_data_classification_with_metrics import KineticDataClassificationWithMetrics
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
 from .reactions.forward import ForwardReaction, ForwardReactionWithTags

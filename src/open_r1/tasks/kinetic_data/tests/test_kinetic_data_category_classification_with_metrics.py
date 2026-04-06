@@ -64,15 +64,13 @@ class TestKineticDataCategoryClassificationWithMetrics:
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
         config = load_config(config_path)
 
-        self.classification_task = (
-            KineticDataCategoryClassificationWithMetrics(
-                dataset_id_or_path=config["dataset_id_or_path"],
-                model_revision=config["model_revision"],
-                torch_dtype=config["torch_dtype"],
-                attn_implementation=config["attn_implementation"],
-                bf16=config["bf16"],
-                tf32=config["tf32"],
-            )
+        self.classification_task = KineticDataCategoryClassificationWithMetrics(
+            dataset_id_or_path=config["dataset_id_or_path"],
+            model_revision=config["model_revision"],
+            torch_dtype=config["torch_dtype"],
+            attn_implementation=config["attn_implementation"],
+            bf16=config["bf16"],
+            tf32=config["tf32"],
         )
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -113,9 +111,7 @@ class TestKineticDataCategoryClassificationWithMetrics:
     def test_data(self):
         self.classification_task.load()
         for i in range(self.classification_task.x1_train.shape[0]):
-            data = self.classification_task.generate_data_pass_to_prompt(
-                i, is_test=False
-            )
+            data = self.classification_task.generate_data_pass_to_prompt(i, is_test=False)
             calculator = KineticMetricsCalculator(data)
             # calculator.process_sample()
             metrics = calculator.summarize_minimum_important_value()
@@ -133,10 +129,7 @@ class TestKineticDataCategoryClassificationWithMetrics:
         regex = r"<think>(.*?)<\/think>\s*<answer>(.*?)<\/answer>"
         match = re.search(regex, response_correct_format, re.DOTALL)
 
-        assert [
-            round(r, 1)
-            for r in self.classification_task.format_reward(responses)
-        ] == [
+        assert [round(r, 1) for r in self.classification_task.format_reward(responses)] == [
             float(0.0),
             float(1.0),
         ]
@@ -154,24 +147,18 @@ class TestKineticDataCategoryClassificationWithMetrics:
 
     def test_answer_covered_in_reasoning_traces_reward(self):
         responses = [response_wrong_format, response_correct_format]
-        rewards = (
-            self.classification_task.answer_covered_in_reasoning_traces_reward(
-                responses, ["Core Mechanism", "Core Mechanism"]
-            )
+        rewards = self.classification_task.answer_covered_in_reasoning_traces_reward(
+            responses, ["Core Mechanism", "Core Mechanism"]
         )
         assert rewards == [float(0), float(0.1)]
 
     def test_accuracy_reward(self):
         responses = [response_wrong_format, response_correct_format]
-        rewards = self.classification_task.accuracy_reward(
-            responses, ["Core Mechanism", "Core Mechanism"]
-        )
+        rewards = self.classification_task.accuracy_reward(responses, ["Core Mechanism", "Core Mechanism"])
         assert rewards == [float(0), float(1)]
 
     def test_extract_answer(self):
-        ans = self.classification_task.extract_answer(
-            [response_correct_format, response_wrong_format]
-        )
+        ans = self.classification_task.extract_answer([response_correct_format, response_wrong_format])
         assert ans == ["Core Mechanism", "NONE"]
 
     def test_correct_option_reward(self):
@@ -183,7 +170,7 @@ class TestKineticDataCategoryClassificationWithMetrics:
             responses, ["Core Mechanism", "Mechanism with catalyst activation steps"]
         )
         assert rewards == [float(0.2), float(0)]
-    
+
     def test_run_coverage_reward(self):
         responses = [
             "Looking run 1, the reaction is a core mechanism. However, looking run 2, the reaction might be a mechanism with catalyst activation steps because the catalyst is not stable.",
@@ -193,7 +180,7 @@ class TestKineticDataCategoryClassificationWithMetrics:
             responses, ["Core Mechanism", "Mechanism with catalyst activation steps"]
         )
         assert rewards == [float(0.1), float(0.1)]
-    
+
     def test_category_coverage_reward(self):
         responses = [
             "The reaction is a core mechanism because the catalyst is stable and the mass balance gap is small. However, the reaction might be mechanism with catalyst activation steps because the catalyst is not stable.",
@@ -201,37 +188,36 @@ class TestKineticDataCategoryClassificationWithMetrics:
             "The reaction is a mechanism with catalyst activation steps. However, the reaction might be a core mechanism because the catalyst is stable. Wait, the reaction might be a mechanism with catalyst deactivation steps because the catalyst is not stable.",
         ]
         rewards = self.classification_task.category_coverage_reward(
-            responses, ["Core Mechanism", "Mechanism with catalyst activation steps", "Mechanism with catalyst deactivation steps"]
+            responses,
+            [
+                "Core Mechanism",
+                "Mechanism with catalyst activation steps",
+                "Mechanism with catalyst deactivation steps",
+            ],
         )
         assert rewards == pytest.approx([float(0.1), float(0.05), float(0.15)])
-    
+
     def test_metrics_coverage_reward(self):
         responses = [
             "Looking run 1, the initial concentration of catalyst is 1.0, and the initial concentration of substrate is 1.0"
         ]
-        rewards = self.classification_task.metrics_coverage_reward(
-            responses, ["Core Mechanism"]
-        )
-        assert rewards == [float(2/9*0.2)]
+        rewards = self.classification_task.metrics_coverage_reward(responses, ["Core Mechanism"])
+        assert rewards == [float(2 / 9 * 0.2)]
 
 
-class TestKineticDataCategoryClassificationWithRawDataMetrics(
-    TestKineticDataCategoryClassificationWithMetrics
-):
+class TestKineticDataCategoryClassificationWithRawDataMetrics(TestKineticDataCategoryClassificationWithMetrics):
     def setup_method(self):
         # Load configuration
         config_path = "/home/kuroki/sink/recipes/kinetic_metrics_category.yaml"
         config = load_config(config_path)
 
-        self.classification_task = (
-            KineticDataCategoryClassificationWithRawDataMetrics(
-                dataset_id_or_path=config["dataset_id_or_path"],
-                model_revision=config["model_revision"],
-                torch_dtype=config["torch_dtype"],
-                attn_implementation=config["attn_implementation"],
-                bf16=config["bf16"],
-                tf32=config["tf32"],
-            )
+        self.classification_task = KineticDataCategoryClassificationWithRawDataMetrics(
+            dataset_id_or_path=config["dataset_id_or_path"],
+            model_revision=config["model_revision"],
+            torch_dtype=config["torch_dtype"],
+            attn_implementation=config["attn_implementation"],
+            bf16=config["bf16"],
+            tf32=config["tf32"],
         )
 
         self.tokenizer = AutoTokenizer.from_pretrained(

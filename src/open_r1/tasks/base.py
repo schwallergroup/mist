@@ -271,7 +271,7 @@ class RLTaskForDeepSeekDistill(RLTask):
             try:
                 if random.random() < 0.01:  # 1% chance to print a completion
                     print(f"\n\n=======<RANDOM_RESPONSE>=======\n{completion}")
-                    
+
                 # 0.2 reward if each tag is present once
                 for tag_word in [
                     "<think>",
@@ -320,7 +320,6 @@ class RLTaskForDeepSeekDistill(RLTask):
             rewards.append(current_reward)
 
         return rewards
-        
 
     def preprocess_completions(self, completions: list[str]) -> list[str]:
         """Add <think> tags to the completions."""
@@ -328,7 +327,7 @@ class RLTaskForDeepSeekDistill(RLTask):
         for completion in completions:
             processed_completions.append(f"<think>{completion}")
         return processed_completions
-    
+
     def extract_answer(self, completions: list[str]) -> list[str]:
         """Extract the answer from the completion."""
         answers = []

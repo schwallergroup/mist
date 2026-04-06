@@ -9,7 +9,6 @@ from datasets import Dataset, DatasetDict
 from open_r1.tasks.base import RLTask
 from open_r1.tasks.kinetic_data.calculation_metrics import KineticMetricsCalculator
 
-
 prompt_template_data = f"""
         # Metrics that calculated from the data
         The following metrics were calculated from the experimental data in advance.
@@ -242,7 +241,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = ("""
+        self.question_template = """
             <|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following category prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags,
             think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
@@ -293,7 +292,6 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             <|im_start|>assistant
             <think>
             """
-        )
 
     def load(self) -> DatasetDict:
         """
@@ -394,10 +392,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
         train_dict = {
             "problem": prompts_train,
-            "solution": [
-                convert_from_class_to_category[y]
-                for y in self.y_train.flatten().tolist()
-            ],
+            "solution": [convert_from_class_to_category[y] for y in self.y_train.flatten().tolist()],
             "options": [
                 [
                     "Core mechanism",
@@ -419,10 +414,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
         test_dict = {
             "problem": prompts_test,
-            "solution": [
-                convert_from_class_to_category[y]
-                for y in self.y_test.flatten().tolist()
-            ],
+            "solution": [convert_from_class_to_category[y] for y in self.y_test.flatten().tolist()],
             "options": [
                 [
                     "Core mechanism",
@@ -498,7 +490,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         completions = self.preprocess_completions(completions)
 
         for completion, prompt in zip(completions, prompts):
-        # for completion in completions:
+            # for completion in completions:
             try:
                 if random.random() < 0.00:  # 0% chance to print a completion
                     print("===========prompt===========")
@@ -543,7 +535,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
                     print(prompt)
                     print("===========completion===========")
                     print(completion)
-                    
+
                 # 0.2 reward if each tag is present once
                 for tag_word in [
                     "<think>",
@@ -622,7 +614,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             "Mechanism with catalyst deactivation steps",
         )
         options = [option.lower() for option in options]
-        
+
         rewards = []
         for ans in answers:
             if ans.lower() in options:
@@ -632,7 +624,7 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
 
         rewards = [reward * 0.2 for reward in rewards]
         return rewards
-                
+
     def run_coverage_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer considers the four experimental runs"""
         rewards = []
@@ -640,10 +632,10 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             data_mentioned = set(re.findall(r"run\s*([1-4])", completion.lower()))
             score_data_coverage = len(data_mentioned) / 4
             rewards.append(score_data_coverage)
-        
+
         rewards = [reward * 0.2 for reward in rewards]
         return rewards
-    
+
     def category_coverage_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer considers the four categories"""
         rewards = []
@@ -655,12 +647,10 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         )
 
         for completion in completions:
-            categories_mentioned = {
-                category for category in categories if category.lower() in completion.lower()
-            }
+            categories_mentioned = {category for category in categories if category.lower() in completion.lower()}
             score_class_coverage = len(categories_mentioned) / len(categories)
             rewards.append(score_class_coverage)
-        
+
         rewards = [reward * 0.2 for reward in rewards]
         return rewards
 
@@ -679,18 +669,14 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         )
 
         for completion in completions:
-            metrics_mentioned = {
-                m for m in metrics if m.lower() in completion.lower()
-            }
+            metrics_mentioned = {m for m in metrics if m.lower() in completion.lower()}
             score_metrics_coverage = len(metrics_mentioned) / len(metrics)
             rewards.append(score_metrics_coverage)
-        
+
         rewards = [reward * 0.2 for reward in rewards]
         return rewards
 
-    def answer_covered_in_reasoning_traces_reward(
-        self, completions, solution, **kwargs
-    ):
+    def answer_covered_in_reasoning_traces_reward(self, completions, solution, **kwargs):
         """Reward function - check that the answer is covered in the reasoning traces"""
         rewards = []
         for sol, completion in zip(solution, completions):
@@ -722,16 +708,12 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             train_samples_by_category[category].append(i)
 
         # 各カテゴリから均等にサンプルを選択
-        min_samples_per_category = min(
-            len(samples) for samples in train_samples_by_category.values()
-        )
+        min_samples_per_category = min(len(samples) for samples in train_samples_by_category.values())
         selected_indices = []
 
         for category_samples in train_samples_by_category.values():
             # 各カテゴリからmin_samples_per_category個のサンプルをランダムに選択
-            selected_indices.extend(
-                random.sample(category_samples, min_samples_per_category)
-            )
+            selected_indices.extend(random.sample(category_samples, min_samples_per_category))
 
         # 選択したサンプルをシャッフル
         random.shuffle(selected_indices)
@@ -751,25 +733,17 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
             category = self.dataset["test"][i]["solution"]
             test_samples_by_category[category].append(i)
 
-        min_test_samples_per_category = min(
-            len(samples) for samples in test_samples_by_category.values()
-        )
+        min_test_samples_per_category = min(len(samples) for samples in test_samples_by_category.values())
         selected_test_indices = []
 
         for category_samples in test_samples_by_category.values():
-            selected_test_indices.extend(
-                random.sample(category_samples, min_test_samples_per_category)
-            )
+            selected_test_indices.extend(random.sample(category_samples, min_test_samples_per_category))
 
         random.shuffle(selected_test_indices)
-        self.dataset["test"] = self.dataset["test"].select(
-            selected_test_indices
-        )
+        self.dataset["test"] = self.dataset["test"].select(selected_test_indices)
 
         # プロンプトを生成
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(x["problem"], tokenizer)
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
 
     def extract_answer(self, completions: list[str]) -> list[str]:
@@ -796,15 +770,13 @@ class KineticDataCategoryClassificationWithMetrics(RLTask):
         return processed_completions
 
 
-class KineticDataCategoryClassificationWithRawDataMetrics(
-    KineticDataCategoryClassificationWithMetrics
-):
+class KineticDataCategoryClassificationWithRawDataMetrics(KineticDataCategoryClassificationWithMetrics):
     question_template: str = ""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.question_template = ("""
+        self.question_template = """
             <|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following class prediction question. 
             Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process.
@@ -855,7 +827,6 @@ class KineticDataCategoryClassificationWithRawDataMetrics(
 
             <|im_start|>assistant
             <think>"""
-        )
 
     def load(self) -> DatasetDict:
         """
@@ -962,10 +933,7 @@ class KineticDataCategoryClassificationWithRawDataMetrics(
 
         train_dict = {
             "problem": prompts_train,
-            "solution": [
-                convert_from_class_to_category[y]
-                for y in self.y_train.flatten().tolist()
-            ],
+            "solution": [convert_from_class_to_category[y] for y in self.y_train.flatten().tolist()],
             "options": [
                 [
                     "Core mechanism",
@@ -992,10 +960,7 @@ class KineticDataCategoryClassificationWithRawDataMetrics(
 
         test_dict = {
             "problem": prompts_test,
-            "solution": [
-                convert_from_class_to_category[y]
-                for y in self.y_test.flatten().tolist()
-            ],
+            "solution": [convert_from_class_to_category[y] for y in self.y_test.flatten().tolist()],
             "options": [
                 [
                     "Core mechanism",

@@ -1,12 +1,13 @@
 import os
-import re
 import pickle
-from typing import List
 import random
+import re
+from typing import List
+
+from datasets import Dataset, DatasetDict
 
 from open_r1.tasks.base import RLTask
 from open_r1.tasks.kinetic_data.calculation_metrics import KineticMetricsCalculator
-from datasets import DatasetDict, Dataset
 
 
 class KineticDataClassificationWithMetrics(RLTask):
@@ -20,7 +21,7 @@ class KineticDataClassificationWithMetrics(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = ("""
+        self.question_template = """
         Analyze the reaction behaviour and catalyst performance, then estimate the reaction class based on the following metrics.
         The possible reaction classes are M1 to M20 indicated as follows.
         Please begin your response with "<think>", then provide a detailed, step-by-step reasoning process (including any intermediate reflections or re-evaluations), 
@@ -90,12 +91,12 @@ class KineticDataClassificationWithMetrics(RLTask):
         {}
 
         <think>
-        """)
-        
+        """
+
     def load(self) -> DatasetDict:
         """
         Load and prepare the dataset for the task.
-        
+
         Returns:
             DatasetDict: Dataset with 'train' and 'test' splits
         """
@@ -116,7 +117,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             self.x2_train = pickle.load(f)
         with open(y_train_path, "rb") as f:
             self.y_train = pickle.load(f)
-        
+
         # Validate data shapes
         if not (len(self.x1_train) == len(self.x2_train) == len(self.y_train)):
             raise ValueError(
@@ -138,7 +139,7 @@ class KineticDataClassificationWithMetrics(RLTask):
                 f"x2_test={len(self.x2_test)}, y_test={len(self.y_test)}"
             )
 
-        self.y_test = self.y_test.reshape(-1, 1)[:self.x1_test.shape[0]]
+        self.y_test = self.y_test.reshape(-1, 1)[: self.x1_test.shape[0]]
 
         prompt_template_data = f"""
         # Metrics that calculated from the data
@@ -250,9 +251,7 @@ class KineticDataClassificationWithMetrics(RLTask):
         prompts_test = []
         for i in range(self.x1_test.shape[0]):
             data = self.generate_data_pass_to_prompt(i, is_test=True)
-            calculator = KineticMetricsCalculator(
-                data
-            ).summarize_metrics_for_ml()
+            calculator = KineticMetricsCalculator(data).summarize_metrics_for_ml()
             calculator.process_samples()
             metrics = calculator.summarize_minimum_important_value()
             prompt = prompt_template_data.format(**metrics)
@@ -270,47 +269,46 @@ class KineticDataClassificationWithMetrics(RLTask):
     def generate_data_pass_to_prompt(self, index, is_test=False):
         """
         Generate data dictionary for prompt template.
-        
+
         Args:
             index (int): Index of the data point
             is_test (bool): Whether this is for test data or not
-            
+
         Returns:
             dict: Dictionary containing data for all runs
         """
         x1_data = self.x1_test if is_test else self.x1_train
         x2_data = self.x2_test if is_test else self.x2_train
-        
+
         return {
             "run_1": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 0]),
                 "time_data": x2_data[index, :, 0].tolist(),
                 "substrate_data": x2_data[index, :, 1].tolist(),
-                "product_data": x2_data[index, :, 2].tolist()
+                "product_data": x2_data[index, :, 2].tolist(),
             },
             "run_2": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 1]),
                 "time_data": x2_data[index, :, 3].tolist(),
                 "substrate_data": x2_data[index, :, 4].tolist(),
-                "product_data": x2_data[index, :, 5].tolist()
+                "product_data": x2_data[index, :, 5].tolist(),
             },
             "run_3": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 2]),
                 "time_data": x2_data[index, :, 6].tolist(),
                 "substrate_data": x2_data[index, :, 7].tolist(),
-                "product_data": x2_data[index, :, 8].tolist()
+                "product_data": x2_data[index, :, 8].tolist(),
             },
             "run_4": {
                 "initial_concentration_of_catalyst": float(x1_data[index, 3]),
                 "time_data": x2_data[index, :, 9].tolist(),
                 "substrate_data": x2_data[index, :, 10].tolist(),
-                "product_data": x2_data[index, :, 11].tolist()
-            }
+                "product_data": x2_data[index, :, 11].tolist(),
+            },
         }
 
     def accuracy_reward(self, completions, solutions, **kwargs):
-        """Reward function - check that the answer is same as ground truth
-        """
+        """Reward function - check that the answer is same as ground truth"""
         answers = [self.preprocess_response(c) for c in completions]
         rewards = []
         rewards_dict = {
@@ -326,7 +324,7 @@ class KineticDataClassificationWithMetrics(RLTask):
 
             # exact match reward
             accuracy_reward = self.exact_match_reward(sol, answer)
-            
+
             # sometimes the answer is None
             if answer != "NONE":
                 # category match reward
@@ -347,7 +345,8 @@ class KineticDataClassificationWithMetrics(RLTask):
         self._metrics_output = {
             "accuracy_reward_ave": sum(rewards_dict["accuracy_reward"]) / len(rewards_dict["accuracy_reward"]),
             "category_reward_ave": sum(rewards_dict["category_reward"]) / len(rewards_dict["category_reward"]),
-            "class_coverage_reward_ave": sum(rewards_dict["class_coverage_reward"]) / len(rewards_dict["class_coverage_reward"]),
+            "class_coverage_reward_ave": sum(rewards_dict["class_coverage_reward"])
+            / len(rewards_dict["class_coverage_reward"]),
             "accuracy_reward_max": max(rewards_dict["accuracy_reward"]),
             "category_reward_max": max(rewards_dict["category_reward"]),
             "class_coverage_reward_max": max(rewards_dict["class_coverage_reward"]),
@@ -356,7 +355,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             "class_coverage_reward_min": min(rewards_dict["class_coverage_reward"]),
         }
         return rewards
-    
+
     def generate_prompt(self, problem, tokenizer, **kwargs):
         r1_prefix = [
             {
@@ -365,29 +364,19 @@ class KineticDataClassificationWithMetrics(RLTask):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
-            "problem": problem
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
+            "problem": problem,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(50000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(10000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
         )
 
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(
-                x["problem"], tokenizer
-            )
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
 
     def preprocess_response(self, response):
@@ -405,7 +394,7 @@ class KineticDataClassificationWithMetrics(RLTask):
             return 1
         else:
             return 0
-    
+
     def category_reward(self, sol, answer):
         category_dict = {
             "M1": 0,
@@ -471,6 +460,6 @@ class KineticDataClassificationWithMetrics(RLTask):
             except Exception:
                 rewards.append(0.0)
         return rewards
-    
+
     def get_metrics(self):
         return self._metrics_output

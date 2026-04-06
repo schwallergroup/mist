@@ -1,21 +1,23 @@
-
-from ..base import RLTask
-from typing import Dict
-import re
+import difflib
 import os
+import re
+from random import random
+from typing import Dict
+
+import pandas as pd
 from datasets import Dataset, DatasetDict
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
-import pandas as pd
-from random import random
-import difflib
+
+from ..base import RLTask
+
 
 class Smiles2Name(RLTask):
     question_template: str = ""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.question_template = ("""
+        self.question_template = """
             "What is the name of this reaction? {}. "
             "You have the choice between the following reaction names : ['Formation of Sulfonic Esters',
             'Reduction of nitro groups to amines',
@@ -187,26 +189,19 @@ class Smiles2Name(RLTask):
             'Carbonylation with aryl formates', 'Oxidation of boronic acids]"
             "Show your work in <think> </think> tags. And return the final answer in <answer> </answer> tags in SMILES notation, for example <answer> ... </answer>. Think step by step inside <think> tags."
             """
-        )
         # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/CRLLM-PubChem-compounds1M.csv
 
     def load(self) -> DatasetDict:
         """Load and return the complete dataset."""
         df = pd.read_csv(self.dataset_id_or_path)
-        train_dict = {
-            'problem': df['REACTION'].tolist(),
-            'solution': df['NAME'].tolist()
-        }
+        train_dict = {"problem": df["REACTION"].tolist(), "solution": df["NAME"].tolist()}
         train_dataset = Dataset.from_dict(train_dict)
         train_test_split = train_dataset.train_test_split(test_size=0.1)
-        train_dataset = train_test_split['train']
-        test_dataset = train_test_split['test']
-        
+        train_dataset = train_test_split["train"]
+        test_dataset = train_test_split["test"]
+
         # Combine into DatasetDict
-        self.dataset = DatasetDict({
-            'train': train_dataset,
-            'test': test_dataset
-        })
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
@@ -224,7 +219,7 @@ class Smiles2Name(RLTask):
 
             similarity = difflib.SequenceMatcher(None, norm_ans, norm_sol).ratio()
 
-            if similarity > 0.9:  
+            if similarity > 0.9:
                 rewards.append(1)
                 self.log_correct(content)
             elif similarity > 0.8:
@@ -232,7 +227,6 @@ class Smiles2Name(RLTask):
             else:
                 rewards.append(-0.5)
         return rewards
-
 
     def preprocess_response(self, response):
         """Preprocess the response before checking for accuracy."""
@@ -250,8 +244,3 @@ class Smiles2Name(RLTask):
             return smi
         else:
             return "NONE"
-
-
-
-
-
