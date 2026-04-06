@@ -12,3 +12,4 @@ rxn_inversion,demo/datasets/rxn_inversion_sample.csv,50,"~45 train / ~5 test",re
 rxn_replacement,demo/datasets/rxn_inversion_sample.csv,50,"~45 train / ~5 test",repo-local fixture,ready,"Same schema as rxn_inversion (MCQ with 4 options)"
 rxn_naming,demo/datasets/rxn_naming_sample.csv,50,"~45 train / ~5 test",repo-local fixture,ready,"Reaction classification into 10 named categories"
 rxn_truefalse,demo/datasets/rxn_truefalse_sample.csv,50,"~45 train / ~5 test",repo-local fixture,ready,"Binary true/false reaction validity"
+condmatgen,demo/condmatgen_tiny,50,"~45 train / ~5 test",repo-local fixture,ready,"JSON with element lists for conditional material generation"
