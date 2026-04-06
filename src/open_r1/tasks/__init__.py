@@ -21,6 +21,7 @@ CHEMTASKS = {
 
 try:
     from .condmatgen.condmatgen import ConditionalMaterialGeneration
+
     CHEMTASKS["condmatgen"] = ConditionalMaterialGeneration
 except ImportError:
     pass
