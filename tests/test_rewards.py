@@ -105,9 +105,7 @@ def test_inversion_accuracy_wrong(inversion_task):
 
 
 def test_inversion_format_reward(inversion_task):
-    good = inversion_task.format_reward(
-        ["p"], ["<think>reasoning</think>\n<answer>A</answer>"]
-    )
+    good = inversion_task.format_reward(["p"], ["<think>reasoning</think>\n<answer>A</answer>"])
     bad = inversion_task.format_reward(["p"], ["just some text"])
     assert good[0] > bad[0]
 
@@ -197,9 +195,7 @@ def test_naming_accuracy_invalid(naming_task):
 
 
 def test_naming_format_reward(naming_task):
-    good = naming_task.format_reward(
-        ["<think>reasoning</think><answer>Acylation</answer>"]
-    )
+    good = naming_task.format_reward(["<think>reasoning</think><answer>Acylation</answer>"])
     bad = naming_task.format_reward(["just some text without tags"])
     assert good[0] > bad[0]
 
@@ -243,17 +239,13 @@ def test_truefalse_accuracy_wrong(truefalse_task):
 def test_truefalse_majority_vote(truefalse_task):
     truefalse_task.load()
     # Majority of mentions is "true" even though the answer tag says false
-    completions = [
-        "<think>true true true reasoning</think><answer>false</answer>"
-    ]
+    completions = ["<think>true true true reasoning</think><answer>false</answer>"]
     rewards = truefalse_task.accuracy_reward(completions, solution=["true"])
     # Majority vote: 3x true > 1x false → predicted "true" → matches gold
     assert rewards[0] == 1.0
 
 
 def test_truefalse_format_reward(truefalse_task):
-    good = truefalse_task.format_reward(
-        ["<think>reasoning</think><answer>true</answer>"]
-    )
+    good = truefalse_task.format_reward(["<think>reasoning</think><answer>true</answer>"])
     bad = truefalse_task.format_reward(["just some text"])
     assert good[0] > bad[0]

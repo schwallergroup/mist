@@ -44,9 +44,7 @@ class Smiles2Name(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def generate_prompt(self, problem, tokenizer, **kwargs):
@@ -107,9 +105,7 @@ class Smiles2Name(RLTask):
         rewards = []
 
         for completion, gold in zip(completions, solution):
-            answers = re.findall(
-                r"<answer>(.*?)</answer>", completion, re.DOTALL
-            )
+            answers = re.findall(r"<answer>(.*?)</answer>", completion, re.DOTALL)
             answers = [ans.strip() for ans in answers]
 
             selected = answers[0] if answers else ""
@@ -125,9 +121,7 @@ class Smiles2Name(RLTask):
                 print(f"Ground truth:  {gold!r}\n")
 
             else:
-                matching = [
-                    ans for ans in answers if ans.lower() in lc_choices
-                ]
+                matching = [ans for ans in answers if ans.lower() in lc_choices]
                 if matching:
                     reward = 0.2
                     print("======= FULL_COMPLETION_VALID_CHOICE =======")

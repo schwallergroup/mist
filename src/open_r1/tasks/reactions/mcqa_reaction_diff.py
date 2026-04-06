@@ -40,8 +40,7 @@ class SmilesReplacement(RLTask):
 
         df = pd.read_csv(self.dataset_id_or_path)
         shuffled = [
-            np.random.permutation(row).tolist()
-            for row in df[["true_reaction", "fake1", "fake2", "fake3"]].values
+            np.random.permutation(row).tolist() for row in df[["true_reaction", "fake1", "fake2", "fake3"]].values
         ]
         train_dict = {
             "solution": df["true_reaction"].tolist(),
@@ -54,9 +53,7 @@ class SmilesReplacement(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def generate_prompt(self, tokenizer, **kwargs):
@@ -70,27 +67,19 @@ class SmilesReplacement(RLTask):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "options": options,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(50000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(10000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
         )
 
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(tokenizer, options=x["options"])
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(tokenizer, options=x["options"]))
 
         return self.dataset
 
@@ -119,9 +108,7 @@ class SmilesReplacement(RLTask):
                 processed.append(c)
         return processed
 
-    def accuracy_reward(
-        self, prompts, completions, solution, options, **kwargs
-    ):
+    def accuracy_reward(self, prompts, completions, solution, options, **kwargs):
 
         completions = self.preprocess_completions(completions)
         if prompts:
@@ -131,9 +118,7 @@ class SmilesReplacement(RLTask):
         rewards = []
         letters = "ABCD"
 
-        for i, (prompt, completion, gold, opts) in enumerate(
-            zip(prompts, completions, solution, options)
-        ):
+        for i, (prompt, completion, gold, opts) in enumerate(zip(prompts, completions, solution, options)):
             ans = self.preprocess_response(completion).strip()
             ans = re.sub(r"[^ABCD]", "", ans)
             reward = 0.0
@@ -147,12 +132,8 @@ class SmilesReplacement(RLTask):
 
                 if correct:
                     reward = 1.0
-                    print(
-                        f"\n\n====== CORRECT COMPLETION DUMP (idx={i}) ======"
-                    )
-                    print(
-                        f"Choice: {ans!r}  Selected: {select!r}  Gold: {gold!r}\n"
-                    )
+                    print(f"\n\n====== CORRECT COMPLETION DUMP (idx={i}) ======")
+                    print(f"Choice: {ans!r}  Selected: {select!r}  Gold: {gold!r}\n")
                     print(completion)
                     print("====== END DUMP ======\n")
 
@@ -161,21 +142,15 @@ class SmilesReplacement(RLTask):
                 else:
                     reward = 0.0
                     if random() < 0.5:
-                        print(
-                            f"\n\n====== INCORRECT COMPLETION DUMP (idx={i}) ======"
-                        )
-                        print(
-                            f"Choice: {ans!r}  Selected: {select!r}  Gold: {gold!r}\n"
-                        )
+                        print(f"\n\n====== INCORRECT COMPLETION DUMP (idx={i}) ======")
+                        print(f"Choice: {ans!r}  Selected: {select!r}  Gold: {gold!r}\n")
                         print(completion)
                         print("====== END DUMP ======\n")
 
                     self.random_print(info)
             else:
                 if random() < 0.5:
-                    print(
-                        f"\n\n====== BAD ANSWER FORMATING DUMP (idx={i}) ======"
-                    )
+                    print(f"\n\n====== BAD ANSWER FORMATING DUMP (idx={i}) ======")
                     print(f"The answer given: {ans!r}")
                     print(completion)
 
@@ -244,9 +219,7 @@ class SmilesReplacement(RLTask):
                     current_reward -= 0.05
 
                 # if answer is not empty 0.2 and if answer is letter 0.2
-                m_ans = re.search(
-                    r"<answer>(.*?)</answer>", completion, re.DOTALL
-                )
+                m_ans = re.search(r"<answer>(.*?)</answer>", completion, re.DOTALL)
                 if not m_ans:
                     current_reward -= 0.25
                 else:
