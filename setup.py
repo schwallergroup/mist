@@ -128,7 +128,7 @@ setup(
     package_data={
         "open_r1.dataset": ["spacegroups.txt"],
         "open_r1.tasks.smiles_understanding": ["smiles_hydrogen_prompt_guiding.json"],
-        "open_r1.tasks.crystal_structure.AIRS_preporcess": ["spacegroups.txt"],
+        "open_r1.tasks.crystal_structure.AIRS_preprocess": ["spacegroups.txt"],
     },
     zip_safe=False,
     extras_require=extras,

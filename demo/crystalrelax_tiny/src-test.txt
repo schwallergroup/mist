@@ -10,3 +10,51 @@ lattice_parameters a 6.58000000 b 6.58000000 c 6.58000000 alpha 90.00000000 beta
 Rb 4_int 0.00000000 0.00000000 0.00000000
 Cl 4_int 0.50000000 0.50000000 0.50000000
 
+serialized_cif formula Cs 1_int I 1_int
+space_group_symbol Pm-3m_sg
+lattice_parameters a 4.57000000 b 4.57000000 c 4.57000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Cs 1_int 0.00000000 0.00000000 0.00000000
+I 1_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Rb 1_int Cl 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 6.58000000 b 6.58000000 c 6.58000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Rb 4_int 0.00000000 0.00000000 0.00000000
+Cl 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Cs 1_int I 1_int
+space_group_symbol Pm-3m_sg
+lattice_parameters a 4.57000000 b 4.57000000 c 4.57000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Cs 1_int 0.00000000 0.00000000 0.00000000
+I 1_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Rb 1_int Cl 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 6.58000000 b 6.58000000 c 6.58000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Rb 4_int 0.00000000 0.00000000 0.00000000
+Cl 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Cs 1_int I 1_int
+space_group_symbol Pm-3m_sg
+lattice_parameters a 4.57000000 b 4.57000000 c 4.57000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Cs 1_int 0.00000000 0.00000000 0.00000000
+I 1_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Rb 1_int Cl 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 6.58000000 b 6.58000000 c 6.58000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Rb 4_int 0.00000000 0.00000000 0.00000000
+Cl 4_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Cs 1_int I 1_int
+space_group_symbol Pm-3m_sg
+lattice_parameters a 4.57000000 b 4.57000000 c 4.57000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Cs 1_int 0.00000000 0.00000000 0.00000000
+I 1_int 0.50000000 0.50000000 0.50000000
+
+serialized_cif formula Rb 1_int Cl 1_int
+space_group_symbol Fm-3m_sg
+lattice_parameters a 6.58000000 b 6.58000000 c 6.58000000 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Rb 4_int 0.00000000 0.00000000 0.00000000
+Cl 4_int 0.50000000 0.50000000 0.50000000
+
