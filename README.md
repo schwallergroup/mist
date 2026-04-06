@@ -56,6 +56,29 @@ pip install -e .
 ```
 
 
+## Quick Start — Download Data and Run
+
+The datasets and model checkpoints are released on
+[Figshare](https://figshare.com/articles/code/29132657) (v3, ~7.3 GB total).
+
+To download and set up everything automatically:
+
+```bash
+# Download datasets only (~2.2 GB)
+python scripts/setup_data.py --data-dir ./data --skip-models
+
+# Or full setup including model checkpoints (~7.3 GB)
+python scripts/setup_data.py --data-dir ./data
+```
+
+This downloads from Figshare, verifies MD5 checksums, extracts into the
+directory layout expected by the training recipes, and writes a `.env.local`
+file. Then:
+
+```bash
+source .env.local && export MIST_DATA_DIR
+```
+
 ## Setup
 
 > [!IMPORTANT]  
@@ -163,15 +186,16 @@ Then open `http://localhost:8000` in your browser.
 
 ## Demo
 
-This repository includes lightweight reviewer fixtures under `demo/`.
+This repository includes lightweight 50-row fixtures under `demo/` for all
+implemented tasks, enabling smoke testing without downloading full datasets.
 
-- `demo/rxnpred_tiny/` provides a 40-train / 10-test reaction-prediction
-  example.
-- `demo/datasets/` provides 50-row PubChem-derived CSV slices for the
-  IUPAC/SMILES, canonicalization, permutation, and hydrogen tasks.
-- `demo/make_kinetic_tiny.py` generates a 40-train / 10-validation synthetic
-  kinetic bundle in the same on-disk format expected by the kinetic task
-  loader.
+- `demo/rxnpred_tiny/` — reaction prediction (40 train + 10 test)
+- `demo/datasets/*.csv` — 50-row CSV fixtures for I2S, canonicalization,
+  permutation, hydrogen, reaction naming, inversion, replacement, and
+  true/false tasks
+- `demo/kinetic_tiny/` — synthetic kinetic data (40 train + 10 val)
+- `demo/crystalrelax_tiny/` — M2S crystal structures (40 train + 10 test)
+- `demo/condmatgen_tiny/` — element lists for material generation (50 entries)
 
 Run the demo from the repository root:
 
@@ -179,46 +203,19 @@ Run the demo from the repository root:
 PYTHONPATH=src python demo/run_demo.py
 ```
 
-Expected output:
-
-```json
-{
-  "train_examples": 2,
-  "test_examples": 2,
-  "solutions": [
-    "COC",
-    "CCNC"
-  ],
-  "rewards": [
-    4.0,
-    4.0
-  ]
-}
-```
-
-The demo exercises dataset loading and reward evaluation on a tiny bundled
-dataset without requiring GPUs or cluster infrastructure.
-
-To smoke-test the dataset loaders across multiple tasks, run:
+To smoke-test dataset loaders across all tasks:
 
 ```bash
 PYTHONPATH=src python demo/run_fixture_smoke.py
 ```
 
-This second script exercises the local fixtures for:
+This exercises fixtures for all tasks: `rxnpred`, `iupacsm`,
+`iupacsm_with_tags`, `canonic`, `canonmc`, `smi_permute`, `smhydrogen`,
+`kinetic`, `rxn_inversion`, `rxn_replacement`, `rxn_naming`, `rxn_truefalse`,
+and conditionally `crystalrelax` and `condmatgen` (when heavy dependencies are
+installed).
 
-- `rxnpred`
-- `iupacsm`
-- `iupacsm_with_tags`
-- `canonic`
-- `canonmc`
-- `smi_permute`
-- `smhydrogen`
-- `kinetic`
-
-See `demo/README.md` for fixture provenance and notes about which datasets were
-and were not present in the current Figshare bundle. A task-to-fixture mapping
-is also provided in `demo/fixture_manifest.csv`.
+See `demo/fixture_manifest.csv` for the complete task-to-fixture mapping.
 
 ## Submission and Release Inventory
 
@@ -512,6 +509,8 @@ When creating a new task, ensure:
 - **Reaction Replacement** (`rxn_replacement`): MCQ — identify correct reaction among modified fakes
 - **Reaction Naming** (`rxn_naming`): Classify reactions into 10 named categories
 - **Reaction True/False** (`rxn_truefalse`): Binary reaction validity classification
+- **Conditional Material Generation** (`condmatgen`): Generate novel crystal compositions from element sets
+- **Crystal Structure Relaxation** (`crystalrelax`): Relax perturbed binary crystal structures
 
 For detailed examples and API reference, see the [documentation](docs/source/).
 
