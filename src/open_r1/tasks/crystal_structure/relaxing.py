@@ -9,6 +9,7 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 
 from open_r1.download_data import download_data
+from open_r1.paths import expand_path
 from open_r1.tasks.base import RLTask
 
 from .AIRS_preprocess._tokenizer import CIFTokenizer
@@ -30,6 +31,7 @@ class BinaryCompoundRelaxing(RLTask):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.dataset_id_or_path = expand_path(self.dataset_id_or_path)
         if not os.path.exists(self.dataset_id_or_path):
             os.makedirs(self.dataset_id_or_path)
         download_data(self.dataset_id_or_path)
@@ -57,8 +59,6 @@ class BinaryCompoundRelaxing(RLTask):
         self.custom_metrics = {
             "val/rewards": [],
         }
-
-        # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/binary_compound_relaxing
 
     @classmethod
     def _get_mace_device(cls) -> str:
