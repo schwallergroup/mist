@@ -1,6 +1,0 @@
-Flask
-pymatgen
-gemmi
-mace
-ase
-

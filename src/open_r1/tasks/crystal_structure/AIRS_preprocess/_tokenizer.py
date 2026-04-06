@@ -1,8 +1,7 @@
 import math
 import os
 import re
-
-from torch.utils.data import Dataset
+import math
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -525,18 +524,72 @@ class CIFTokenizer:
 
         return extracted_data
 
+# 构造测试样本
+llm_output = """  
+formula Si 1_int C 1_int
+space_group_symbol P 1
+lattice_parameters a 3.07486950 b 3.07486950 c 5.04587300 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
+Si 1_int 0.66666700 0.33333300 0.46331700
+Si 1_int 0.33333300 0.66666700 0.96331700
+C 1_int 0.66666700 0.33333300 0.96331700
+C 1_int 0.33333300 0.66666700 0.46331700
+"""
 
-class CinDataset(Dataset):
-    def __init__(self, texts):
-        self.texts = texts
+ground_truth = """data_MoS2
+_symmetry_space_group_name_H-M   P6_3/mmc
+_cell_length_a   3.19223791
+_cell_length_b   3.19223791
+_cell_length_c   13.37829400
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   120.00000000
+_symmetry_Int_Tables_number   194
+_chemical_formula_structural   MoS2
+_chemical_formula_sum   'Mo2 S4'
+_cell_volume   118.06518982
+_cell_formula_units_Z   2
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+  2  '-x, -y, -z'
+  3  'x-y, x, z+1/2'
+  4  '-x+y, -x, -z+1/2'
+  5  '-y, x-y, z'
+  6  'y, -x+y, -z'
+  7  '-x, -y, z+1/2'
+  8  'x, y, -z+1/2'
+  9  '-x+y, -x, z'
+  10  'x-y, x, -z'
+  11  'y, -x+y, z+1/2'
+  12  '-y, x-y, -z+1/2'
+  13  '-y, -x, -z+1/2'
+  14  'y, x, z+1/2'
+  15  '-x, -x+y, -z'
+  16  'x, x-y, z'
+  17  '-x+y, y, -z+1/2'
+  18  'x-y, -y, z+1/2'
+  19  'y, x, -z'
+  20  '-y, -x, z'
+  21  'x, x-y, -z+1/2'
+  22  '-x, -x+y, z+1/2'
+  23  'x-y, -y, -z'
+  24  '-x+y, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Mo  Mo0  2  0.33333333  0.66666667  0.75000000  1
+  S  S1  4  0.33333333  0.66666667  0.13308200  1
+"""
 
-    def __len__(self):
-        return len(self.texts)
+# 初始化假 tokenizer 并运行测试
+cif_tokenizer = CIFTokenizer()
+result = cif_tokenizer.deserialize(llm_output, ground_truth)
 
-    def __getitem__(self, idx):
-        text = self.texts[idx][:1500]
-        # if self.conditions is not None:
-        #     raw_input_ids = raw_input_ids[1:]  # Remove the first token (<s>)
-        input_ids = text[:-1]
-        targets = text[1:]
-        return input_ids, targets
+print("\n=== Deserialized Output ===")  
+print(result)
