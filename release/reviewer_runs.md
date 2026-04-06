@@ -67,21 +67,6 @@ PYTHONPATH=src python src/open_r1/diagnostic/smiles_competence.py \
 
 For a multi-GPU cluster run, use `launch_diagnostics.slurm`.
 
-### Verified reference run
-
-The SCS path above was validated on April 4, 2026 on a GCP `a2-highgpu-1g`
-instance using `Qwen/Qwen2.5-3B`, `10000` rows from
-`CRLLM-PubChem-compounds1M.csv`, `tensor_parallel_size=1`, and the current
-`smiles_competence.py` batching implementation.
-
-Observed outputs:
-
-- `SCS logprobs = 0.9553193281550367`
-- `SCS rank = -0.07295051975114555`
-
-The run wrote `lps_canonical.csv`, `lps_random.csv`, `lps_corrupt.csv`, and
-`summary.json` under `/var/log/mist-scs` on the evaluation VM.
-
 ## 3. GRPO training
 
 This repository contains the task implementations, recipes, and SLURM launchers

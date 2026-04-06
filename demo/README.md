@@ -3,8 +3,8 @@
 This directory contains lightweight data fixtures for reviewer-friendly smoke
 tests.
 
-The CSV fixtures under `datasets/` were extracted on GCP from the published
-Figshare `datasets.zip` bundle for article `29132657`. The committed demo files
+The CSV fixtures under `datasets/` were extracted from the published Figshare
+`datasets.zip` bundle for article `29132657`. The committed demo files
 now contain 50 rows each, built from that extracted slice so they stay small
 enough for the repository while remaining faithful to the real dataset schema.
 The fixture-to-task mapping is recorded in `fixture_manifest.csv`.

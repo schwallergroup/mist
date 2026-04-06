@@ -63,6 +63,3 @@ files and release artifacts.
 - For datasets with restrictive upstream licensing or impractical sizes,
   release the preprocessing scripts, manifests, and split definitions rather
   than mirrored raw source dumps.
-- For lightweight reproducibility checks on cloud infrastructure, use:
-  - `release/gcp_demo_startup.sh`
-  - `release/gcp_create_demo_vm.sh`
