@@ -524,8 +524,8 @@ class CIFTokenizer:
 
         return extracted_data
 
-# 构造测试样本
-llm_output = """  
+if __name__ == "__main__":
+    llm_output = """
 formula Si 1_int C 1_int
 space_group_symbol P 1
 lattice_parameters a 3.07486950 b 3.07486950 c 5.04587300 alpha 90.00000000 beta 90.00000000 gamma 90.00000000
@@ -535,7 +535,7 @@ C 1_int 0.66666700 0.33333300 0.96331700
 C 1_int 0.33333300 0.66666700 0.46331700
 """
 
-ground_truth = """data_MoS2
+    ground_truth = """data_MoS2
 _symmetry_space_group_name_H-M   P6_3/mmc
 _cell_length_a   3.19223791
 _cell_length_b   3.19223791
@@ -587,9 +587,8 @@ loop_
   S  S1  4  0.33333333  0.66666667  0.13308200  1
 """
 
-# 初始化假 tokenizer 并运行测试
-cif_tokenizer = CIFTokenizer()
-result = cif_tokenizer.deserialize(llm_output, ground_truth)
+    cif_tokenizer = CIFTokenizer()
+    result = cif_tokenizer.deserialize(llm_output, ground_truth)
 
-print("\n=== Deserialized Output ===")  
-print(result)
+    print("\n=== Deserialized Output ===")
+    print(result)

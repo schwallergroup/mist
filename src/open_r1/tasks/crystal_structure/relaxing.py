@@ -8,16 +8,10 @@ from typing import Dict, Optional
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
-import gemmi
-from ase.io import read
-from mace.calculators import mace_mp
 from open_r1.download_data import download_data
 from open_r1.tasks.base import RLTask
-from pymatgen.analysis.structure_matcher import StructureMatcher
-from pymatgen.core import Structure
 
-import torch
-from .AIRS_preporcess._tokenizer import CIFTokenizer
+from .AIRS_preprocess._tokenizer import CIFTokenizer
 
 cif_tokenizer = CIFTokenizer()
 
@@ -75,6 +69,8 @@ class BinaryCompoundRelaxing(RLTask):
         if cls._mace_device is not None:
             return cls._mace_device
 
+        import torch
+
         cls._mace_device = "cuda" if torch.cuda.is_available() else "cpu"
 
         print(f"Using MACE device: {cls._mace_device}")
@@ -83,6 +79,8 @@ class BinaryCompoundRelaxing(RLTask):
     @classmethod
     def _get_mace_calculator(cls):
         if cls._mace_calculator is None:
+            from mace.calculators import mace_mp
+
             cls._mace_calculator = mace_mp(model="large", device=cls._get_mace_device())
         return cls._mace_calculator
 
@@ -144,6 +142,10 @@ class BinaryCompoundRelaxing(RLTask):
     def accuracy_reward(self, completions, solution, **kwargs):
         """Reward function - check that completion is same as ground truth."""
 
+        import gemmi
+        from ase.io import read as ase_read
+        from pymatgen.core import Structure
+
         def compute_internal_score(answer_cif, ground_truth_dict, alpha=5.0):
             def sanitize_cif(cif_str):
                 lines = cif_str.splitlines()
@@ -180,8 +182,8 @@ class BinaryCompoundRelaxing(RLTask):
 
             def compare_internal_energy(cif1, cif2):
                 # uses ASE + MACE to get per‐atom potential energies
-                atoms1 = read(StringIO(cif1), format='cif')
-                atoms2 = read(StringIO(cif2), format='cif')
+                atoms1 = ase_read(StringIO(cif1), format='cif')
+                atoms2 = ase_read(StringIO(cif2), format='cif')
                 calc = self._get_mace_calculator()
                 atoms1.calc = calc
                 atoms2.calc = calc

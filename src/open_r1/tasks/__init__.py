@@ -1,4 +1,3 @@
-from .crystal_structure.relaxing import BinaryCompoundRelaxing
 from .kinetic_data.kinetic_data_classification import KineticDataClassification
 from .reactions.canon_mcqa import CanonicalizeSmilesMCQA
 from .reactions.canonical import CanonicalizeSmiles
@@ -10,7 +9,6 @@ from .reactions.reaction2name import Smiles2Name
 from .reactions.reaction_truefalse import ReactionTrueFalse
 from .reactions.smi_permute import PermuteSmiles
 from .smiles_understanding.smiles_hydrogen import SmilesHydrogen
-from .crystal_structure.relaxing import BinaryCompoundRelaxing
 
 
 # Task keys as specified in the task recipes and documentation
@@ -28,5 +26,11 @@ CHEMTASKS = {
     "rxn_replacement": SmilesReplacement,
     "rxn_naming": Smiles2Name,
     "rxn_truefalse": ReactionTrueFalse,
-    "crystalrelax": BinaryCompoundRelaxing,
 }
+
+try:
+    from .crystal_structure.relaxing import BinaryCompoundRelaxing
+
+    CHEMTASKS["crystalrelax"] = BinaryCompoundRelaxing
+except ImportError:
+    pass
