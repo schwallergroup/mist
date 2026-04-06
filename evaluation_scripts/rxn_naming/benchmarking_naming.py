@@ -1,20 +1,21 @@
 #!/usr/bin/env python
+import argparse
 import os
 import re
-import argparse
+
 import pandas as pd
-from vllm import LLM, SamplingParams
 from sklearn.model_selection import train_test_split
+
+from vllm import LLM, SamplingParams
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Benchmarking Naming-2 without reasoning")
-    parser.add_argument("--model_path", type=str, required=True,
-                        help="Path or Hugging Face repo ID for the vLLM model checkpoint")
-    parser.add_argument("--data_path", type=str, required=True,
-                        help="Path to the input data CSV file")
-    parser.add_argument("--out_dir", type=str, required=True,
-                        help="Directory to save output files")
+    parser.add_argument(
+        "--model_path", type=str, required=True, help="Path or Hugging Face repo ID for the vLLM model checkpoint"
+    )
+    parser.add_argument("--data_path", type=str, required=True, help="Path to the input data CSV file")
+    parser.add_argument("--out_dir", type=str, required=True, help="Directory to save output files")
     return parser.parse_args()
 
 
@@ -34,18 +35,10 @@ def main():
     df = pd.read_csv(args.data_path)
     df = df.iloc[10_000:].reset_index(drop=True)
 
-    _, test_df = train_test_split(
-        df,
-        test_size=3000,
-        random_state=42,
-        shuffle=True
-    )
+    _, test_df = train_test_split(df, test_size=3000, random_state=42, shuffle=True)
 
     test_df = test_df.drop(columns=[c for c in ["Unnamed: 0", "REACTION"] if c in test_df.columns])
-    test_df = test_df.rename(columns={
-        "REACTION_PROMPT": "input",
-        "CLASS":           "answer"
-    })
+    test_df = test_df.rename(columns={"REACTION_PROMPT": "input", "CLASS": "answer"})
 
     test_data = test_df.to_dict(orient="records")
 
@@ -110,12 +103,9 @@ def main():
             if ok:
                 correct += 1
                 hit = True
-                records.append({
-                    "example_idx":      idx,
-                    "gold_answer":      gold,
-                    "predicted_answer": pred,
-                    "full_completion":  comp
-                })
+                records.append(
+                    {"example_idx": idx, "gold_answer": gold, "predicted_answer": pred, "full_completion": comp}
+                )
                 break
 
     total = len(test_data)
@@ -125,11 +115,7 @@ def main():
     out_df = pd.DataFrame(records)
     out_df.to_csv(os.path.join(args.out_dir, "naming_correct_completions_direct.csv"), index=False)
 
-    metrics = pd.DataFrame([{
-        "accuracy_pct": round(acc, 2),
-        "correct":      correct,
-        "total":        total
-    }])
+    metrics = pd.DataFrame([{"accuracy_pct": round(acc, 2), "correct": correct, "total": total}])
     metrics.to_csv(os.path.join(args.out_dir, "naming_metrics_direct.csv"), index=False)
 
 

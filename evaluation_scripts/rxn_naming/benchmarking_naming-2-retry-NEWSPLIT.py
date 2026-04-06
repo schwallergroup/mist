@@ -1,20 +1,24 @@
 import argparse
 import os
-from vllm import LLM, SamplingParams
-from rdkit import Chem
-import re
 import pickle
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from datasets import Dataset
 import random
+import re
+
+import pandas as pd
+from datasets import Dataset
+from rdkit import Chem
+from sklearn.model_selection import train_test_split
+
+from vllm import LLM, SamplingParams
+
 
 def extract_answer(text):
-    m = re.search(r"<answer>\s*(.*?)\s*</answer>", text, re.DOTALL|re.IGNORECASE)
+    m = re.search(r"<answer>\s*(.*?)\s*</answer>", text, re.DOTALL | re.IGNORECASE)
     if m:
         return m.group(1).strip()
     m2 = re.search(r"([A-Za-z \-]+?)\s*</answer>", text, re.IGNORECASE)
     return m2.group(1).strip() if m2 else None
+
 
 def generate_with_retry(prompt, sampling_params, llm, max_retries=1):
     """
@@ -24,39 +28,47 @@ def generate_with_retry(prompt, sampling_params, llm, max_retries=1):
     Returns the raw text of the first well‐formed completion (or the last attempt).
     """
     last_text = ""
-    
-    result  = llm.generate([prompt], sampling_params)
+
+    result = llm.generate([prompt], sampling_params)
     outputs = result[0].outputs
     last_text = outputs[0].text
-    
+
     if extract_answer(last_text) is not None:
         return last_text
-    
-    for attempt in range(1, max_retries+1):
+
+    for attempt in range(1, max_retries + 1):
         print(f"Retry #{attempt}: feeding back previous output + <answer>…")
-        
+
         to_send = prompt + last_text + "\n<answer>"
-        
-        result  = llm.generate([to_send], sampling_params)
+
+        result = llm.generate([to_send], sampling_params)
         outputs = result[0].outputs
         last_text = outputs[0].text
-        
+
         if extract_answer(last_text) is not None:
             return last_text
 
     return last_text
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Benchmarking Naming-2 with retries")
     parser.add_argument("--model_path", type=str, required=True, help="Path to the vLLM model checkpoint")
     parser.add_argument("--out_dir", type=str, required=True, help="Directory to save output files")
-    parser.add_argument("--data_path", type=str, required=True, default="/data/david/final_tasks_prompts/reaction_class_prompts_600k.csv", help="Path to the input data CSV file")
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        required=True,
+        default="/data/david/final_tasks_prompts/reaction_class_prompts_600k.csv",
+        help="Path to the input data CSV file",
+    )
 
     return parser.parse_args()
 
+
 def main(args):
     # df = pd.read_csv("/data/david/final_tasks_prompts/reaction_class_prompts_600k.csv")
-   
+
     df = pd.read_csv(args.data_path)
     df["orig_idx"] = df.index
 
@@ -79,26 +91,23 @@ def main(args):
 
     common_df = common_ds.to_pandas().reset_index(drop=True)
 
-    print(common_df.shape)    
-    print(common_df.columns) 
+    print(common_df.shape)
+    print(common_df.columns)
 
-    test_df = common_df.drop(columns=["Unnamed: 0", "REACTION", "orig_idx"])  
-    test_df = test_df.rename(columns={
-        "REACTION_PROMPT": "input",
-        "CLASS":           "answer"
-    })
+    test_df = common_df.drop(columns=["Unnamed: 0", "REACTION", "orig_idx"])
+    test_df = test_df.rename(columns={"REACTION_PROMPT": "input", "CLASS": "answer"})
 
     test_data = test_df.to_dict(orient="records")
 
     all_keys = set().union(*(rec.keys() for rec in test_data))
-    print(all_keys)  
+    print(all_keys)
 
     # Load vLLM model
-    # llm = LLM(model="/data/share/jgoumaz_grpo_models/checkpoints/rxn_naming_409465/checkpoint-200/")  
+    # llm = LLM(model="/data/share/jgoumaz_grpo_models/checkpoints/rxn_naming_409465/checkpoint-200/")
     # llm = LLM(model="Qwen/Qwen2.5-3B", trust_remote_code=True)
-    # llm = LLM(model="/data/share/qwen_pretranined_v6")  
+    # llm = LLM(model="/data/share/qwen_pretranined_v6")
     llm = LLM(args.model_path, trust_remote_code=True)
-    
+
     sampling_params = SamplingParams(
         n=1,
         presence_penalty=0.0,
@@ -113,7 +122,7 @@ def main(args):
         include_stop_str_in_output=True,
         skip_special_tokens=True,
     )
-    #sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
+    # sampling_params = SamplingParams(n=5, max_tokens=4096, stop_token_ids=[151643, 151644, 151645])
 
     classes = [
         "Acylation",
@@ -127,7 +136,6 @@ def main(args):
         "Protection",
         "Reduction",
     ]
-
 
     prompts = []
     for ex in test_data:
@@ -148,7 +156,7 @@ def main(args):
         #     "<|im_start|>assistant\n"
         #     "<think>"
         # )
-        
+
         prompt = f"""<|im_start|>assistant
             You are a useful Chemistry assistant and you will answer the following class prediction question. Give your reasoning inside the <think>...</think> tags and then respond inside <answer>...</answer> tags, think and reason for all the options before giving your answer. Structure your reasoning such that you think through all options before giving the answer.<|im_end|>
 
@@ -172,16 +180,10 @@ def main(args):
 
     completions = [res.outputs[0].text for res in first_results]
 
-    needs_retry = [
-        i for i, text in enumerate(completions)
-        if extract_answer(text) is None
-    ]
+    needs_retry = [i for i, text in enumerate(completions) if extract_answer(text) is None]
 
     if needs_retry:
-        retry_prompts = [
-            prompts[i] + completions[i] + "\n<answer>"
-            for i in needs_retry
-        ]
+        retry_prompts = [prompts[i] + completions[i] + "\n<answer>" for i in needs_retry]
 
         print(f"Retrying {len(needs_retry)} examples: {needs_retry}")
         retry_results = llm.generate(retry_prompts, sampling_params)
@@ -204,44 +206,34 @@ def main(args):
             else:
                 print(f"Retrying for example #{idx} still has no <answer> tag; keeping old completion")
 
-
     records = []
     correct = 0
     for i, (ex, comp) in enumerate(zip(test_data, completions), start=1):
         gold = ex["answer"].strip().lower()
         pred = extract_answer(comp) or ""
-        hit  = gold in pred.lower()
+        hit = gold in pred.lower()
         if hit:
             print(f"\nExample #{i}")
             print("Gold class:   ", ex["answer"].strip().lower())
             print("Full completion:\n" + comp)
             print("-" * 80)
             correct += 1
-            records.append({
-                "example_idx":      i,
-                "gold_answer":      gold,
-                "predicted_answer": pred,
-                "full_completion":  comp
-            })
-
+            records.append({"example_idx": i, "gold_answer": gold, "predicted_answer": pred, "full_completion": comp})
 
     out_df = pd.DataFrame(records)
     # out_df.to_csv("/data/david/benchmark_save_completion_runs/naming_2_correct_completions_think_retry_pt.csv", index=False)
     samplewise_csv = os.path.join(args.out_dir, "samplewise_results.csv")
     out_df.to_csv(samplewise_csv, index=False)
-        
+
     acc = 100 * correct / len(test_data)
     print(f"\nFinal Any-of-5 Accuracy: {acc:.2f}% ({correct}/{len(test_data)})")
 
-    metrics = pd.DataFrame([{
-        "accuracy_pct":   round(acc, 2),
-        "correct":        correct,
-        "total":          len(test_data)
-    }])
+    metrics = pd.DataFrame([{"accuracy_pct": round(acc, 2), "correct": correct, "total": len(test_data)}])
 
     # metrics.to_csv("/data/david/benchmark_save_completion_runs/naming_2_metrics_think_retry_pt.csv", index=False)
     eval_res_csv = os.path.join(args.out_dir, "evaluation_metrics.csv")
     metrics.to_csv(eval_res_csv, index=False)
+
 
 if __name__ == "__main__":
     args = parse_args()
