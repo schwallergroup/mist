@@ -6,7 +6,6 @@ import sys
 import urllib.request
 from pathlib import Path
 
-
 FILES = [
     (
         "code.zip",
@@ -42,9 +41,7 @@ def ensure_download(path: Path, url: str, expected_size: int) -> None:
         return
 
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=60) as response, path.open(
-        "wb"
-    ) as output:
+    with urllib.request.urlopen(req, timeout=60) as response, path.open("wb") as output:
         while True:
             chunk = response.read(1024 * 1024)
             if not chunk:

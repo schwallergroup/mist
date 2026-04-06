@@ -64,9 +64,7 @@ class Iupac2Smiles(SMILESBasedTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions, solution, prompts, **kwargs):
@@ -81,10 +79,7 @@ class Iupac2Smiles(SMILESBasedTask):
         #     return DataStructs.TanimotoSimilarity(fp1, fp2)
 
         def _calc_score(mol1: str, mol2: str, beta=10):
-            if (
-                Chem.MolFromSmiles(mol1) is None
-                or Chem.MolFromSmiles(mol2) is None
-            ):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
                 return 0.0
             sim = tanimoto_sim(mol1, mol2)
             return sim**beta
@@ -96,22 +91,14 @@ class Iupac2Smiles(SMILESBasedTask):
             reasoning_smiles = self.extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
-            best_smiles_reasoning = (
-                reasoning_smiles[scores.index(max_score)]
-                if max_score in scores
-                else "None"
-            )
+            best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else "None"
             reasoning_score = max_score
             if reasoning_score == 1.0:
-                reasoning_score += (
-                    1.0  # massive bonus for truly correct reasoning
-                )
+                reasoning_score += 1.0  # massive bonus for truly correct reasoning
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer)
-            answer_score = (
-                _calc_score(answer_smiles, ref) if answer_smiles else 0
-            )
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0  # massive bonus for truly correct answer
 
@@ -180,9 +167,7 @@ class Iupac2Smiles(SMILESBasedTask):
                 elif tanimoto < 0.3:  # You can adjust this threshold
                     reward = -0.5
                 else:
-                    reward = (
-                        tanimoto - 0.3
-                    )  # Shifts the reward to be negative for very low similarities
+                    reward = tanimoto - 0.3  # Shifts the reward to be negative for very low similarities
 
                 rewards.append(reward)
 

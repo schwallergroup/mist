@@ -37,9 +37,7 @@ class CanonicalizeSmiles(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions, solution, **kwargs):
@@ -60,13 +58,9 @@ class CanonicalizeSmiles(RLTask):
             else:
                 # It gets a point if when we canonicalize it, it's the same
                 try:
-                    completion_mol = Chem.MolToSmiles(
-                        Chem.MolFromSmiles(content)
-                    )
+                    completion_mol = Chem.MolToSmiles(Chem.MolFromSmiles(content))
                     if completion_mol == sol:
-                        rewards.append(
-                            0.2
-                        )  # as it didnt directly predict the correct canonical smiles
+                        rewards.append(0.2)  # as it didnt directly predict the correct canonical smiles
                     else:
                         rewards.append(-0.5)  # at least its a valid smiles
                 except:

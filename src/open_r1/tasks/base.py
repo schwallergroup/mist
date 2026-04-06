@@ -15,7 +15,6 @@ from rdkit import Chem, RDLogger
 
 from pydantic import BaseModel, Field
 
-
 RDLogger.DisableLog("rdApp.*")
 
 
@@ -80,9 +79,7 @@ class RLTask(BaseModel):
         if self.dataset_id_or_path is None:
             raise NotImplementedError
         else:
-            self.dataset = load_dataset(
-                self.dataset_id_or_path, split=self.dataset_splits
-            )
+            self.dataset = load_dataset(self.dataset_id_or_path, split=self.dataset_splits)
             return self.dataset
 
     def accuracy_reward(self, completions, **kwargs):
@@ -98,27 +95,19 @@ class RLTask(BaseModel):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "problem": problem,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(50000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(10000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
         )
 
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(x["problem"], tokenizer)
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer))
         return self.dataset
 
     def log_correct(self, content, p=0.5):
@@ -167,10 +156,7 @@ class RLTask(BaseModel):
         """
         pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,|Wait|But|but|However)"
         completion_contents = [completion for completion in completions]
-        matches = [
-            len(re.findall(pattern, content))
-            for content in completion_contents
-        ]
+        matches = [len(re.findall(pattern, content)) for content in completion_contents]
 
         # Magic number 3 to encourage 3 steps and more, otherwise partial reward
         return [min(1.0, count / 3) for count in matches]

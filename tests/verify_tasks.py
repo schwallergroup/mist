@@ -3,7 +3,6 @@ import os
 import sys
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = REPO_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
@@ -19,9 +18,7 @@ def verify_tasks():
     task_classes = [
         name
         for name, obj in inspect.getmembers(tasks)
-        if inspect.isclass(obj)
-        and issubclass(obj, RLTask)
-        and obj is not RLTask
+        if inspect.isclass(obj) and issubclass(obj, RLTask) and obj is not RLTask
     ]
 
     # Base paths
@@ -32,9 +29,7 @@ def verify_tasks():
 
     for task_key, task_class in CHEMTASKS.items():
         if task_class.__name__ not in task_classes:
-            missing_files.append(
-                f"Task `{task_key}` is not a subclass of RLTask"
-            )
+            missing_files.append(f"Task `{task_key}` is not a subclass of RLTask")
             continue
 
         # Check for recipe file using task_key
@@ -45,9 +40,7 @@ def verify_tasks():
         # Check for documentation entry using task_key
         docs_file = os.path.join(docs_path, f"{task_key}.rst")
         if not os.path.isfile(docs_file):
-            missing_files.append(
-                f"Missing documentation for task `{task_key}`"
-            )
+            missing_files.append(f"Missing documentation for task `{task_key}`")
 
     return missing_files
 

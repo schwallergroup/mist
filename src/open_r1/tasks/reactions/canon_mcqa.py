@@ -39,33 +39,22 @@ class CanonicalizeSmilesMCQA(RLTask):
                     ]
                 ].values
             ]
-        elif (
-            self.task_kwargs.get("task_variant", "base")
-            == "options_sameformula_canon"
-        ):
+        elif self.task_kwargs.get("task_variant", "base") == "options_sameformula_canon":
             # Drop duplicates (same SMILES)
             df = df.drop_duplicates(subset="SMILES", keep=False)
             # Drop compounds with rare molecular formulas (less than 4 occurrences)
             molecular_formula_dropped = {
-                k
-                for k, v in collections.Counter(
-                    df["MolecularFormula"].tolist()
-                ).items()
-                if v < 4
+                k for k, v in collections.Counter(df["MolecularFormula"].tolist()).items() if v < 4
             }
             df = df[~df["MolecularFormula"].isin(molecular_formula_dropped)]
             # Build the molecular formula mapping
-            formula_mapping = (
-                df.groupby("MolecularFormula")["SMILES"].apply(list).to_dict()
-            )
+            formula_mapping = df.groupby("MolecularFormula")["SMILES"].apply(list).to_dict()
             # Build the wrong SMILES (different from the correct one but with the same molecular formula and also canonicalized)
             df_smiles = df["SMILES"].tolist()
             df_formulas = df["MolecularFormula"].tolist()
             random.seed(42)
             df_smiles_wrong = [
-                random.sample(
-                    [sw for sw in formula_mapping[f] if sw != s], k=3
-                )
+                random.sample([sw for sw in formula_mapping[f] if sw != s], k=3)
                 for s, f in zip(df_smiles, df_formulas)
             ]
             df["SMILES_wrong1"] = [sw[0] for sw in df_smiles_wrong]
@@ -99,9 +88,7 @@ class CanonicalizeSmilesMCQA(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def accuracy_reward(self, completions, solution, options, **kwargs):
@@ -135,30 +122,20 @@ class CanonicalizeSmilesMCQA(RLTask):
             },
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "problem": problem,
             "options": options,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(50000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(50000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(10000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(10000, len(self.dataset["test"]))))
         )
 
-        self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(
-                x["problem"], tokenizer, options=x["options"]
-            )
-        )
+        self.dataset = self.dataset.map(lambda x: self.generate_prompt(x["problem"], tokenizer, options=x["options"]))
         return self.dataset
 
     def preprocess_response(self, response):

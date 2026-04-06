@@ -217,7 +217,8 @@ This second script exercises the local fixtures for:
 - `kinetic`
 
 See `demo/README.md` for fixture provenance and notes about which datasets were
-and were not present in the current Figshare bundle.
+and were not present in the current Figshare bundle. A task-to-fixture mapping
+is also provided in `demo/fixture_manifest.csv`.
 
 ## Submission and Release Inventory
 
@@ -314,6 +315,26 @@ GRPO training is covered by this repository and the cluster launchers above.
 The mid-training / pretraining pipeline is only partially represented here at
 the moment: the final public release still needs the preprocessing scripts,
 manifests, and split definitions tracked under `release/`.
+
+### Single-GPU RL Smoke Run
+
+For a minimal end-to-end GRPO smoke run on a single GPU, use the bundled
+50-example reaction-prediction fixture and the smoke accelerate config:
+
+```bash
+accelerate launch --config_file configs/smoke_single_gpu.yaml \
+  src/open_r1/run_r1_grpo.py \
+  --config recipes/rxnpred.smoke.yaml \
+  --model_name_or_path Qwen/Qwen2.5-3B \
+  --output_dir output/rxnpred-smoke \
+  --run_name rxnpred-smoke-qwen25-3b \
+  --base_model_name Qwen/Qwen2.5-3B \
+  --base_model_id Qwen/Qwen2.5-3B
+```
+
+This smoke path does not require a MiST checkpoint. It is intended to validate
+that the GRPO loop, task loading, reward wiring, and checkpoint output all work
+with any compatible base model that fits on the available GPU.
 
 ## Contributing New Tasks
 

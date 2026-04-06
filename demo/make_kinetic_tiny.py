@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 TRAIN_SIZE = 40
 VAL_SIZE = 10
 TIME_STEPS = 4
@@ -50,21 +49,11 @@ def build_y(num_examples: int, start_class: int) -> np.ndarray:
 
 def build_kinetic_files():
     return {
-        "x1_train_M1_M20_train_val_test_set_part_0.pkl": build_x1(
-            TRAIN_SIZE, 0.00
-        ),
-        "x2_train_M1_M20_train_val_test_set_part_0.pkl": build_x2(
-            TRAIN_SIZE, 0.00
-        ),
-        "y_train_M1_M20_train_val_test_set_part_0.pkl": build_y(
-            TRAIN_SIZE, 0
-        ),
-        "x1_val_M1_M20_train_val_test_set_part_0.pkl": build_x1(
-            VAL_SIZE, 0.40
-        ),
-        "x2_val_M1_M20_train_val_test_set_part_0.pkl": build_x2(
-            VAL_SIZE, 0.10
-        ),
+        "x1_train_M1_M20_train_val_test_set_part_0.pkl": build_x1(TRAIN_SIZE, 0.00),
+        "x2_train_M1_M20_train_val_test_set_part_0.pkl": build_x2(TRAIN_SIZE, 0.00),
+        "y_train_M1_M20_train_val_test_set_part_0.pkl": build_y(TRAIN_SIZE, 0),
+        "x1_val_M1_M20_train_val_test_set_part_0.pkl": build_x1(VAL_SIZE, 0.40),
+        "x2_val_M1_M20_train_val_test_set_part_0.pkl": build_x2(VAL_SIZE, 0.10),
         "y_val_M1_M20_train_val_test_set_part_0.pkl": build_y(VAL_SIZE, 4),
     }
 

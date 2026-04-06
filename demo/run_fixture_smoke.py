@@ -1,9 +1,8 @@
 import json
 from pathlib import Path
 
-from open_r1.tasks import CHEMTASKS
-
 from make_kinetic_tiny import ensure_kinetic_tiny
+from open_r1.tasks import CHEMTASKS
 
 
 def summarize_dataset(task_name, task):

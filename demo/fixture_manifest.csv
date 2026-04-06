@@ -1,0 +1,10 @@
+task,fixture_path,total_examples,split_details,source,status,notes
+rxnpred,demo/rxnpred_tiny,50,"40 train / 10 test",repo-local fixture,ready,"Suitable for GRPO smoke runs"
+rxnpred_with_tags,demo/rxnpred_tiny,50,"40 train / 10 test",repo-local fixture,ready,"Uses the same reaction files as rxnpred"
+iupacsm,demo/datasets/CRLLM-PubChem-compounds1M.sample.csv,50,"loader split -> 45 train / 5 test",Figshare datasets.zip slice,ready,"50-row CSV extracted from the released PubChem bundle"
+iupacsm_with_tags,demo/datasets/CRLLM-PubChem-compounds1M-simple.sample.csv,50,"loader split -> 45 train / 5 test",Figshare datasets.zip slice,ready,"Same CSV as iupacsm"
+canonic,demo/datasets/CRLLM-PubChem-compounds1M.sample.csv,50,"loader split -> 45 train / 5 test",Figshare datasets.zip slice,ready,"Uses SMILES and SMILES_variant1 columns"
+canonmc,demo/datasets/CRLLM-PubChem-compounds1M.sample.csv,50,"loader split -> 45 train / 5 test",Figshare datasets.zip slice,ready,"Uses canonical plus variant columns from the main 50-row PubChem slice"
+smi_permute,demo/datasets/CRLLM-PubChem-compounds1M-very_very_simple.sample.csv,50,"loader split -> 45 train / 5 test",Figshare datasets.zip slice,ready,"50-row CSV extracted from the released PubChem bundle"
+smhydrogen,demo/datasets/CRLLM-PubChem-compounds1M_hydrogen.sample.csv,50,"loader expansion -> 90 train / 10 test",Figshare datasets.zip slice,ready,"Each input row yields add-H and remove-H examples"
+kinetic,demo/kinetic_tiny,50,"40 train / 10 validation",repo-local synthetic fixture,ready,"Matches the pickle layout expected by the kinetic loader"

@@ -8,8 +8,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 
 DEFAULT_DATA_PATH = "${MIST_DATA_DIR}/CRLLM-PubChem-compounds1M.csv"
 DEFAULT_OUTPUT_DIR = "${MIST_OUTPUT_DIR}/scs"
@@ -56,16 +56,12 @@ def load_dataset(data_path, num_rows, corruption_rate, seed):
     required_columns = {"SMILES", "SMILES_variant1"}
     missing = required_columns.difference(df.columns)
     if missing:
-        raise ValueError(
-            f"Missing required columns in {data_path}: {', '.join(sorted(missing))}"
-        )
+        raise ValueError(f"Missing required columns in {data_path}: {', '.join(sorted(missing))}")
 
     rng = random.Random(seed)
     df["prompt_canon"] = df["SMILES"].apply(prompt_template)
     df["prompt_random"] = df["SMILES_variant1"].apply(prompt_template)
-    df["corrupt"] = df["SMILES"].apply(
-        lambda smiles: corrupt_smi(smiles, rng, corruption_rate=corruption_rate)
-    )
+    df["corrupt"] = df["SMILES"].apply(lambda smiles: corrupt_smi(smiles, rng, corruption_rate=corruption_rate))
     df["prompt_corrupt"] = df["corrupt"].apply(prompt_template)
     return df
 
@@ -84,9 +80,7 @@ def process_generation_output(out):
 
         token_logprobs = [values[token_id].logprob for values, token_id in zip(logprobs, smiles_tokens)]
         token_ranks = [values[token_id].rank for values, token_id in zip(logprobs, smiles_tokens)]
-        smiles = "".join(
-            values[token_id].decoded_token for values, token_id in zip(logprobs, smiles_tokens)
-        )
+        smiles = "".join(values[token_id].decoded_token for values, token_id in zip(logprobs, smiles_tokens))
         smiles = re.sub("Ġ", "", smiles)
 
         return LogprobStat(

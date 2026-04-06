@@ -33,10 +33,7 @@ class ForwardReaction(SMILESBasedTask):
             "src-test.txt",
             "tgt-test.txt",
         ]
-        return all(
-            os.path.exists(os.path.join(dataset_dir, filename))
-            for filename in required_files
-        )
+        return all(os.path.exists(os.path.join(dataset_dir, filename)) for filename in required_files)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -46,22 +43,10 @@ class ForwardReaction(SMILESBasedTask):
         if not self._has_local_reaction_files(self.dataset_id_or_path):
             download_data(self.dataset_id_or_path)
 
-        self.src_train_file = os.path.join(
-            self.dataset_id_or_path, "src-train.txt"
-        )
-        self.tgt_train_file = os.path.join(
-            self.dataset_id_or_path, "tgt-train.txt"
-        )
-        self.src_test_file = (
-            os.path.join(self.dataset_id_or_path, "src-test.txt")
-            if "src-test.txt"
-            else None
-        )
-        self.tgt_test_file = (
-            os.path.join(self.dataset_id_or_path, "tgt-test.txt")
-            if "tgt-test.txt"
-            else None
-        )
+        self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
+        self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
+        self.src_test_file = os.path.join(self.dataset_id_or_path, "src-test.txt") if "src-test.txt" else None
+        self.tgt_test_file = os.path.join(self.dataset_id_or_path, "tgt-test.txt") if "tgt-test.txt" else None
         self.question_template = (
             "You are an organic chemistry expert, and I have a task for you. "
             "Given the following reagents in SMILES notation, please predict the most likely product(s) of the reaction between them. "
@@ -98,10 +83,7 @@ class ForwardReaction(SMILESBasedTask):
     def read_files(self, src_file: str, tgt_file: str) -> Dict:
         """Read source and target files and create dataset dictionary."""
         with open(src_file, "r", encoding="utf-8") as f:
-            problems = [
-                self.question_template.format(self.process_line(line))
-                for line in f.readlines()
-            ]
+            problems = [self.question_template.format(self.process_line(line)) for line in f.readlines()]
 
         with open(tgt_file, "r", encoding="utf-8") as f:
             solutions = [self.process_line(line) for line in f.readlines()]
@@ -128,9 +110,7 @@ class ForwardReaction(SMILESBasedTask):
             test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
 
         return self.dataset
 
@@ -147,10 +127,7 @@ class ForwardReaction(SMILESBasedTask):
         """Reward function - check that completion is same as ground truth."""
 
         def _calc_score(mol1: str, mol2: str, beta=20):
-            if (
-                Chem.MolFromSmiles(mol1) is None
-                or Chem.MolFromSmiles(mol2) is None
-            ):
+            if Chem.MolFromSmiles(mol1) is None or Chem.MolFromSmiles(mol2) is None:
                 return 0.0
             sim = tanimoto_sim(mol1, mol2)
             return sim**beta
@@ -162,22 +139,14 @@ class ForwardReaction(SMILESBasedTask):
             reasoning_smiles = self.extract_smiles(reasoning)
             scores = [_calc_score(smi, ref) for smi in reasoning_smiles]
             max_score = max(scores) if scores else -0.5
-            best_smiles_reasoning = (
-                reasoning_smiles[scores.index(max_score)]
-                if max_score in scores
-                else "None"
-            )
+            best_smiles_reasoning = reasoning_smiles[scores.index(max_score)] if max_score in scores else "None"
             reasoning_score = max_score
             if reasoning_score == 1.0:
-                reasoning_score += (
-                    1.0  # massive bonus for truly correct reasoning
-                )
+                reasoning_score += 1.0  # massive bonus for truly correct reasoning
 
             answer = self.preprocess_response(completion)
             answer_smiles = self.extract_smiles_from_answer(answer, prompt)
-            answer_score = (
-                _calc_score(answer_smiles, ref) if answer_smiles else 0
-            )
+            answer_score = _calc_score(answer_smiles, ref) if answer_smiles else 0
             if answer_score == 1.0:
                 answer_score += 1.0  # massive bonus for truly correct answer
 

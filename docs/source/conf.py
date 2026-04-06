@@ -56,7 +56,6 @@ html_static_path = ["_static"]
 import os
 import sys
 
-
 sys.path.insert(0, os.path.abspath("../../src"))
 
 # Add any Sphinx extension module names here
@@ -106,6 +105,4 @@ autodoc_default_options = {
 
 # Hide default values in signatures
 autodoc_hide_paramtypes = True
-autodoc_class_signature = (
-    "separated"  # This will show the class signature separately from __init__
-)
+autodoc_class_signature = "separated"  # This will show the class signature separately from __init__

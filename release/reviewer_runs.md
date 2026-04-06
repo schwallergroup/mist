@@ -87,6 +87,25 @@ The run wrote `lps_canonical.csv`, `lps_random.csv`, `lps_corrupt.csv`, and
 This repository contains the task implementations, recipes, and SLURM launchers
 used for the MiST GRPO experiments.
 
+### Single-GPU smoke run
+
+The quickest end-to-end GRPO check uses the bundled `rxnpred` fixture with a
+single compatible base model checkpoint:
+
+```bash
+accelerate launch --config_file configs/smoke_single_gpu.yaml \
+  src/open_r1/run_r1_grpo.py \
+  --config recipes/rxnpred.smoke.yaml \
+  --model_name_or_path Qwen/Qwen2.5-3B \
+  --output_dir output/rxnpred-smoke \
+  --run_name rxnpred-smoke-qwen25-3b \
+  --base_model_name Qwen/Qwen2.5-3B \
+  --base_model_id Qwen/Qwen2.5-3B
+```
+
+This path uses `demo/rxnpred_tiny/`, which contains 50 total examples
+(`40 train / 10 test`), and it does not require a MiST checkpoint.
+
 Example cluster launch:
 
 ```bash

@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import json
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -44,7 +44,9 @@ class ExtendedGRPOTrainer(GRPOTrainer):
                 "temperature": args.temperature,  # default from TRL 0.14.0
                 "max_tokens": self.max_completion_length,  # default from TRL 0.14.0
             }
-            sampling_params_dict.update(args.sampling_params_config)  # added from the sampling_params config -> overwrite default values
+            sampling_params_dict.update(
+                args.sampling_params_config
+            )  # added from the sampling_params config -> overwrite default values
             self.sampling_params = SamplingParams(**sampling_params_dict)
         print(f"SamplingParams used in ExtendedGRPOTrainer: {self.sampling_params}")
 
@@ -56,9 +58,7 @@ class ExtendedGRPOTrainer(GRPOTrainer):
             for metric_name, metric_value in metrics.items():
                 if mode in self._metrics.keys():
                     # Compatible with the current version 'main' of trl repository
-                    self._metrics[mode][f"custom/{metric_name}"].append(
-                        metric_value
-                    )
+                    self._metrics[mode][f"custom/{metric_name}"].append(metric_value)
                 else:
                     # Compatible with the "older versions" of trl repository (0.14.0 included)
                     self._metrics[f"custom/{metric_name}"].append(metric_value)
@@ -149,8 +149,7 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
             model_id = line_split[0].strip()
             sampling_params_config_name = line_split[1].strip()
             assert model_id not in model_default_sampling_params, (
-                "Invalid format in model_default_sampling_params.txt -> "
-                f"model_id {model_id} is duplicated"
+                "Invalid format in model_default_sampling_params.txt -> " f"model_id {model_id} is duplicated"
             )
             if sampling_params_config_name != "default":
                 config_path = sampling_dir / f"{sampling_params_config_name}.json"
@@ -163,9 +162,7 @@ def load_sampling_params_config(training_args: ExtendedGRPOConfig):
     # Update training_args.sampling_params_config_name (if needed)
     if training_args.sampling_params_config_name == "default":
         if training_args.base_model_id in model_default_sampling_params:
-            training_args.sampling_params_config_name = (
-                model_default_sampling_params[training_args.base_model_id]
-            )
+            training_args.sampling_params_config_name = model_default_sampling_params[training_args.base_model_id]
 
     # Update training_args.sampling_params_config (if needed)
     if training_args.sampling_params_config_name != "default":

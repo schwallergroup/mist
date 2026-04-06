@@ -8,9 +8,7 @@ def reaction_task(tmp_path, monkeypatch):
     def fake_download(_data_path):
         return None
 
-    monkeypatch.setattr(
-        "open_r1.tasks.reactions.forward.download_data", fake_download
-    )
+    monkeypatch.setattr("open_r1.tasks.reactions.forward.download_data", fake_download)
 
     (tmp_path / "src-train.txt").write_text("CCO.C\n", encoding="utf-8")
     (tmp_path / "tgt-train.txt").write_text("CCOC\n", encoding="utf-8")

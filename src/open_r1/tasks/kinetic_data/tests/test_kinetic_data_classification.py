@@ -1,7 +1,4 @@
-from open_r1.tasks.kinetic_data.kinetic_data_classification import (
-    KineticDataClassification,
-)
-
+from open_r1.tasks.kinetic_data.kinetic_data_classification import KineticDataClassification
 
 response_wrong_format = """
 <think>Reasoning about the mechanism and data coverage.</think>
@@ -20,9 +17,7 @@ def build_task():
 
 def test_format_reward():
     task = build_task()
-    assert task.format_reward(
-        [response_wrong_format, response_correct_format]
-    ) == [0.0, 1.0]
+    assert task.format_reward([response_wrong_format, response_correct_format]) == [0.0, 1.0]
 
 
 def test_accuracy_reward():

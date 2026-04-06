@@ -14,7 +14,6 @@ from open_r1.paths import expand_path
 from ..base import RLTask
 from ..task_utils import compute_lcs_length, compute_levenshtein_distance, compute_tanimoto_similarity
 
-
 RDLogger.DisableLog("rdApp.*")
 
 
@@ -75,12 +74,9 @@ class SmilesHydrogen(RLTask):
 
         if self.task_mode in ["base", "PG1", "PG2", "PG3"]:
             train_dict = {
-                "problem": df["SMILES_noHs"].tolist()
-                + df["SMILES_Hs"].tolist(),
-                "solution": df["SMILES_Hs"].tolist()
-                + df["SMILES_noHs"].tolist(),
-                "question_category": len(df) * ["addH"]
-                + len(df) * ["removeH"],
+                "problem": df["SMILES_noHs"].tolist() + df["SMILES_Hs"].tolist(),
+                "solution": df["SMILES_Hs"].tolist() + df["SMILES_noHs"].tolist(),
+                "question_category": len(df) * ["addH"] + len(df) * ["removeH"],
             }
         elif self.task_mode == "addH":
             train_dict = {
@@ -102,9 +98,7 @@ class SmilesHydrogen(RLTask):
         test_dataset = train_test_split["test"]
 
         # Combine into DatasetDict
-        self.dataset = DatasetDict(
-            {"train": train_dataset, "test": test_dataset}
-        )
+        self.dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
         return self.dataset
 
     def generate_prompt(self, problem, question_category, tokenizer, **kwargs):
@@ -113,35 +107,25 @@ class SmilesHydrogen(RLTask):
         elif question_category == "removeH":
             question_template = self.question_template_removeH
         else:
-            raise ValueError(
-                f"Dataset 'question_category' not recognized: {question_category}"
-            )
+            raise ValueError(f"Dataset 'question_category' not recognized: {question_category}")
         r1_prefix = [
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": question_template.format(problem)},
         ]
         return {
-            "prompt": tokenizer.apply_chat_template(
-                r1_prefix, tokenize=False, continue_final_message=True
-            ),
+            "prompt": tokenizer.apply_chat_template(r1_prefix, tokenize=False, continue_final_message=True),
             "problem": problem,
         }
 
     def dataset_preprocess(self, tokenizer):
         self.dataset["train"] = (
-            self.dataset["train"]
-            .shuffle(seed=42)
-            .select(range(min(100_000, len(self.dataset["train"]))))
+            self.dataset["train"].shuffle(seed=42).select(range(min(100_000, len(self.dataset["train"]))))
         )
         self.dataset["test"] = (
-            self.dataset["test"]
-            .shuffle(seed=42)
-            .select(range(min(20_000, len(self.dataset["test"]))))
+            self.dataset["test"].shuffle(seed=42).select(range(min(20_000, len(self.dataset["test"]))))
         )
         self.dataset = self.dataset.map(
-            lambda x: self.generate_prompt(
-                x["problem"], x["question_category"], tokenizer
-            )
+            lambda x: self.generate_prompt(x["problem"], x["question_category"], tokenizer)
         )
         return self.dataset
 
@@ -154,10 +138,7 @@ class SmilesHydrogen(RLTask):
             # Maybe smiles contains [BEGIN_SMILES] and [END_SMILES]
             if "[BEGIN_SMILES]" in smi:
                 if "[END_SMILES]" in smi[smi.index("[BEGIN_SMILES]") :]:
-                    smi = smi[
-                        smi.index("[BEGIN_SMILES]")
-                        + len("[BEGIN_SMILES]") : smi.index("[END_SMILES]")
-                    ]
+                    smi = smi[smi.index("[BEGIN_SMILES]") + len("[BEGIN_SMILES]") : smi.index("[END_SMILES]")]
             return smi
         else:
             return "NONE"
@@ -171,9 +152,7 @@ class SmilesHydrogen(RLTask):
         else:
             return "NONE"
 
-    def format_reward(
-        self, completions, problem, solution, question_category, **kwargs
-    ):
+    def format_reward(self, completions, problem, solution, question_category, **kwargs):
         """
         Format: <think>...</think><answer>...</answer>
         Args:
@@ -249,19 +228,11 @@ class SmilesHydrogen(RLTask):
                     "question_category": [question_category[completion_id]],
                 }
                 _format_reward = f"{current_reward:.2f}"
-                _reasoning_steps_reward = (
-                    f"{self.reasoning_steps_reward(**kwargs)[0]:.2f}"
-                )
+                _reasoning_steps_reward = f"{self.reasoning_steps_reward(**kwargs)[0]:.2f}"
                 _accuracy_reward = f"{self.accuracy_reward(**kwargs)[0]:.2f}"
-                _smiles_validity_reward = (
-                    f"{self.smiles_validity_reward(**kwargs)[0]:.2f}"
-                )
-                _tanimoto_accuracy_reward = (
-                    f"{self.tanimoto_accuracy_reward(**kwargs)[0]:.2f}"
-                )
-                _levenstein_accuracy_reward = (
-                    f"{self.levenstein_accuracy_reward(**kwargs)[0]:.2f}"
-                )
+                _smiles_validity_reward = f"{self.smiles_validity_reward(**kwargs)[0]:.2f}"
+                _tanimoto_accuracy_reward = f"{self.tanimoto_accuracy_reward(**kwargs)[0]:.2f}"
+                _levenstein_accuracy_reward = f"{self.levenstein_accuracy_reward(**kwargs)[0]:.2f}"
                 self.log_custom_metrics = True
                 # Print
                 print(
@@ -301,9 +272,7 @@ class SmilesHydrogen(RLTask):
         # Magic number 3 to encourage 3 steps and more, otherwise partial reward
         return [min(1.0, count / 3) for count in matches]
 
-    def accuracy_reward(
-        self, completions, solution, question_category, **kwargs
-    ):
+    def accuracy_reward(self, completions, solution, question_category, **kwargs):
         """Reward function - check that answer is same as solution."""
         # Reward goal: if the answer is perfectly correct, reward 1.0
         # Reward range: 0 to 1
@@ -324,11 +293,7 @@ class SmilesHydrogen(RLTask):
                 [r for r, c in zip(rewards, question_category) if c == "addH"]
             )
             self.custom_metrics["removeH/accuracy_reward"].extend(
-                [
-                    r
-                    for r, c in zip(rewards, question_category)
-                    if c == "removeH"
-                ]
+                [r for r, c in zip(rewards, question_category) if c == "removeH"]
             )
 
         return rewards
@@ -357,18 +322,12 @@ class SmilesHydrogen(RLTask):
                 [r for r, c in zip(rewards, question_category) if c == "addH"]
             )
             self.custom_metrics["removeH/smiles_validity_reward"].extend(
-                [
-                    r
-                    for r, c in zip(rewards, question_category)
-                    if c == "removeH"
-                ]
+                [r for r, c in zip(rewards, question_category) if c == "removeH"]
             )
 
         return rewards
 
-    def tanimoto_accuracy_reward(
-        self, completions, solution, question_category, **kwargs
-    ):
+    def tanimoto_accuracy_reward(self, completions, solution, question_category, **kwargs):
         """Reward function - compute Tanimoto similarity reward between answer and solution."""
         # Reward goal: foster answers with high Tanimoto similarity to the solution
         # Reward range: -0.5 to 1
@@ -387,9 +346,7 @@ class SmilesHydrogen(RLTask):
                 elif tanimoto_similarity == 1.0:
                     reward = 1.0
                 else:
-                    reward = (
-                        tanimoto_similarity - 0.5
-                    )  # Shifts the reward to be negative for very low similarities
+                    reward = tanimoto_similarity - 0.5  # Shifts the reward to be negative for very low similarities
                 rewards.append(reward)
             except:
                 rewards.append(0.0)
@@ -400,18 +357,12 @@ class SmilesHydrogen(RLTask):
                 [r for r, c in zip(rewards, question_category) if c == "addH"]
             )
             self.custom_metrics["removeH/tanimoto_accuracy_reward"].extend(
-                [
-                    r
-                    for r, c in zip(rewards, question_category)
-                    if c == "removeH"
-                ]
+                [r for r, c in zip(rewards, question_category) if c == "removeH"]
             )
 
         return rewards
 
-    def levenstein_accuracy_reward(
-        self, completions, problem, solution, question_category, **kwargs
-    ):
+    def levenstein_accuracy_reward(self, completions, problem, solution, question_category, **kwargs):
         """Reward function - compute Levenshtein distance reward between answer and solution."""
         # Reward goal: foster answers that are adding or removing hydrogens correctly
         # Reward range: -0.5 to 1
@@ -419,19 +370,11 @@ class SmilesHydrogen(RLTask):
         answers = [self.preprocess_answer(c) for c in completions]
 
         rewards = []
-        for content, prob, sol, cat in zip(
-            answers, problem, solution, question_category
-        ):
+        for content, prob, sol, cat in zip(answers, problem, solution, question_category):
             # Compute Levenshtein distance
-            levenshtein_distance_problem_solution = (
-                compute_levenshtein_distance(prob, sol)
-            )
-            levenshtein_distance_input = compute_levenshtein_distance(
-                prob, content
-            )
-            levenshtein_distance_solution = compute_levenshtein_distance(
-                sol, content
-            )
+            levenshtein_distance_problem_solution = compute_levenshtein_distance(prob, sol)
+            levenshtein_distance_input = compute_levenshtein_distance(prob, content)
+            levenshtein_distance_solution = compute_levenshtein_distance(sol, content)
 
             # Step 1: set the reward in function of the levenshtein distances
             if levenshtein_distance_problem_solution == 0:
@@ -440,15 +383,10 @@ class SmilesHydrogen(RLTask):
                     reward = 1.0
                 else:
                     reward = -0.5
-            elif (
-                levenshtein_distance_solution
-                < levenshtein_distance_problem_solution
-            ):
+            elif levenshtein_distance_solution < levenshtein_distance_problem_solution:
                 # Reward from 0.2 to 1.0 if the answer contains correctly inferred information
                 reward = max(
-                    1
-                    - levenshtein_distance_solution
-                    / levenshtein_distance_problem_solution,
+                    1 - levenshtein_distance_solution / levenshtein_distance_problem_solution,
                     0.2,
                 )
             elif levenshtein_distance_input == 0:
@@ -463,17 +401,11 @@ class SmilesHydrogen(RLTask):
             elif cat == "removeH":
                 _SMILES_noHs = sol
             else:
-                raise ValueError(
-                    f"Dataset 'question_category' not recognized: {cat}"
-                )
+                raise ValueError(f"Dataset 'question_category' not recognized: {cat}")
             lcs_length = compute_lcs_length(_SMILES_noHs, content)
             missing_characters = len(_SMILES_noHs) - lcs_length
-            reward -= (
-                0.1 * missing_characters
-            )  # Remove 0.1 for each missing character
-            reward = max(
-                reward, -0.5
-            )  # Ensure the reward is not lower than -0.5
+            reward -= 0.1 * missing_characters  # Remove 0.1 for each missing character
+            reward = max(reward, -0.5)  # Ensure the reward is not lower than -0.5
 
             rewards.append(reward)
 
@@ -483,18 +415,12 @@ class SmilesHydrogen(RLTask):
                 [r for r, c in zip(rewards, question_category) if c == "addH"]
             )
             self.custom_metrics["removeH/levenstein_accuracy_reward"].extend(
-                [
-                    r
-                    for r, c in zip(rewards, question_category)
-                    if c == "removeH"
-                ]
+                [r for r, c in zip(rewards, question_category) if c == "removeH"]
             )
 
         return rewards
 
-    def sequential_reward(
-        self, completions, problem, solution, question_category, **kwargs
-    ):
+    def sequential_reward(self, completions, problem, solution, question_category, **kwargs):
         reward_funcs_ordered = [
             self.format_reward,
             self.reasoning_steps_reward,
@@ -506,13 +432,9 @@ class SmilesHydrogen(RLTask):
         reward_rescaling_funcs = [
             lambda x: (x + 1) / 2,  # format_reward [-1, 1] -> [0, 1]
             lambda x: x,  # reasoning_steps_reward [0, 1] -> [0, 1]
-            lambda x: (x + 0.5)
-            / 1.5,  # levenstein_accuracy_reward [-0.5, 1] -> [0, 1]
-            lambda x: (x + 0.5)
-            / 0.5,  # smiles_validity_reward [-0.5, 0] -> [0, 1]
-            lambda x: np.maximum(
-                x, 0
-            ),  # tanimoto_accuracy_reward [-0.5, 1] -> [0, 1]
+            lambda x: (x + 0.5) / 1.5,  # levenstein_accuracy_reward [-0.5, 1] -> [0, 1]
+            lambda x: (x + 0.5) / 0.5,  # smiles_validity_reward [-0.5, 0] -> [0, 1]
+            lambda x: np.maximum(x, 0),  # tanimoto_accuracy_reward [-0.5, 1] -> [0, 1]
             lambda x: x,  # accuracy_reward [0, 1] -> [0, 1]
         ]
 
@@ -524,17 +446,11 @@ class SmilesHydrogen(RLTask):
             "question_category": question_category,
             **kwargs,
         }
-        rewards = [
-            np.array(reward_func(**reward_kwargs))
-            for reward_func in reward_funcs_ordered
-        ]
+        rewards = [np.array(reward_func(**reward_kwargs)) for reward_func in reward_funcs_ordered]
 
         # Compute rewards_rescaled (rescaled to [0, 1])
         rewards_rescaled = [
-            reward_rescaling_func(_rewards)
-            for reward_rescaling_func, _rewards in zip(
-                reward_rescaling_funcs, rewards
-            )
+            reward_rescaling_func(_rewards) for reward_rescaling_func, _rewards in zip(reward_rescaling_funcs, rewards)
         ]
 
         # Sum rewards - compute the reward scaling factors
@@ -542,30 +458,18 @@ class SmilesHydrogen(RLTask):
         n_samples = len(completions)
         reward_scaling_factors = np.ones((n_rewards, n_samples), dtype=float)
         for i in range(n_rewards - 1):
-            reward_scaling_factors[i + 1 :] = reward_scaling_factors[
-                i + 1 :
-            ] * rewards_rescaled[i].reshape(1, -1)
+            reward_scaling_factors[i + 1 :] = reward_scaling_factors[i + 1 :] * rewards_rescaled[i].reshape(1, -1)
         # Sum rewards - compute final rewards
-        sequential_rewards = np.sum(
-            np.stack(rewards, axis=0) * reward_scaling_factors, axis=0
-        )
+        sequential_rewards = np.sum(np.stack(rewards, axis=0) * reward_scaling_factors, axis=0)
         sequential_rewards = sequential_rewards.tolist()
 
         # Logging custom metrics
         if self.log_custom_metrics:
             self.custom_metrics["addH/sequential_reward"].extend(
-                [
-                    r
-                    for r, c in zip(sequential_rewards, question_category)
-                    if c == "addH"
-                ]
+                [r for r, c in zip(sequential_rewards, question_category) if c == "addH"]
             )
             self.custom_metrics["removeH/sequential_reward"].extend(
-                [
-                    r
-                    for r, c in zip(sequential_rewards, question_category)
-                    if c == "removeH"
-                ]
+                [r for r, c in zip(sequential_rewards, question_category) if c == "removeH"]
             )
 
         return sequential_rewards
@@ -581,13 +485,11 @@ class SmilesHydrogen(RLTask):
             if self.custom_metrics["n_samples"] > 0:
                 metrics["n_samples"] = self.custom_metrics["n_samples"]
             # Iterate over the custom metrics and compute the average
-            for metric_name in [
-                m for m in self.custom_metrics.keys() if m not in ["n_samples"]
-            ]:
+            for metric_name in [m for m in self.custom_metrics.keys() if m not in ["n_samples"]]:
                 if len(self.custom_metrics[metric_name]) > 0:
-                    metrics[metric_name] = sum(
+                    metrics[metric_name] = sum(self.custom_metrics[metric_name]) / len(
                         self.custom_metrics[metric_name]
-                    ) / len(self.custom_metrics[metric_name])
+                    )
                     # Reset the metric
                     self.custom_metrics[metric_name] = []
         return metrics
