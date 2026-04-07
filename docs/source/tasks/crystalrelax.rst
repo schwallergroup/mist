@@ -63,10 +63,20 @@ Reward Functions
 ----------------
 
 1. **Accuracy Reward (accuracy_reward)**
-   - Reward is assigned based on the validity of the generated CIF structure and its internal energy relative to the input:
-     - **–10**: if the generated structure (`S_gen`) is **not a valid CIF format**.
-     - **–4**: if `S_gen` is a **valid CIF format** but has **higher or equal internal energy** than the input.
-     - **+1**: if `S_gen` is **valid** and has **lower internal energy** than the input.
+   - The completion is first reduced to the last ``<answer>...</answer>`` block. If no answer block is found, the reward is ``0``.
+   - The answer is deserialized with ``CIFTokenizer.deserialize(answer, solution)`` and then checked as a CIF structure with ``gemmi`` and ``pymatgen``. Any deserialization, CIF validation, or structure parsing failure returns ``0``.
+   - Valid structures are scored by comparing per-atom MACE potential energy between the reference solution CIF and the generated answer CIF:
+     - ``1``: the generated answer has lower per-atom potential energy than the reference solution.
+     - ``0.5``: the reference solution has lower per-atom potential energy than the generated answer.
+     - ``0``: both structures have equal per-atom potential energy, or the answer exactly matches the solution text before energy scoring.
+
+2. **Format Reward (format_reward)**
+   - The completion is expected to contain ``<think>...</think>`` followed by ``<answer>...</answer>``. If this tag pattern cannot be found, the reward is ``0.0``.
+   - If the completion does not start with ``<think>``, the reward function prepends that opening tag before matching.
+   - Once the tags are present, the reward is a keyword-based bonus score up to ``1.0``:
+     - ``+0.2`` for math-like reasoning patterns.
+     - ``+0.1`` each for CIF/crystallographic terms, position or coordinate terms, recognized space groups, crystallographic concepts, energy or force terms, dynamical stability terms, and structure-classification terms.
+     - ``+0.05`` each for lattice-angle terms and chemistry terms.
 
 Task Example
 ------------
