@@ -8,13 +8,66 @@ from typing import Dict, Optional
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
-from open_r1.download_data import download_data
-from open_r1.paths import expand_path
 from open_r1.tasks.base import RLTask
 
 from .AIRS_preprocess._tokenizer import CIFTokenizer
 
 cif_tokenizer = CIFTokenizer()
+
+CRYSTALRELAX_DATA_URL = "https://drive.google.com/drive/folders/1gt3E8OIGHbs2B8cKJOAnXaoM3K_loa9k?usp=sharing"
+CRYSTALRELAX_REQUIRED_FILES = (
+    "src-train.txt",
+    "tgt-train.txt",
+    "src-test.txt",
+    "tgt-test.txt",
+)
+
+
+def _expand_local_path(path: str) -> str:
+    raw_path = os.fspath(path)
+    if "MIST_DATA_DIR" in raw_path and "MIST_DATA_DIR" not in os.environ:
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+        data_root = os.path.join(repo_root, "data")
+        raw_path = raw_path.replace("${MIST_DATA_DIR}", data_root).replace("$MIST_DATA_DIR", data_root)
+    return os.path.expandvars(os.path.expanduser(raw_path))
+
+
+def _missing_crystalrelax_files(data_path: str) -> list[str]:
+    return [name for name in CRYSTALRELAX_REQUIRED_FILES if not os.path.exists(os.path.join(data_path, name))]
+
+
+def download_crystalrelax_data(data_path: str) -> str:
+    """Download the released crystal relaxation dataset if it is not already present."""
+    data_path = _expand_local_path(data_path)
+    if not _missing_crystalrelax_files(data_path):
+        return data_path
+
+    os.makedirs(data_path, exist_ok=True)
+
+    import gdown
+
+    try:
+        gdown.download_folder(
+            url=CRYSTALRELAX_DATA_URL,
+            output=data_path,
+            quiet=False,
+            use_cookies=False,
+            remaining_ok=True,
+        )
+    except TypeError:
+        gdown.download_folder(
+            url=CRYSTALRELAX_DATA_URL,
+            output=data_path,
+            quiet=False,
+            use_cookies=False,
+        )
+
+    missing_files = _missing_crystalrelax_files(data_path)
+    if missing_files:
+        raise FileNotFoundError(
+            f"Downloaded crystalrelax data to {data_path}, but missing required files: {', '.join(missing_files)}"
+        )
+    return data_path
 
 
 class BinaryCompoundRelaxing(RLTask):
@@ -29,19 +82,9 @@ class BinaryCompoundRelaxing(RLTask):
     log_custom_metrics: bool = True
     custom_metrics: dict = field(default_factory=dict)
 
-    @staticmethod
-    def _has_local_files(dataset_dir: str) -> bool:
-        return os.path.exists(os.path.join(dataset_dir, "src-train.txt")) and os.path.exists(
-            os.path.join(dataset_dir, "tgt-train.txt")
-        )
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.dataset_id_or_path = expand_path(self.dataset_id_or_path)
-        if not os.path.exists(self.dataset_id_or_path):
-            os.makedirs(self.dataset_id_or_path)
-        if not self._has_local_files(self.dataset_id_or_path):
-            download_data(self.dataset_id_or_path)
+        self.dataset_id_or_path = download_crystalrelax_data(self.dataset_id_or_path)
 
         self.src_train_file = os.path.join(self.dataset_id_or_path, "src-train.txt")
         self.tgt_train_file = os.path.join(self.dataset_id_or_path, "tgt-train.txt")
@@ -66,6 +109,8 @@ class BinaryCompoundRelaxing(RLTask):
         self.custom_metrics = {
             "val/rewards": [],
         }
+
+        # Dataset here: /iopsstor/store/cscs/swissai/a05/chem/binary_compound_relaxing
 
     @classmethod
     def _get_mace_device(cls) -> str:
