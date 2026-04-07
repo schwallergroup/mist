@@ -16,5 +16,6 @@ Modules Reference
    tasks/rxn_replacement
    tasks/rxn_naming
    tasks/rxn_truefalse
+   tasks/crystalrelax
    tasks/template
    tasks/smi_permute

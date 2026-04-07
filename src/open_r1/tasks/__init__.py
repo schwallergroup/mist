@@ -26,3 +26,10 @@ CHEMTASKS = {
     "rxn_naming": Smiles2Name,
     "rxn_truefalse": ReactionTrueFalse,
 }
+
+try:
+    from .crystal_structure.relaxing import BinaryCompoundRelaxing
+
+    CHEMTASKS["crystalrelax"] = BinaryCompoundRelaxing
+except ImportError:
+    pass
