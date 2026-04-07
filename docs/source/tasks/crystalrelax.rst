@@ -51,6 +51,14 @@ The task reads paired text files with multi-line CIF records separated by blank 
 - `src-train.txt / src-test.txt`: Each record is a serialized CIF string of a perturbed binary structure.
 - `tgt-train.txt / tgt-test.txt`: Each record is the ground‑truth CIF string after DFT relaxation.
 
+Dataset
+-------
+
+The CrystalRelax dataset is published on figshare:
+
+- DOI: https://doi.org/10.6084/m9.figshare.31948860
+- Download URL: https://figshare.com/ndownloader/articles/31948860/versions/1
+
 Task
 ----------------
 Generate a structure with lower internal energy.
